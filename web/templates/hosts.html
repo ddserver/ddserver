@@ -1,0 +1,56 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+  <div class="row">
+    <div class="span12"><h1>Manage Hostnames</h1></div>
+  </div>
+  
+  <div class="row">
+    <div class="span6">
+      <h3>Your Hostnames</h3>
+      <table class="table table-bordered table-striped">
+        <tr>
+          <th>Hostname</th>
+          <th width="20%">Address</th>
+          <th width="135px">Updated</th>
+          <th width="65px">Actions</th>
+        </tr>
+      {% if hosts %}
+        {% for h in hosts %}
+          <tr>
+            <td>{{h['hostname']}}</td>
+            <td>{{h['address']}}</td>
+            <td>{{h['updated']}}</td>
+            <td>
+              <form action="/hosts" method="post">
+                <input type="hidden" name="hostid" value="{{h['id']}}">
+                <input type="submit" class="btn btn-danger" value="Delete">
+              </form>
+            </td>
+          </tr>  
+        {% endfor %}
+      {% else %}
+        <tr><td colspan="4">None</td></tr>
+      {% endif %}  
+      </table>
+    </div>
+    
+    <div class="span6">
+      <h3>Add Hostname</h3>
+      <form class="form-horizontal" action="/hosts/add" method="post">
+        <div class="control-group box">
+          <label class="control-label control-label-small" for="inputHostname">Hostname</label>
+          <div class="controls">
+            <div class="input-prepend">
+              <span class="add-on"><i class="icon-th-large"></i></span>
+              <input type="text" id="inputHostname" placeholder="Hostname" name="hostname">
+            </div>
+            <input type="submit" class="btn btn-success" value="Add">
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+  
+{% endblock %}

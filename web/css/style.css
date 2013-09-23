@@ -1,0 +1,26 @@
+/*
+ * Copyright 2012 Sven Reissmann <sven@0x80.io>
+ *
+ * This file is part of ddserver. It is licensed under the terms of the 
+ * GNU General Public License version 3. See <http://www.gnu.org/licenses/>.
+ */
+
+.main {
+  margin-top: 60px;
+  padding: 20px;
+}
+
+h1 {
+  font-size: 30px;
+}
+
+h3 {
+  font-size: 20px;
+} 
+
+.box {
+  border: 1px solid #ddd;
+  background: #f9f9f9;
+  border-radius: 5px;
+  padding: 10px;
+}

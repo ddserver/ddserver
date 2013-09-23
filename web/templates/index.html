@@ -1,0 +1,33 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+  <div class="row">
+    <div class="span12"><h1>Welcome to ddserver</h1></div>
+  </div>
+
+  <div class="row">
+    <div class="span6">
+      <h3>About</h3>
+      <p>
+        This application allows you to specify hostnames in a dynamic DNS zone.
+        It can be used, to set a domain name for dynamic IP addresses, allowing 
+        you to access those addresses by name, even if the IP address changes.
+      </p>
+      <p>
+        The update protocol of this application is compatible to the dyndns2
+        protocol, allowing you to use your homerouters DDNS service or a tool
+        like ddclient to send updates of your address.
+      </p>
+    </div>
+    
+    <div class="span6">
+      <h3>Developers</h3>
+      <p>
+        Sven Reissmann &lt;sven@0x80.io&gt;<br>
+        Dustin Frisch &lt;fooker@lab.sh&gt;
+      </p>
+    </div>
+  </div>  
+  
+{% endblock %}
