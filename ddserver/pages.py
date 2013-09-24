@@ -99,6 +99,65 @@ def account_display(db):
 
 
 
+@route('/account', method = 'POST')
+def account_edit(db):
+  ''' display account information.
+  '''
+  session = request.environ.get('beaker.session')
+
+  if 'username' not in session:
+    redirect('/')
+
+  email = request.POST.get('email', '')
+  pass1 = request.POST.get('password1', '')
+  pass2 = request.POST.get('password2', '')
+
+  # email address may not be empty
+  if email != '':
+    db.execute('UPDATE users SET email = %s WHERE id = %s',
+               (email, session['userid'],))
+    session['msg'] = 'Ok, done.'
+
+    # if a password was entered, is long enough and matches the retype
+    # field, it gets encrypted and updated in mysql
+    if pass1 == pass2:
+      if pass1 != '':
+        if len(pass1) >= int(Config().limits['passwd_min_chars']):
+          newpass = pwd.encrypt(pass1)
+          db.execute('UPDATE users SET password = %s WHERE id = %s',
+                     (newpass, session['userid'],))
+          session['msg'] = 'Ok, done.'
+
+        else:
+          session['msg'] = 'The password you entered is to short (use at least %s characters).' % Config().limits['passwd_min_chars']
+
+    else:
+      session['msg'] = 'The passwords you entered do not match.'
+
+  else:
+    session['msg'] = 'The email address can not be empty.'
+
+  session.save()
+  redirect('/account')
+
+
+
+@route('/account/delete', method = 'POST')
+def account_delete(db):
+  ''' display account information.
+  '''
+  session = request.environ.get('beaker.session')
+
+  if 'username' not in session:
+    redirect('/')
+
+  db.execute('DELETE FROM users WHERE id = %s LIMIT 1', (session['userid'],))
+  session['msg'] = 'Ok. Bye bye.'
+
+  logout()
+
+
+
 @route('/hosts')
 def hosts_display(db):
   ''' display the users hostnames and a form for adding new ones.
