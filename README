@@ -1,0 +1,7 @@
+ddserver is a server-side application for dynamic DNS management.
+
+It allows you to specify names inside a dynamic DNS zone, allowing you to 
+access hosts with dynamic IP addresses by the same name, even if the IP 
+address changes. Updates of the IP addresses are performed using the Dynamic 
+DNS Update Protocol, allowing homerouters that provide a DDNS client service 
+or a tool like ddclient to send updates of the IP address.
