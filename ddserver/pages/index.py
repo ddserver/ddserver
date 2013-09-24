@@ -17,33 +17,33 @@ You should have received a copy of the GNU General Public License
 along with ddserver.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
-from beaker.middleware import SessionMiddleware
+import os
 
-import bottle
-import bottle_mysql
+from bottle import route, request, static_file
 
-from ddserver.config import Config
-from ddserver.pages import *
+from ddserver import templates
 
 
 
-session_opts = {
-    'session.cookie_expires': True
-}
+@route('/static/<path:path>')
+def static(path):
+  ''' provides a route to static files (css, images)
+  '''
+  return static_file(path, os.path.join(os.getcwd(), 'resources', 'web'))
 
 
-plugin = bottle_mysql.Plugin(dbhost = Config().database['hostname'],
-                             dbuser = Config().database['username'],
-                             dbpass = Config().database['password'],
-                             dbname = Config().database['database'])
+
+@route('/')
+def index():
+  ''' display the index page
+  '''
+  session = request.environ.get('beaker.session')
+
+  return templates.get_template('index.html').render(session = session)
 
 
-app = bottle.app()
-app.install(plugin)
 
-app = SessionMiddleware(app, session_opts)
 
-bottle.run(app,
-           host = Config().server['address'],
-           port = Config().server['port'])
+
+
 

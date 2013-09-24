@@ -19,29 +19,126 @@ along with ddserver.  If not, see <http://www.gnu.org/licenses/>.
 
 from ConfigParser import SafeConfigParser
 
+import argparse
+
+
+
+# Define a argument parser
+parser = argparse.ArgumentParser()
+parser.add_argument('-v', '--verbose',
+                    default = False,
+                    const = True,
+                    action = 'store_const',
+                    dest = 'verbose',
+                    help = 'show more verbose messages')
+parser.add_argument('-c', '--config',
+                    type = str,
+                    dest = 'config',
+                    default = '/etc/ddserver.conf',
+                    help = 'path to the config file to load')
+
+parser_dns = parser.add_argument_group(title = 'DNS options')
+parser_dns.add_argument('--dns-suffix',
+                        dest = 'dns_suffix',
+                        type = str,
+                        metavar = 'SUFFIX',
+                        help = 'the dynamic domain suffix to remove from update requests')
+parser_dns.add_argument('--dns-max-hosts',
+                        dest = 'dns_max_hosts',
+                        type = str,
+                        metavar = 'MAX_HOSTS',
+                        help = 'the maximum number of hosts per user')
+
+parser_wsgi = parser.add_argument_group(title = 'WSGI options')
+parser_wsgi.add_argument('--wsgi-host',
+                         dest = 'wsgi_host',
+                         type = str,
+                         default = '',
+                         metavar = 'HOST',
+                         help = 'the WSGI host to listen on')
+parser_wsgi.add_argument('--wsgi-port',
+                         dest = 'wsgi_port',
+                         type = int,
+                         default = 80,
+                         metavar = 'PORT',
+                         help = 'the WSGI port to listen on')
+parser_wsgi.add_argument('--wsgi-standalone',
+                         dest = 'wsgi_standalone',
+                         default = False,
+                         const = True,
+                         action = 'store_const',
+                         help = 'run in stand-alone mode')
+
+parser_db = parser.add_argument_group(title = 'Database options')
+parser_db.add_argument('--db-host',
+                       dest = 'database_host',
+                       type = str,
+                       default = 'localhost',
+                       metavar = 'DB_HOST',
+                       help = 'the database host to connect to')
+parser_db.add_argument('--db-port',
+                       dest = 'database_port',
+                       type = int,
+                       default = 3306,
+                       metavar = 'DB_PORT',
+                       help = 'the database port to connect to')
+parser_db.add_argument('--db-name',
+                       dest = 'database_name',
+                       type = str,
+                       default = 'ddserver',
+                       metavar = 'DB_HOST',
+                       help = 'the database name to connect to')
+parser_db.add_argument('--db-user',
+                       dest = 'database_username',
+                       type = str,
+                       default = 'ddserver',
+                       metavar = 'DB_USER',
+                       help = 'the database username to connect with')
+parser_db.add_argument('--db-pass',
+                       dest = 'database_password',
+                       type = str,
+                       required = True,
+                       metavar = 'DB_PASS',
+                       help = 'the database password to connect with')
+
+parser_auth = parser.add_argument_group(title = 'Authentication options')
+parser_auth.add_argument('--auth-passwd-min-chars',
+                         dest = 'auth_passwd_min_chars',
+                         type = int,
+                         metavar = 'AUTH_PASSWD_MIN_CHARS',
+                         help = 'the minimal number of password characters')
+
+
 
 
 class Config(object):
-  ''' Allows to read configuration values in form Config().section['key']
-      from the configuration file config/settings.conf
+  ''' Allows to read configuration values in form Config.section.key
+      from the configuration file.
   '''
-  __instance = None
 
+  def __init__(self):
+    # Parse the command line arguments
+    args = parser.parse_args()
 
-  def __new__(cls, *args, **kwargs):
-    if cls.__instance is None:
-      cls.__instance = object.__new__(cls)
-      cls.__instance.__init()
-
-    return cls.__instance
-
-
-  def __init(self):
+    # Load the config file
     self.__parser = SafeConfigParser()
-    self.__parser.read('config/settings.conf')
+    self.__parser.read(args.config)
+
+    # Apply the config from the command line
+    for key, value in vars(args).iteritems():
+      if not '_' in key:
+        section, option = 'general', key
+
+      else:
+        section, option = key.split('_', 1)
+
+      if section not in self.__parser.sections():
+        self.__parser.add_section(section)
+
+      self.__parser.set(section, option, str(value))
 
 
-  def __getattr__(self,
+  def __getitem__(self,
                   section):
     parser = self.__parser
 
@@ -52,10 +149,16 @@ class Config(object):
       def __getitem__(self, option):
         return parser.get(section, option)
 
+      def __getattr__(self, option):
+        return self[option]
+
       def __iter__(self):
         return iter(parser.items(section))
 
     return SectionWrapper()
+
+  def __getattr__(self, option):
+    return self[option]
 
 
   def has_section(self,
@@ -67,3 +170,7 @@ class Config(object):
           section,
           option):
     return self.__parser.get(section, option)
+
+
+
+config = Config()

@@ -17,11 +17,11 @@ You should have received a copy of the GNU General Public License
 along with ddserver.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
-from jinja2 import Environment, PackageLoader
+from jinja2 import Environment, FileSystemLoader
 
 
 
-templates = Environment(loader = PackageLoader('web', 'templates'))
+templates = Environment(loader = FileSystemLoader('resources/web/templates'))
 
 def getmsg(s):
   if 'msg' in s:
