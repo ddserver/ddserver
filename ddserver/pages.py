@@ -111,8 +111,11 @@ def hosts_display(db):
   db.execute('SELECT * FROM hosts WHERE user_id = %s', (session['userid'],))
   rows = db.fetchall()
 
-  return templates.get_template('hosts.html').render(session = session,
-                                                     hosts = rows)
+  template = templates.get_template('hosts.html')
+  return template.render(session = session,
+                         hosts = rows,
+                         origin = Config().dns['origin'],
+                         max_hostnames = Config().limits['max_hostnames'])
 
 
 
@@ -155,19 +158,38 @@ def hosts_add(db):
     redirect('/')
 
   hostname = request.POST.get('hostname', '')
+  address = request.POST.get('address', '')
+
+  # validate ip address
+  if address != '':
+    try:
+      formencode.validators.IPAddress().to_python(address)
+    except formencode.Invalid, e:
+      session['msg'] = e
+      session.save()
+      redirect('/hosts')
+
+  # validate hostname
+  try:
+    validators.Hostname().to_python(hostname)
+  except formencode.Invalid, e:
+    session['msg'] = e
+    session.save()
+    redirect('/hosts')
+
 
   db.execute('SELECT COUNT(hostname) AS count FROM hosts WHERE user_id = %s',
                  (session['userid'],))
   result = db.fetchone()
 
-  if result['count'] < Config().limits['max_hostnames']:
+  if result['count'] < int(Config().limits['max_hostnames']):
     if hostname != '':
       db.execute('SELECT hostname FROM hosts WHERE hostname = %s', (hostname,))
 
       if len(hostname) < 256:
         if db.fetchone() == None:
-          result = db.execute('INSERT INTO hosts SET hostname = %s, user_id = %s',
-                              (hostname, session['userid'],))
+          result = db.execute('INSERT INTO hosts SET hostname = %s, address = %s, user_id = %s',
+                              (hostname, address, session['userid'],))
 
           if result == 1:
             session['msg'] = 'Ok, done.'
@@ -185,7 +207,7 @@ def hosts_add(db):
       session['msg'] = 'No hostname specified.'
 
   else:
-    session['msg'] = 'You already have %s hostnames defined.', Config().limits['max_hostnames']
+    session['msg'] = 'You already have %s hostnames defined.' % Config().limits['max_hostnames']
 
   session.save()
   redirect('/hosts')

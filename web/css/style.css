@@ -5,22 +5,63 @@
  * GNU General Public License version 3. See <http://www.gnu.org/licenses/>.
  */
 
+/*
+ * main content
+ */
 .main {
-  margin-top: 60px;
+  margin-top: 40px;
   padding: 20px;
 }
 
+/*
+ * headings
+ */
 h1 {
-  font-size: 30px;
+  padding-top: 0px;
+  font-size: 28px;
+  border-bottom: 1px solid #ddd;
+  margin-bottom: 15px;
 }
 
 h3 {
-  font-size: 20px;
-} 
+  font-size: 16px;
+  padding-top: 0px;
+  margin-top: 0px;
+}
 
+/*
+ * sub content
+ */
 .box {
   border: 1px solid #ddd;
   background: #f9f9f9;
   border-radius: 5px;
-  padding: 10px;
+  padding: 20px 10px 10px 10px;
+  margin-bottom: 20px;
+}
+
+/*
+ * sub labels
+ */
+label span {
+  font-size: 75%;
+  color: #999;
+}
+
+p.j {
+  text-align: justify;
+}
+
+span.origin {
+  color: #999;
+}
+
+form {
+  margin: 0; 
+  padding:0;
+}
+
+td.noresults {
+  line-height: 50px;
+  text-align: center;
 }

@@ -6,7 +6,7 @@
     <div class="span12"><h1>Welcome to ddserver</h1></div>
   </div>
 
-  <div class="row">
+  <div class="row-fluid">
     <div class="span6">
       <h3>About</h3>
       <p>
@@ -19,15 +19,68 @@
         protocol, allowing you to use your homerouters DDNS service or a tool
         like ddclient to send updates of your address.
       </p>
-    </div>
-    
-    <div class="span6">
       <h3>Developers</h3>
       <p>
         Sven Reissmann &lt;sven@0x80.io&gt;<br>
         Dustin Frisch &lt;fooker@lab.sh&gt;
       </p>
     </div>
+    
+    
+    {% if 'username' not in session %}
+    <div class="span6">
+      <h3>Login</h3>
+      <div class="box">
+        <form class="form-horizontal" action="/login" method="post">
+          <div class="control-group">
+            <label class="control-label" for="loginUsername">Username</label>
+            <div class="controls">
+              <div class="input-prepend">
+                <span class="add-on"><i class="icon-user"></i></span>
+                <input type="text" id="loginUsername" placeholder="Username" name="username" required="required">
+              </div>
+            </div>
+          </div>
+          <div class="control-group">
+            <label class="control-label" for="loginPassword">Password</label>
+            <div class="controls">
+              <div class="input-prepend">
+                <span class="add-on"><i class="icon-lock"></i></span>
+                <input type="password" id="loginPassword" placeholder="Password" name="password" required="required">
+              </div>
+            </div>
+          </div>
+          <div class="control-group">
+            <div class="controls">
+              <button type="submit" class="btn btn-success btn-primary">Login</button>
+            </div>
+          </div>
+        </form>
+      </div>
+      
+      <h3>Sign up</h3>
+      <p>
+        If you are a member of <i>Cafe Chaos Computerclub Fulda (c4fd)</i> you 
+        may sign up for free. Otherwise, become a member :) 
+      </p>
+      <div class="box">
+        <form class="form-horizontal" action="/hosts/add" method="post">
+          <div class="control-group">
+            <label class="control-label" for="inputEmail">Your email address</label>
+            <div class="controls">
+              <div class="input-prepend">
+                <span class="add-on"><i class="icon-envelope"></i></span>
+                <input type="text" id="inputEmail" name="email" placeholder="user@example.com" required="required" type="email">
+              </div>
+              <button type="submit" class="btn btn-primary btn-success">Signup</button>
+            </div>
+          </div>
+        </form>
+      </div>
+      
+    </div>
+    {% endif %}
+    
   </div>  
   
 {% endblock %}

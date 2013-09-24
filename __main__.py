@@ -37,6 +37,7 @@ plugin = bottle_mysql.Plugin(dbhost = Config().database['hostname'],
                              dbpass = Config().database['password'],
                              dbname = Config().database['database'])
 
+
 app = bottle.app()
 app.install(plugin)
 
