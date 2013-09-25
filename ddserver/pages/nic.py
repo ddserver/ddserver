@@ -73,7 +73,7 @@ resp_911 = functools.partial(Response, '911', None)
 
 def update(db, username, password, hostnames, address):
     # Check if we get some credentials
-    if not request.auth:
+    if not username or not password:
         logger.warning('Missing credentials')
         return resp_badauth()
 
@@ -158,7 +158,11 @@ def get_update(db):
     offline = request.query.get('offline', 'NO') == 'YES'
 
     # Fetch the the credentials from HTTP header
-    username, password = request.auth
+    if request.auth:
+      username, password = request.auth
+
+    else:
+      username, password = None, None
 
     # Clear the address if the offline flag is set
     if offline:
