@@ -26,7 +26,6 @@ import argparse
 # Define a argument parser
 parser = argparse.ArgumentParser()
 parser.add_argument('-v', '--verbose',
-                    default = False,
                     const = True,
                     action = 'store_const',
                     dest = 'verbose',
@@ -53,18 +52,15 @@ parser_wsgi = parser.add_argument_group(title = 'WSGI options')
 parser_wsgi.add_argument('--wsgi-host',
                          dest = 'wsgi_host',
                          type = str,
-                         default = '',
                          metavar = 'HOST',
                          help = 'the WSGI host to listen on')
 parser_wsgi.add_argument('--wsgi-port',
                          dest = 'wsgi_port',
                          type = int,
-                         default = 80,
                          metavar = 'PORT',
                          help = 'the WSGI port to listen on')
 parser_wsgi.add_argument('--wsgi-standalone',
                          dest = 'wsgi_standalone',
-                         default = False,
                          const = True,
                          action = 'store_const',
                          help = 'run in stand-alone mode')
@@ -73,31 +69,26 @@ parser_db = parser.add_argument_group(title = 'Database options')
 parser_db.add_argument('--db-host',
                        dest = 'database_host',
                        type = str,
-                       default = 'localhost',
                        metavar = 'DB_HOST',
                        help = 'the database host to connect to')
 parser_db.add_argument('--db-port',
                        dest = 'database_port',
                        type = int,
-                       default = 3306,
                        metavar = 'DB_PORT',
                        help = 'the database port to connect to')
 parser_db.add_argument('--db-name',
                        dest = 'database_name',
                        type = str,
-                       default = 'ddserver',
                        metavar = 'DB_HOST',
                        help = 'the database name to connect to')
 parser_db.add_argument('--db-user',
                        dest = 'database_username',
                        type = str,
-                       default = 'ddserver',
                        metavar = 'DB_USER',
                        help = 'the database username to connect with')
 parser_db.add_argument('--db-pass',
                        dest = 'database_password',
                        type = str,
-                       required = True,
                        metavar = 'DB_PASS',
                        help = 'the database password to connect with')
 
@@ -126,6 +117,9 @@ class Config(object):
 
     # Apply the config from the command line
     for key, value in vars(args).iteritems():
+      if value is None:
+        continue
+
       if not '_' in key:
         section, option = 'general', key
 
