@@ -19,10 +19,9 @@ along with ddserver.  If not, see <http://www.gnu.org/licenses/>.
 
 from bottle import route, request, redirect
 
-import formencode
-
 from ddserver import templates
 from ddserver.config import config
+
 
 
 
@@ -62,13 +61,13 @@ def hosts_delete(db):
                         (hostid, session['userid'],))
 
     if result == 1:
-      session['msg'] = 'Ok, done.'
+      session['msg'] = ('success', 'Ok, done.')
 
     else:
-      session['msg'] = 'Error executing the requested action.'
+      session['msg'] = ('error', 'Error executing the requested action.')
 
   else:
-    session['msg'] = 'No Host-ID specified.'
+    session['msg'] = ('error', 'No Host-ID specified.')
 
   session.save()
   redirect('/hosts')
@@ -87,24 +86,6 @@ def hosts_add(db):
   hostname = request.POST.get('hostname', '')
   address = request.POST.get('address', '')
 
-  # validate ip address
-  if address != '':
-    try:
-      formencode.validators.IPAddress().to_python(address)
-    except formencode.Invalid, e:
-      session['msg'] = e
-      session.save()
-      redirect('/hosts')
-
-  # validate hostname
-  try:
-    validators.Hostname().to_python(hostname)
-  except formencode.Invalid, e:
-    session['msg'] = e
-    session.save()
-    redirect('/hosts')
-
-
   db.execute('SELECT COUNT(hostname) AS count FROM hosts WHERE user_id = %s',
                  (session['userid'],))
   result = db.fetchone()
@@ -122,19 +103,19 @@ def hosts_add(db):
             session['msg'] = 'Ok, done.'
 
           else:
-            session['msg'] = 'Error executing the requested action.'
+            session['msg'] = ('error', 'Error executing the requested action.')
 
         else:
-          session['msg'] = 'This hostname already exists.'
+          session['msg'] = ('error', 'This hostname already exists.')
 
       else:
-        session['msg'] = 'Hostname can be max. 255 characters long.'
+        session['msg'] = ('error', 'Hostname can be max. 255 characters long.')
 
     else:
-      session['msg'] = 'No hostname specified.'
+      session['msg'] = ('error', 'No hostname specified.')
 
   else:
-    session['msg'] = 'You already have %s hostnames defined.' % config.limits['max_hostnames']
+    session['msg'] = ('error', 'You already have %s hostnames defined.' % config.limits['max_hostnames'])
 
   session.save()
   redirect('/hosts')

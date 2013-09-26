@@ -20,9 +20,10 @@ along with ddserver.  If not, see <http://www.gnu.org/licenses/>.
 from passlib.apps import custom_app_context as pwd
 
 from bottle import route, request, redirect
+
 from ddserver import templates
 from ddserver.config import config
-
+from ddserver.pages.session import logout
 
 
 @route('/account')
@@ -69,16 +70,16 @@ def account_edit(db):
           newpass = pwd.encrypt(pass1)
           db.execute('UPDATE users SET password = %s WHERE id = %s',
                      (newpass, session['userid'],))
-          session['msg'] = 'Ok, done.'
+          session['msg'] = ('success', 'Ok, done.')
 
         else:
-          session['msg'] = 'The password you entered is to short (use at least %s characters).' % config.limits['passwd_min_chars']
+          session['msg'] = ('error', 'The password you entered is to short (use at least %s characters).' % config.limits['passwd_min_chars'])
 
     else:
-      session['msg'] = 'The passwords you entered do not match.'
+      session['msg'] = ('error', 'The passwords you entered do not match.')
 
   else:
-    session['msg'] = 'The email address can not be empty.'
+    session['msg'] = ('error', 'The email address can not be empty.')
 
   session.save()
   redirect('/account')
@@ -95,6 +96,6 @@ def account_delete(db):
     redirect('/')
 
   db.execute('DELETE FROM users WHERE id = %s LIMIT 1', (session['userid'],))
-  session['msg'] = 'Ok. Bye bye.'
+  session['msg'] = ('success', 'Ok. Bye bye.')
 
   logout()

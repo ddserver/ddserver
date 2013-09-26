@@ -32,11 +32,11 @@
   </div>
   
   <div class="container main">
-    {% set msg = getmsg(session) %}
+    {% set msg = getmsg() %}
     {% if msg %}
-        <div class="alert alert-block">
+        <div class="alert alert-block alert-{{msg[0]}}">
           <a class="close" data-dismiss="alert" href="#">×</a>
-            {{msg}}
+            {{msg[1]}}
         </div>
     {% endif %}
     

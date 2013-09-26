@@ -39,7 +39,12 @@ def login(db):
   if row and pwd.verify(password, row['password']):
     session['username'] = row['username']
     session['userid'] = row['id']
-    session.save()
+    session['msg'] = ('success', 'Welcome, %s' % row['username'])
+
+  else:
+    session['msg'] = ('error', 'Login incorrect.')
+
+  session.save()
 
   redirect('/')
 

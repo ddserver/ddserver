@@ -17,16 +17,21 @@ You should have received a copy of the GNU General Public License
 along with ddserver.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
-from jinja2 import Environment, FileSystemLoader
+import bottle
+
+from jinja2 import Environment, PackageLoader
 
 
 
-templates = Environment(loader = FileSystemLoader('resources/web/templates'))
+templates = Environment(loader = PackageLoader('web', 'templates'))
 
-def getmsg(s):
-  if 'msg' in s:
-    msg = s['msg']
-    s['msg'] = None
+
+def getmsg():
+  session = bottle.request.environ.get('beaker.session')
+  if 'msg' in session:
+    msg = session['msg']
+    del session['msg']
+    session.save()
     return msg
 
 templates.globals['getmsg'] = getmsg
