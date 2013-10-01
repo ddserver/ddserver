@@ -24,6 +24,7 @@ from bottle import route, request
 
 from passlib.apps import custom_app_context as pwd
 
+from ddserver.db import database as db
 from ddserver.config import config
 
 
@@ -71,19 +72,20 @@ resp_911 = functools.partial(Response, '911', None)
 
 
 
-def update(db, username, password, hostnames, address):
+def update(username, password, hostnames, address):
     # Check if we get some credentials
     if not username or not password:
         logger.warning('Missing credentials')
         return resp_badauth()
 
     # Try to get user ID from database
-    db.execute('''
-        SELECT `id`, `password`
-        FROM `users`
-        WHERE `username` = %(username)s
-    ''', {'username': username})
-    user = db.fetchone()
+    with db.cursor() as cur:
+      cur.execute('''
+          SELECT `id`, `password`
+          FROM `users`
+          WHERE `username` = %(username)s
+      ''', {'username': username})
+      user = cur.fetchone()
 
     # Check if we have a valid user
     if not user or not pwd.verify(password, user['password']):
@@ -102,14 +104,15 @@ def update(db, username, password, hostnames, address):
         logger.debug('Fetching host entry for %s', hostname)
 
         # Get the host entry for the current hostname from the database
-        db.execute('''
-            SELECT `id`, `address`
-            FROM `hosts`
-            WHERE `user_id` = %(user_id)s
-              AND `hostname` = %(hostname)s
-        ''', {'user_id': user['id'],
-              'hostname': hostname})
-        host = db.fetchone()
+        with db.cursor() as cur:
+          cur.execute('''
+              SELECT `id`, `address`
+              FROM `hosts`
+              WHERE `user_id` = %(user_id)s
+                AND `hostname` = %(hostname)s
+          ''', {'user_id': user['id'],
+                'hostname': hostname})
+          host = cur.fetchone()
 
         # Check if we got a host entry for the queried hostname
         if not host:
@@ -126,13 +129,14 @@ def update(db, username, password, hostnames, address):
             continue
 
         # Update the host entry
-        db.execute('''
-            UPDATE `hosts`
-            SET `address` = %(address)s,
-                `updated` = CURRENT_TIMESTAMP
-            WHERE `id` = %(id)s
-        ''', {'id': host['id'],
-              'address': address})
+        with db.cursor() as cur:
+          cur.execute('''
+              UPDATE `hosts`
+              SET `address` = %(address)s,
+                  `updated` = CURRENT_TIMESTAMP
+              WHERE `id` = %(id)s
+          ''', {'id': host['id'],
+                'address': address})
 
         logger.debug('Host entry updated')
 
@@ -150,7 +154,7 @@ def get_ip():
 
 
 @route('/nic/update')
-def get_update(db):
+def get_update():
     # Extract the hostnames separated by comma, the new IP address and the
     # deletion flag from the query
     hostnames = request.query.get('hostname', None).split(',')
@@ -172,8 +176,7 @@ def get_update(db):
 
     # Call the update function
     try:
-        responses = update(db = db,
-                           username = username,
+        responses = update(username = username,
                            password = password,
                            hostnames = hostnames,
                            address = address)

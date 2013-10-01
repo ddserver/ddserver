@@ -19,14 +19,14 @@ along with ddserver.  If not, see <http://www.gnu.org/licenses/>.
 
 from bottle import route, request, redirect
 
+from ddserver.db import database as db
 from ddserver import templates
 from ddserver.config import config
 
 
 
-
 @route('/hosts')
-def hosts_display(db):
+def hosts_display():
   ''' display the users hostnames and a form for adding new ones.
   '''
   session = request.environ.get('beaker.session')
@@ -34,8 +34,13 @@ def hosts_display(db):
   if 'username' not in session:
     redirect('/')
 
-  db.execute('SELECT * FROM hosts WHERE user_id = %s', (session['userid'],))
-  rows = db.fetchall()
+  with db.cursor() as cur:
+    cur.execute('''
+        SELECT *
+        FROM hosts
+        WHERE user_id = %(user_id)s
+    ''', {'user_id': session['userid']})
+    rows = cur.fetchall()
 
   template = templates.get_template('hosts.html')
   return template.render(session = session,
@@ -46,7 +51,7 @@ def hosts_display(db):
 
 
 @route('/hosts', method = 'POST')
-def hosts_delete(db):
+def hosts_delete():
   ''' delete a hostname.
   '''
   session = request.environ.get('beaker.session')
@@ -57,8 +62,14 @@ def hosts_delete(db):
   hostid = request.POST.get('hostid', '')
 
   if hostid != '':
-    result = db.execute('DELETE FROM hosts WHERE id = %s AND user_id = %s',
-                        (hostid, session['userid'],))
+    with db.cursor() as cur:
+      result = cur.execute('''
+          DELETE
+          FROM hosts
+          WHERE id = %(id)s
+            AND user_id = %(user_id)s
+      ''', {'id': hostid,
+            'user_id': session['userid']})
 
     if result == 1:
       session['msg'] = ('success', 'Ok, done.')
@@ -75,7 +86,7 @@ def hosts_delete(db):
 
 
 @route('/hosts/add', method = 'POST')
-def hosts_add(db):
+def hosts_add():
   ''' add a new hostname
   '''
   session = request.environ.get('beaker.session')
@@ -86,36 +97,40 @@ def hosts_add(db):
   hostname = request.POST.get('hostname', '')
   address = request.POST.get('address', '')
 
-  db.execute('SELECT COUNT(hostname) AS count FROM hosts WHERE user_id = %s',
-                 (session['userid'],))
-  result = db.fetchone()
+  with db.cursor() as cur:
+    cur.execute('''
+        SELECT COUNT(hostname) AS count
+        FROM hosts
+        WHERE user_id = %(user_id)s
+    ''', {'user_id' : session['userid']})
+    result = cur.fetchone()
 
-  if result['count'] < int(config.dns.max_hosts):
-    if hostname != '':
-      db.execute('SELECT hostname FROM hosts WHERE hostname = %s', (hostname,))
+    if result['count'] < int(config.dns.max_hosts):
+      if hostname != '':
+        cur.execute('SELECT hostname FROM hosts WHERE hostname = %s', (hostname,))
 
-      if len(hostname) < 256:
-        if db.fetchone() == None:
-          result = db.execute('INSERT INTO hosts SET hostname = %s, address = %s, user_id = %s',
-                              (hostname, address, session['userid'],))
+        if len(hostname) < 256:
+          if cur.fetchone() == None:
+            result = cur.execute('INSERT INTO hosts SET hostname = %s, address = %s, user_id = %s',
+                                 (hostname, address, session['userid'],))
 
-          if result == 1:
-            session['msg'] = ('success', 'Ok, done.')
+            if result == 1:
+              session['msg'] = ('success', 'Ok, done.')
+
+            else:
+              session['msg'] = ('error', 'Error executing the requested action.')
 
           else:
-            session['msg'] = ('error', 'Error executing the requested action.')
+            session['msg'] = ('error', 'This hostname already exists.')
 
         else:
-          session['msg'] = ('error', 'This hostname already exists.')
+          session['msg'] = ('error', 'Hostname can be max. 255 characters long.')
 
       else:
-        session['msg'] = ('error', 'Hostname can be max. 255 characters long.')
+        session['msg'] = ('error', 'No hostname specified.')
 
     else:
-      session['msg'] = ('error', 'No hostname specified.')
-
-  else:
-    session['msg'] = ('error', 'You already have %s hostnames defined.' % config.limits['max_hostnames'])
+      session['msg'] = ('error', 'You already have %s hostnames defined.' % config.limits['max_hostnames'])
 
   session.save()
   redirect('/hosts')

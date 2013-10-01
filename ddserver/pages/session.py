@@ -21,10 +21,12 @@ from passlib.apps import custom_app_context as pwd
 
 from bottle import route, request, redirect
 
+from ddserver.db import database as db
+
 
 
 @route('/login', method = 'POST')
-def login(db):
+def login():
   ''' handles user authentication. redirects to index in any case.
   '''
   session = request.environ.get('beaker.session')
@@ -32,9 +34,10 @@ def login(db):
   username = request.POST.get('username', '')
   password = request.POST.get('password', '')
 
-  db.execute('SELECT id, username, password FROM users WHERE username = %s',
-             (username,))
-  row = db.fetchone()
+  with db.cursor() as cur:
+    cur.execute('SELECT id, username, password FROM users WHERE username = %s',
+                (username,))
+    row = cur.fetchone()
 
   if row and pwd.verify(password, row['password']):
     session['username'] = row['username']

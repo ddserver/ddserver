@@ -39,7 +39,6 @@ setuptools.setup(
 
     install_requires = [
         'beaker >= 1.6',
-        'bottle-mysql >= 0.1',
         'bottle >= 0.11',
         'jinja2 >= 2.6',
         'formencode >= 1.2',

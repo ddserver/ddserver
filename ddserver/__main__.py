@@ -25,6 +25,7 @@ import bottle_mysql
 import logging
 
 from ddserver.config import config
+from ddserver.db import database
 
 from ddserver.pages import *
 from ddserver.pages.index import *
@@ -48,18 +49,15 @@ def main():
   if config.dns.suffix and not config.dns.suffix.startswith('.'):
       config.dns.suffix = '.%s' % config.dns.suffix
 
+  # Connect to the database
+  database.setup(dbhost = config.database.host,
+                 dbport = int(config.database.port),
+                 dbname = config.database.name,
+                 dbuser = config.database.username,
+                 dbpass = config.database.password)
+
   # Get the bottle application
   app = bottle.app()
-
-  # Connect to the database
-  database = bottle_mysql.MySQLPlugin(dbhost = config.database.host,
-                                      dbport = int(config.database.port),
-                                      dbname = config.database.name,
-                                      dbuser = config.database.username,
-                                      dbpass = config.database.password,
-                                      autocommit = True)
-  app.install(database)
-
   app = SessionMiddleware(app, {'session.cookie_expires': True})
 
   # Start web server and run it

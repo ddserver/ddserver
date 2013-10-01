@@ -21,13 +21,14 @@ from passlib.apps import custom_app_context as pwd
 
 from bottle import route, request, redirect
 
+from ddserver.db import database as db
 from ddserver import templates
 from ddserver.config import config
 from ddserver.pages.session import logout
 
 
 @route('/account')
-def account_display(db):
+def account_display():
   ''' display account information.
   '''
   session = request.environ.get('beaker.session')
@@ -35,8 +36,13 @@ def account_display(db):
   if 'username' not in session:
     redirect('/')
 
-  db.execute('SELECT * FROM users WHERE username = %s', (session['username'],))
-  row = db.fetchone()
+  with db.cursor() as cur:
+    cur.execute('''
+      SELECT *
+      FROM users
+      WHERE username = %(username)s
+    ''', {'username' : session['username']})
+    row = cur.fetchone()
 
   return templates.get_template('account.html').render(session = session,
                                                        data = row)
@@ -44,7 +50,7 @@ def account_display(db):
 
 
 @route('/account', method = 'POST')
-def account_edit(db):
+def account_edit():
   ''' display account information.
   '''
   session = request.environ.get('beaker.session')
@@ -58,9 +64,15 @@ def account_edit(db):
 
   # email address may not be empty
   if email != '':
-    db.execute('UPDATE users SET email = %s WHERE id = %s',
-               (email, session['userid'],))
-    session['msg'] = 'Ok, done.'
+    with db.cursor() as cur:
+      cur.execute('''
+        UPDATE users
+        SET email = %(email)s
+        WHERE id = %(id)s
+      ''', {'email': email,
+            'id': session['userid']})
+
+      session['msg'] = ('success', 'Ok, done.')
 
     # if a password was entered, is long enough and matches the retype
     # field, it gets encrypted and updated in mysql
@@ -68,9 +80,15 @@ def account_edit(db):
       if pass1 != '':
         if len(pass1) >= int(config.limits['passwd_min_chars']):
           newpass = pwd.encrypt(pass1)
-          db.execute('UPDATE users SET password = %s WHERE id = %s',
-                     (newpass, session['userid'],))
-          session['msg'] = ('success', 'Ok, done.')
+          with db.cursor() as cur:
+            cur.execute('''
+              UPDATE users
+              SET password = %(newpass)s
+              WHERE id = %(id)s
+            ''', {'newpass' : newpass,
+                  'id': session['userid']})
+
+            session['msg'] = ('success', 'Ok, done.')
 
         else:
           session['msg'] = ('error', 'The password you entered is to short (use at least %s characters).' % config.limits['passwd_min_chars'])
@@ -87,7 +105,7 @@ def account_edit(db):
 
 
 @route('/account/delete', method = 'POST')
-def account_delete(db):
+def account_delete():
   ''' display account information.
   '''
   session = request.environ.get('beaker.session')
@@ -95,7 +113,14 @@ def account_delete(db):
   if 'username' not in session:
     redirect('/')
 
-  db.execute('DELETE FROM users WHERE id = %s LIMIT 1', (session['userid'],))
+  with db.cursor() as cur:
+    cur.execute('''
+      DELETE
+      FROM users
+      WHERE id = %(id)s
+      LIMIT 1
+    ''', {'id' : session['userid']})
+
   session['msg'] = ('success', 'Ok. Bye bye.')
 
   logout()
