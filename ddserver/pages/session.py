@@ -64,3 +64,17 @@ def logout():
   session.save()
 
   redirect('/')
+
+
+
+def authorized(func):
+  def __(*args, **kwargs):
+    session = request.environ.get('beaker.session')
+
+    if 'username' not in session:
+      redirect('/')
+
+    else:
+      func(*args, **kwargs)
+
+  return __
