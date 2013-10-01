@@ -22,17 +22,17 @@ from bottle import route, request, redirect
 from ddserver.db import database as db
 from ddserver import templates
 from ddserver.config import config
+from ddserver.pages.session import authorized
+
 
 
 
 @route('/hosts')
+@authorized
 def hosts_display():
   ''' display the users hostnames and a form for adding new ones.
   '''
   session = request.environ.get('beaker.session')
-
-  if 'username' not in session:
-    redirect('/')
 
   with db.cursor() as cur:
     cur.execute('''
@@ -51,13 +51,11 @@ def hosts_display():
 
 
 @route('/hosts', method = 'POST')
+@authorized
 def hosts_delete():
   ''' delete a hostname.
   '''
   session = request.environ.get('beaker.session')
-
-  if 'username' not in session:
-    redirect('/')
 
   hostid = request.POST.get('hostid', '')
 
@@ -86,13 +84,11 @@ def hosts_delete():
 
 
 @route('/hosts/add', method = 'POST')
+@authorized
 def hosts_add():
   ''' add a new hostname
   '''
   session = request.environ.get('beaker.session')
-
-  if 'username' not in session:
-    redirect('/')
 
   hostname = request.POST.get('hostname', '')
   address = request.POST.get('address', '')
