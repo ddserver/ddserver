@@ -1,4 +1,9 @@
-.project
-.pydevproject
+/build/
+/dist/
+
+/ddserver.egg-info/
+
+/.project
+/.pydevproject
+
 *.pyc
-*/*.pyc
