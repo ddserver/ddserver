@@ -109,16 +109,15 @@ def hosts_add():
       if hostname != '':
         cur.execute('SELECT hostname FROM hosts WHERE hostname = %s', (hostname,))
 
-        if len(hostname) < 256:
-          if cur.fetchone() == None:
-            result = cur.execute('INSERT INTO hosts SET hostname = %s, address = %s, user_id = %s',
-                                 (hostname, address, session['userid'],))
+    if result['count'] < int(config.dns.max_hosts):
+      if hostname != '':
+        cur.execute('SELECT hostname FROM hosts WHERE hostname = %s', (hostname,))
 
             if result == 1:
               session['msg'] = ('success', 'Ok, done.')
 
-            else:
-              session['msg'] = ('error', 'Error executing the requested action.')
+            if result == 1:
+              session['msg'] = ('success', 'Ok, done.')
 
           else:
             session['msg'] = ('error', 'This hostname already exists.')

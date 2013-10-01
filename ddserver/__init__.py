@@ -23,7 +23,7 @@ from jinja2 import Environment, PackageLoader
 
 
 
-templates = Environment(loader = PackageLoader('web', 'templates'))
+templates = Environment(loader = PackageLoader('resources.web', 'templates'))
 
 
 def getmsg():
