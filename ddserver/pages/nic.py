@@ -96,7 +96,7 @@ def update(db, username, password, hostnames, address):
     responses = []
     for hostname in hostnames:
         # Check if the hostname has suffix and strip it off
-        if hostname.endswith(config.dns.suffix):
+        if config.dns.suffix and hostname.endswith(config.dns.suffix):
             hostname = hostname[:-len(config.dns.suffix)]
 
         logger.debug('Fetching host entry for %s', hostname)

@@ -90,7 +90,7 @@ def hosts_add(db):
                  (session['userid'],))
   result = db.fetchone()
 
-  if result['count'] < int(config.limits['max_hostnames']):
+  if result['count'] < int(config.dns.max_hosts):
     if hostname != '':
       db.execute('SELECT hostname FROM hosts WHERE hostname = %s', (hostname,))
 
@@ -100,7 +100,7 @@ def hosts_add(db):
                               (hostname, address, session['userid'],))
 
           if result == 1:
-            session['msg'] = 'Ok, done.'
+            session['msg'] = ('success', 'Ok, done.')
 
           else:
             session['msg'] = ('error', 'Error executing the requested action.')

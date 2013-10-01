@@ -45,7 +45,7 @@ def main():
   logging.basicConfig(level = logging.DEBUG if config.general.verbose else logging.INFO)
 
   # Ensure the suffix has a leading dot
-  if not config.dns.suffix.startswith('.'):
+  if config.dns.suffix and not config.dns.suffix.startswith('.'):
       config.dns.suffix = '.%s' % config.dns.suffix
 
   # Get the bottle application
