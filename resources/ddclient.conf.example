@@ -1,0 +1,38 @@
+# Copyright 2013 Dustin Frisch<fooker@lab.sh>
+# 
+# This file is part of ddserver.
+# 
+# ddserver is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# ddserver is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with ddserver.  If not, see <http://www.gnu.org/licenses/>.
+
+#
+# This is an example configuration for ddclient
+#
+
+# == General options
+daemon=300
+syslog=yes
+mail=root
+mail-failure=root
+ssl=yes
+
+# == Update server
+# The USERNAME and PASSWORD below must be replaced with your credentials. The
+# DOMAIN1, and DOMAIN2 must contain your host names as specified in the front
+# end. Please note that there can multiple domains for the same IP separated
+# with a comma, but no space.
+protocol=noip, \
+server=dyn.c4fd.org, \
+login=USERNAME, \
+password=PASSWORD \
+DOMAIN1.dyn.c4fd.org,DOMAIN2.dyn.c4fd.org
