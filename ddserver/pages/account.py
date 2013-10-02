@@ -32,6 +32,7 @@ from ddserver.pages.session import authorized, logout
 def account_display():
   ''' display account information.
   '''
+  session = request.environ.get('beaker.session')
 
   with db.cursor() as cur:
     cur.execute('''
@@ -51,6 +52,7 @@ def account_display():
 def account_edit():
   ''' display account information.
   '''
+  session = request.environ.get('beaker.session')
 
   email = request.POST.get('email', '')
   pass1 = request.POST.get('password1', '')
@@ -72,7 +74,7 @@ def account_edit():
     # field, it gets encrypted and updated in mysql
     if pass1 == pass2:
       if pass1 != '':
-        if len(pass1) >= int(config.limits['passwd_min_chars']):
+        if len(pass1) >= int(config.auth_passwd_min_chars):
           newpass = pwd.encrypt(pass1)
           with db.cursor() as cur:
             cur.execute('''
@@ -85,7 +87,7 @@ def account_edit():
             session['msg'] = ('success', 'Ok, done.')
 
         else:
-          session['msg'] = ('error', 'The password you entered is to short (use at least %s characters).' % config.limits['passwd_min_chars'])
+          session['msg'] = ('error', 'The password you entered is to short (use at least %s characters).' % config.auth_passwd_min_chars)
 
     else:
       session['msg'] = ('error', 'The passwords you entered do not match.')
@@ -103,6 +105,7 @@ def account_edit():
 def account_delete():
   ''' display account information.
   '''
+  session = request.environ.get('beaker.session')
 
   with db.cursor() as cur:
     cur.execute('''

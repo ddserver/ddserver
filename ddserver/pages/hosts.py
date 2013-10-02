@@ -32,6 +32,7 @@ from ddserver.pages.session import authorized
 def hosts_display():
   ''' display the users hostnames and a form for adding new ones.
   '''
+  session = request.environ.get('beaker.session')
 
   with db.cursor() as cur:
     cur.execute('''
@@ -44,8 +45,8 @@ def hosts_display():
   template = templates.get_template('hosts.html')
   return template.render(session = session,
                          hosts = rows,
-                         origin = config.dns['suffix'],
-                         max_hostnames = config.dns['max_hosts'])
+                         origin = config.dns_suffix,
+                         max_hostnames = config.dns_max_hosts)
 
 
 
@@ -54,6 +55,7 @@ def hosts_display():
 def hosts_delete():
   ''' delete a hostname.
   '''
+  session = request.environ.get('beaker.session')
 
   hostid = request.POST.get('hostid', '')
 
@@ -86,6 +88,7 @@ def hosts_delete():
 def hosts_add():
   ''' add a new hostname
   '''
+  session = request.environ.get('beaker.session')
 
   hostname = request.POST.get('hostname', '')
   address = request.POST.get('address', '')
@@ -98,13 +101,13 @@ def hosts_add():
     ''', {'user_id' : session['userid']})
     result = cur.fetchone()
 
-    if result['count'] < int(config.dns.max_hosts):
+    if result['count'] < int(config.dns_max_hosts):
       if hostname != '':
         cur.execute('SELECT hostname FROM hosts WHERE hostname = %s', (hostname,))
 
-    if result['count'] < int(config.dns.max_hosts):
-      if hostname != '':
-        cur.execute('SELECT hostname FROM hosts WHERE hostname = %s', (hostname,))
+        if result['count'] < int(config.dns_max_hosts):
+          if hostname != '':
+            cur.execute('SELECT hostname FROM hosts WHERE hostname = %s', (hostname,))
 
             if result == 1:
               session['msg'] = ('success', 'Ok, done.')
@@ -122,7 +125,7 @@ def hosts_add():
         session['msg'] = ('error', 'No hostname specified.')
 
     else:
-      session['msg'] = ('error', 'You already have %s hostnames defined.' % config.limits['max_hostnames'])
+      session['msg'] = ('error', 'You already have %s hostnames defined.' % config.dns_max_hosts)
 
   session.save()
   redirect('/hosts')

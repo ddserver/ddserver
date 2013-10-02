@@ -43,32 +43,32 @@ logger = logging.getLogger('ddserver')
 
 def main():
   # Initialize logging
-  logging.basicConfig(level = logging.DEBUG if config.general.verbose else logging.INFO)
+  logging.basicConfig(level = logging.DEBUG if config.verbose else logging.INFO)
 
   # Ensure the suffix has a leading dot
-  if config.dns.suffix and not config.dns.suffix.startswith('.'):
-      config.dns.suffix = '.%s' % config.dns.suffix
+  if config.dns_suffix and not config.dns_suffix.startswith('.'):
+      config.dns_suffix = '.%s' % config.dns_suffix
 
   # Connect to the database
-  database.setup(dbhost = config.database.host,
-                 dbport = int(config.database.port),
-                 dbname = config.database.name,
-                 dbuser = config.database.username,
-                 dbpass = config.database.password)
+  database.setup(dbhost = config.database_host,
+                 dbport = int(config.database_port),
+                 dbname = config.database_name,
+                 dbuser = config.database_username,
+                 dbpass = config.database_password)
 
   # Get the bottle application
   app = bottle.app()
   app = SessionMiddleware(app, {'session.cookie_expires': True})
 
   # Start web server and run it
-  if config.general.verbose:
+  if config.verbose:
       bottle.debug(True)
 
-  if config.wsgi.standalone:
+  if config.wsgi_standalone:
       bottle.run(app = app,
-                 host = config.wsgi.host,
-                 port = config.wsgi.port,
-                 debug = config.general.verbose)
+                 host = config.wsgi_host,
+                 port = config.wsgi_port,
+                 debug = config.verbose)
 
 
 
