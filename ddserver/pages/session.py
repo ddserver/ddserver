@@ -75,6 +75,6 @@ def authorized(func):
       redirect('/')
 
     else:
-      func(*args, **kwargs)
+      return func(*args, **kwargs)
 
   return __

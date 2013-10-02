@@ -19,11 +19,13 @@ along with ddserver.  If not, see <http://www.gnu.org/licenses/>.
 
 from bottle import route, request, redirect
 
+import formencode
+
 from ddserver.db import database as db
 from ddserver import templates
 from ddserver.config import config
 from ddserver.pages.session import authorized
-
+from ddserver.validation.schemas import *
 
 
 
@@ -40,11 +42,11 @@ def hosts_display():
         FROM hosts
         WHERE user_id = %(user_id)s
     ''', {'user_id': session['userid']})
-    rows = cur.fetchall()
+    hosts = cur.fetchall()
 
   template = templates.get_template('hosts.html')
   return template.render(session = session,
-                         hosts = rows,
+                         hosts = hosts,
                          origin = config.dns_suffix,
                          max_hostnames = config.dns_max_hosts)
 
@@ -52,80 +54,39 @@ def hosts_display():
 
 @route('/hosts', method = 'POST')
 @authorized
+@validated(DelHostnameSchema, '/hosts')
 def hosts_delete():
   ''' delete a hostname.
   '''
   session = request.environ.get('beaker.session')
 
-  hostid = request.POST.get('hostid', '')
+  with db.cursor() as cur:
+    cur.execute('''
+        DELETE
+        FROM hosts
+        WHERE id = %(host_id)s
+    ''', {'host_id': request.POST.get('hostid')})
 
-  if hostid != '':
-    with db.cursor() as cur:
-      result = cur.execute('''
-          DELETE
-          FROM hosts
-          WHERE id = %(id)s
-            AND user_id = %(user_id)s
-      ''', {'id': hostid,
-            'user_id': session['userid']})
-
-    if result == 1:
-      session['msg'] = ('success', 'Ok, done.')
-
-    else:
-      session['msg'] = ('error', 'Error executing the requested action.')
-
-  else:
-    session['msg'] = ('error', 'No Host-ID specified.')
-
-  session.save()
-  redirect('/hosts')
+  session['msg'] = ('success', 'Ok, done.')
 
 
 
 @route('/hosts/add', method = 'POST')
 @authorized
+@validated(AddHostnameSchema, '/hosts')
 def hosts_add():
   ''' add a new hostname
   '''
   session = request.environ.get('beaker.session')
 
-  hostname = request.POST.get('hostname', '')
-  address = request.POST.get('address', '')
-
   with db.cursor() as cur:
     cur.execute('''
-        SELECT COUNT(hostname) AS count
-        FROM hosts
-        WHERE user_id = %(user_id)s
-    ''', {'user_id' : session['userid']})
-    result = cur.fetchone()
+      INSERT INTO `hosts`
+      SET `hostname` = %(hostname)s,
+          `address` = %(address)s,
+          `user_id` = %(user_id)s
+    ''', {'hostname': request.POST.get('hostname'),
+          'address': request.POST.get('address'),
+          'user_id' : session['userid']})
 
-    if result['count'] < int(config.dns_max_hosts):
-      if hostname != '':
-        cur.execute('SELECT hostname FROM hosts WHERE hostname = %s', (hostname,))
-
-        if result['count'] < int(config.dns_max_hosts):
-          if hostname != '':
-            cur.execute('SELECT hostname FROM hosts WHERE hostname = %s', (hostname,))
-
-            if result == 1:
-              session['msg'] = ('success', 'Ok, done.')
-
-            if result == 1:
-              session['msg'] = ('success', 'Ok, done.')
-
-          else:
-            session['msg'] = ('error', 'This hostname already exists.')
-
-        else:
-          session['msg'] = ('error', 'Hostname can be max. 255 characters long.')
-
-      else:
-        session['msg'] = ('error', 'No hostname specified.')
-
-    else:
-      session['msg'] = ('error', 'You already have %s hostnames defined.' % config.dns_max_hosts)
-
-  session.save()
-  redirect('/hosts')
+  session['msg'] = ('success', 'Ok, done.')
