@@ -35,7 +35,7 @@ def login():
 
   with db.cursor() as cur:
     cur.execute('''
-      SELECT id, username, password, active 
+      SELECT *
         FROM users 
        WHERE username = %(username)s
     ''', {'username': request.POST.get('username')})
@@ -45,6 +45,7 @@ def login():
     if row['active'] == True:
       session['username'] = row['username']
       session['userid'] = row['id']
+      session['admin'] = row['admin']
       session['msg'] = ('success', 'Welcome, %s' % row['username'])
 
     else:
@@ -63,6 +64,7 @@ def logout():
 
   del session['username']
   del session['userid']
+  del session['admin']
   session.save()
 
   redirect('/')
@@ -74,6 +76,23 @@ def authorized(func):
     session = request.environ.get('beaker.session')
 
     if 'username' not in session:
+      redirect('/')
+
+    else:
+      return func(*args, **kwargs)
+
+  return __
+
+
+
+def admin(func):
+  def __(*args, **kwargs):
+    session = request.environ.get('beaker.session')
+
+    if 'admin' not in session or session['admin'] != True:
+      session['msg'] = ('error', 'Sorry, you are no admin.')
+      session.save()
+
       redirect('/')
 
     else:

@@ -1,0 +1,43 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+  <div class="row-fluid">
+    <div class="span12"><h1>User management</h1></div>
+  </div>
+  
+  <div class="row-fluid">
+
+    {% if users %}
+    <div class="box">
+      <h3><i class="icon-tag"></i> Users waiting for activation</h3>
+      <table class="table table-bordered table-striped table-hover">
+        <tr>
+          <th>Username</th>
+          <th>Email</th>
+          <th width="160px">Created</th>
+          <th width="150px" colspan="2">Actions</th>
+        </tr>
+        {% for u in users %}
+          <tr>
+            <td>{{u['username']}}</td>
+            <td>{{u['email']}}</td>
+            <td>{{u['created']}}</td>
+            <td width="80px">
+              <form action="/hosts" method="post">
+                <input type="hidden" name="userid" value="{{u['id']}}">
+                <input type="submit" class="btn btn-success" value="Activate">
+              </form>
+            </td>
+            <td width="70px" style="border-left: 0px">
+              <button class="btn btn-danger">Delete</button>
+            </td>
+          </tr>  
+        {% endfor %}
+      </table>
+    </div>
+    {% endif %}
+    
+  </div>
+  
+{% endblock %}

@@ -32,6 +32,7 @@ from ddserver.pages.index import *
 from ddserver.pages.session import *
 from ddserver.pages.account import *
 from ddserver.pages.hosts import *
+from ddserver.pages.admin import *
 from ddserver.pages.nic import *
 
 
