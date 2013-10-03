@@ -29,6 +29,7 @@ CREATE TABLE `users` (
   `password`    VARCHAR(255)   NOT NULL,
   `email`       VARCHAR(255)   NOT NULL,
   `admin`       BOOLEAN        NOT NULL DEFAULT FALSE,
+  `active`      BOOLEAN        NOT NULL DEFAULT FALSE,
   `created`     TIMESTAMP      NOT NULL DEFAULT CURRENT_TIMESTAMP,
   
   INDEX (`username`)

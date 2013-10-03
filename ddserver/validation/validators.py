@@ -31,6 +31,7 @@ from ddserver.config import config
 
 class ValidHostname(validators.FancyValidator):
   ''' check for valid hostname
+      @TODO
   '''
   messages = {
     'too_short': 'Hostname can not be empty',
@@ -45,25 +46,14 @@ class ValidHostname(validators.FancyValidator):
 
   def validate_python(self, value, state):
     if len(value) < self.min:
-      raise Invalid(self.message("too_short", state), value, state)
+      raise Invalid(self.message("too_short", value), value, state)
 
     if len(value) > self.max:
-      raise Invalid(self.message("too_long", state), value, state)
+      raise Invalid(self.message("too_long", value), value, state)
 
     non_letters = self.letter_regex.sub('', value)
     if len(non_letters) != 0:
       raise Invalid(self.message('non_letter', value), value, state)
-
-    print value[-1:]
-    if int(value[0]) not in self.letter_range:
-      raise Invalid(self.message('first_letter', value), value, state)
-
-    print value[-1:]
-    print int(value[-1:])
-    if int(value[-1:]) not in self.letter_range:
-      raise Invalid(self.message('last_letter', value), value, state)
-
-
 
 
 
@@ -146,12 +136,12 @@ class ValidUsername(validators.FancyValidator):
 
   letter_regex = re.compile(r'[a-z0-9\-\.]')
 
-  def _validate_python(self, value, state, db):
+  def validate_python(self, value, state):
     if len(value) < self.min:
-      raise Invalid(self.message('too_short', state))
+      raise Invalid(self.message('too_short', value), value, state)
 
     if len(value) > self.max:
-      raise Invalid(self.message('too_long', state))
+      raise Invalid(self.message('too_long', value), value, state)
 
     non_letters = self.letter_regex.sub('', value)
     if len(non_letters) != 0:
@@ -173,9 +163,10 @@ class UniqueUsername(validators.FancyValidator):
           FROM users
           WHERE username = %(username)s
       ''', {'username': value})
+      result = cur.fetchone()
 
-      if cur.fetchone() != None:
-        raise Invalid(self.message('not_uniq', value), value, state)
+    if result != None:
+      raise Invalid(self.message('not_uniq', value), value, state)
 
 
 
@@ -189,5 +180,5 @@ class SecurePassword(validators.FancyValidator):
 
   def validate_python(self, value, state):
     if len(value) < int(config.auth_passwd_min_chars):
-      raise Invalid(self.message('too_short', state), value, state)
+      raise Invalid(self.message('too_short', value), value, state)
 

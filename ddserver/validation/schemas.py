@@ -84,7 +84,30 @@ class UpdateUserSchema(formencode.Schema):
 
 
 class UpdatePasswordSchema(formencode.Schema):
+  ''' schema for validation of the form for setting a new password
+  '''
   password = validators.SecurePassword(min = 8)
   password_confirm = formencode.validators.String()
   chained_validators = [formencode.validators.FieldsMatch('password',
                                                           'password_confirm')]
+
+
+class CreateUserSchema(formencode.Schema):
+  ''' schema for validation of the form for creating a new account
+  '''
+  username = formencode.All(validators.ValidUsername(min = 1,
+                                                     max = 255),
+                            validators.UniqueUsername())
+  email = formencode.validators.Email()
+  password = validators.SecurePassword(min = 8)
+  password_confirm = formencode.validators.String()
+  chained_validators = [formencode.validators.FieldsMatch('password',
+                                                          'password_confirm')]
+
+
+class LoginSchema(formencode.Schema):
+  ''' schema for validation of the login form 
+  '''
+  username = validators.ValidUsername(min = 1,
+                                      max = 255)
+  password = formencode.validators.String()
