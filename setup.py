@@ -42,7 +42,8 @@ setuptools.setup(
         'bottle >= 0.11',
         'jinja2 >= 2.6',
         'formencode >= 1.2',
-        'passlib >= 1.6'
+        'passlib >= 1.6',
+        'recaptcha-client >= 1.0'
     ],
 
     data_files = [

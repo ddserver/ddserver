@@ -19,7 +19,9 @@ along with ddserver.  If not, see <http://www.gnu.org/licenses/>.
 
 import re
 
-from bottle import request
+from bottle import request, response
+
+from recaptcha.client import captcha
 
 from formencode import validators
 from formencode.api import Invalid
@@ -181,4 +183,43 @@ class SecurePassword(validators.FancyValidator):
   def validate_python(self, value, state):
     if len(value) < int(config.auth_passwd_min_chars):
       raise Invalid(self.message('too_short', value), value, state)
+
+
+
+class ValidCaptcha(validators.FancyValidator):
+  ''' validate the recaptcha from the login form
+  '''
+  messages = {
+    'invalid': 'Captcha invalid'
+  }
+
+  field_names = None
+  validate_partial_form = True
+
+  __unpackargs__ = ('*', 'field_names')
+
+  def __init__(self, *args, **kw):
+    super(ValidCaptcha, self).__init__(*args, **kw)
+    if len(self.field_names) < 2:
+      raise TypeError('FieldsMatch() requires at least two field names')
+
+  def validate_partial(self, field_dict, state):
+    for name in self.field_names:
+      if name not in field_dict:
+        return
+    self.validate_python(field_dict, state)
+
+  def validate_python(self, field_dict, state):
+    print "lalala"
+    print self.field_names[0]
+    print self.field_names[1]
+
+#    response = captcha.submit(
+#        req.args['recaptcha_challenge_field'],
+#        req.args['recaptcha_response_field'],
+#        self.private_key,
+#        req.remote_addr,
+#        )
+
+
 

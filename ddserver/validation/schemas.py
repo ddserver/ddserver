@@ -95,6 +95,8 @@ class UpdatePasswordSchema(formencode.Schema):
 class CreateUserSchema(formencode.Schema):
   ''' schema for validation of the form for creating a new account
   '''
+  allow_extra_fields = True
+
   username = formencode.All(validators.ValidUsername(min = 1,
                                                      max = 255),
                             validators.UniqueUsername())
@@ -103,6 +105,8 @@ class CreateUserSchema(formencode.Schema):
   password_confirm = formencode.validators.String()
   chained_validators = [formencode.validators.FieldsMatch('password',
                                                           'password_confirm')]
+  # captcha = [validators.ValidCaptcha('recaptcha_challenge_field',
+  #                                   'recaptcha_response_field')]
 
 
 class LoginSchema(formencode.Schema):
