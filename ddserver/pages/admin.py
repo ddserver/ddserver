@@ -21,13 +21,13 @@ from bottle import route, request, redirect
 
 from ddserver.db import database as db
 from ddserver import templates
-from ddserver.pages.session import admin
+from ddserver.pages.session import authorized_admin
 from ddserver.validation.schemas import *
 
 
 
 @route('/admin')
-@admin
+@authorized_admin
 def pending_list():
   ''' display a list of users that are waiting for account activation
   '''

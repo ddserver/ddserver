@@ -24,13 +24,13 @@ import formencode
 from ddserver.db import database as db
 from ddserver import templates
 from ddserver.config import config
-from ddserver.pages.session import authorized
+from ddserver.pages.session import authorized_uesr
 from ddserver.validation.schemas import *
 
 
 
 @route('/hosts')
-@authorized
+@authorized_uesr
 def hosts_display():
   ''' display the users hostnames and a form for adding new ones.
   '''
@@ -53,7 +53,7 @@ def hosts_display():
 
 
 @route('/hosts', method = 'POST')
-@authorized
+@authorized_uesr
 @validated(DelHostnameSchema, '/hosts')
 def hosts_delete():
   ''' delete a hostname.
@@ -72,7 +72,7 @@ def hosts_delete():
 
 
 @route('/hosts/add', method = 'POST')
-@authorized
+@authorized_uesr
 @validated(AddHostnameSchema, '/hosts')
 def hosts_add():
   ''' add a new hostname

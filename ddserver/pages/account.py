@@ -23,14 +23,13 @@ from bottle import route, request
 
 from ddserver.db import database as db
 from ddserver import templates
-from ddserver.config import config
-from ddserver.pages.session import authorized, logout
+from ddserver.pages.session import authorized_uesr, logout
 from ddserver.validation.schemas import *
 
 
 
 @route('/account')
-@authorized
+@authorized_uesr
 def account_display():
   ''' display account information.
   '''
@@ -50,7 +49,7 @@ def account_display():
 
 
 @route('/account', method = 'POST')
-@authorized
+@authorized_uesr
 @validated(UpdateUserSchema, '/account')
 def account_edit():
   ''' display account information.
@@ -69,7 +68,7 @@ def account_edit():
 
 
 @route('/account/password', method = 'POST')
-@authorized
+@authorized_uesr
 @validated(UpdatePasswordSchema, '/account')
 def password_edit():
   ''' update the users password
@@ -91,7 +90,7 @@ def password_edit():
 
 
 @route('/account/delete', method = 'POST')
-@authorized
+@authorized_uesr
 def account_delete():
   ''' delete the users account
   '''
