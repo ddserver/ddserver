@@ -138,3 +138,13 @@ class LoginSchema(formencode.Schema):
   username = validators.ValidUsername(min = 1,
                                       max = 255)
   password = formencode.validators.String()
+
+
+class AddSuffixSchema(formencode.Schema):
+  suffixname = formencode.All(validators.ValidSuffix(min = 1,
+                                                       max = 255),
+                              validators.UniqueSuffix())
+
+
+class DelSuffixSchema(formencode.Schema):
+  suffixid = formencode.validators.Int(not_empty = True)

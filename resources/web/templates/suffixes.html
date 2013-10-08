@@ -1,0 +1,74 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+  <div class="row-fluid">
+    <div class="span12"><h1>Manage Suffixes</h1></div>
+  </div>
+  
+  <div class="row-fluid">
+    
+    <div class="box">
+      <div class="span12"><h3><i class="icon-tag"></i> Add new suffix</h3></div>
+      <div class="row-fluid">
+        <div class="span6">
+          <p class="j">
+            Suffixes are the zones, in which hostnames can be defined ($ORIGIN). When 
+            specifying a new hostname, the user can choose in which zone it should be.
+            By adding a suffix <i>example.org</i>, a user can create a hostname like
+            <i>myhost.example.org</i>.
+          </p>
+          <p>
+            Be aware, that no duplicates are allowed! Specifying a suffix here means,
+            users are allowed to add any RFC-compilant subdomain (i.e. <i>mail</i>) to 
+            it. None of the subdomains may appear in your regular powerdns database! 
+          </p>
+        </div>
+        <div class="span6">
+          <form class="form-horizontal" action="/admin/suffixes/add" method="post">
+            <div class="control-group">
+              <label class="control-label" for="inputSuffix">Suffix</label>
+              <div class="controls">
+                <div class="input-prepend">
+                  <span class="add-on"><i class="icon-th-large"></i></span>
+                  <input type="text" id="inputSuffix" placeholder="Suffix" name="suffixname" required="required">
+                </div>
+              </div>
+            </div>
+            <div class="control-group">
+              <div class="controls">
+                <button type="submit" class="btn btn-success btn-primary">Add suffix</button>
+                <button type="reset" class="btn">Cancel</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    {% if suffixes %}
+    <div class="box">
+      <h3><i class="icon-tag"></i> Your suffixes</h3>
+      <table class="table table-bordered table-striped table-hover">
+        <tr>
+          <th>Suffix</th>
+          <th width="100px">Actions</th>
+        </tr>
+        {% for s in suffixes %}
+          <tr>
+            <td>{{s['name']}}</td>
+            <td>
+              <form action="/admin/suffixes" method="post">
+                <input type="hidden" name="suffixid" value="{{s['id']}}">
+                <input type="submit" class="btn btn-danger" value="Delete">
+              </form>
+            </td>
+          </tr>  
+        {% endfor %}
+      </table>
+    </div>
+    {% endif %}
+    
+  </div>
+  
+{% endblock %}

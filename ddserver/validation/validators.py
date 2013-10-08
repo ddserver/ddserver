@@ -211,3 +211,48 @@ class ValidCaptcha(validators.FancyValidator):
 
 
 
+class ValidSuffix(validators.FancyValidator):
+  ''' check for valid suffix
+      @TODO validate hostname, tld, at least one dot, ...
+  '''
+  messages = {
+    'too_short': 'Suffix can not be empty',
+    'too_long': 'Suffix can not exceed 255 characters',
+    'non_letter': 'Suffix can only consist of a-z, 0-9, -, .'
+  }
+
+  letter_regex = re.compile(r'[a-z0-9\-\.]')
+  letter_range = range(97, 122)
+
+  def validate_python(self, value, state):
+    if len(value) < self.min:
+      raise Invalid(self.message("too_short", value), value, state)
+
+    if len(value) > self.max:
+      raise Invalid(self.message("too_long", value), value, state)
+
+    non_letters = self.letter_regex.sub('', value)
+    if len(non_letters) != 0:
+      raise Invalid(self.message('non_letter', value), value, state)
+
+
+
+class UniqueSuffix(validators.FancyValidator):
+  ''' check whether the entered entered is unique
+  '''
+  messages = {
+    'not_uniq': 'This suffix already exists.'
+  }
+
+  def validate_python(self, value, state):
+    with db.cursor() as cur:
+      cur.execute('''
+          SELECT name
+          FROM suffixes
+          WHERE name = %(suffixname)s
+      ''', {'suffixname': value})
+      result = cur.fetchone()
+
+    if result != None:
+      raise Invalid(self.message('not_uniq', value), value, state)
+

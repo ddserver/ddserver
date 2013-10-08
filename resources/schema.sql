@@ -44,8 +44,7 @@ CREATE TABLE `suffixes` (
   `id`          INT             NOT NULL AUTO_INCREMENT PRIMARY KEY,
   `name`        VARCHAR(255)    NOT NULL UNIQUE,
   
-  INDEX (`name`),
-  
+  INDEX (`name`)
 ) ENGINE=InnoDB DEFAULT CHARACTER SET utf8;
 
 
