@@ -66,3 +66,20 @@ def user_activate():
 
 
 
+@route('/admin/deleteUser', method = 'POST')
+@authorized_admin
+@validated(DeleteUserSchema, '/admin/inactiveUsers')
+def user_delete():
+  ''' activate a users account
+  '''
+  session = request.environ.get('beaker.session')
+
+  with db.cursor() as cur:
+    cur.execute('''
+      DELETE FROM users
+      WHERE `id` = %(user_id)s
+    ''', { 'user_id': request.POST.get('uid') })
+
+  session['msg'] = ('success', 'Ok, done.')
+
+
