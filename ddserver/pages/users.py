@@ -26,30 +26,39 @@ from ddserver.validation.schemas import *
 
 
 
-@route('/admin/inactiveUsers')
+@route('/admin/users/<mode>')
 @authorized_admin
-def inactive_users_display():
+def users_display(mode = 'all'):
   ''' display a list of users that are waiting for account activation
   '''
   session = request.environ.get('beaker.session')
 
+  if mode == 'admins':
+      where = 'WHERE `admin` = 1'
+
+  elif mode == 'inactive':
+      where = 'WHERE `active` = 0'
+
+  else:
+      where = 'WHERE 1 = 1'
+
   with db.cursor() as cur:
     cur.execute('''
-      SELECT *
-      FROM users
-      WHERE `active` = 0
-    ''')
+        SELECT *
+        FROM users
+    ''' + where)
     users = cur.fetchall()
 
-  template = templates.get_template('inactive.html')
+  template = templates.get_template('users.html')
   return template.render(session = session,
-                         users = users)
+                         users = users,
+                         mode = mode)
 
 
 
-@route('/admin/activateUser', method = 'POST')
+@route('/admin/users/activate', method = 'POST')
 @authorized_admin
-@validated(ActivateUserSchema, '/admin/inactiveUsers')
+@validated(IsUserSchema, '/admin/users/all')
 def user_activate():
   ''' activate a users account
   '''
@@ -66,9 +75,9 @@ def user_activate():
 
 
 
-@route('/admin/deleteUser', method = 'POST')
+@route('/admin/users/delete', method = 'POST')
 @authorized_admin
-@validated(DeleteUserSchema, '/admin/inactiveUsers')
+@validated(IsUserSchema, '/admin/users/all')
 def user_delete():
   ''' activate a users account
   '''
@@ -77,6 +86,44 @@ def user_delete():
   with db.cursor() as cur:
     cur.execute('''
       DELETE FROM users
+      WHERE `id` = %(user_id)s
+    ''', { 'user_id': request.POST.get('uid') })
+
+  session['msg'] = ('success', 'Ok, done.')
+
+
+
+@route('/admin/users/makeAdmin', method = 'POST')
+@authorized_admin
+@validated(IsUserSchema, '/admin/users/all')
+def user_mkadmin():
+  ''' activate a users account
+  '''
+  session = request.environ.get('beaker.session')
+
+  with db.cursor() as cur:
+    cur.execute('''
+      UPDATE users
+      SET `admin` = 1
+      WHERE `id` = %(user_id)s
+    ''', { 'user_id': request.POST.get('uid') })
+
+  session['msg'] = ('success', 'Ok, done.')
+
+
+
+@route('/admin/users/removeAdmin', method = 'POST')
+@authorized_admin
+@validated(IsUserSchema, '/admin/users/all')
+def user_rmadmin():
+  ''' activate a users account
+  '''
+  session = request.environ.get('beaker.session')
+
+  with db.cursor() as cur:
+    cur.execute('''
+      UPDATE users
+      SET `admin` = 0
       WHERE `id` = %(user_id)s
     ''', { 'user_id': request.POST.get('uid') })
 

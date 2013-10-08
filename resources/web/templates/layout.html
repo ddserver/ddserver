@@ -21,7 +21,7 @@
         <div class="nav-collapse collapse">
           <ul class="nav pull-right">
             {% if session['admin'] == 1 %}
-            <li><a href="/admin/inactiveUsers" title="Manage Users"><i class="icon-th-large icon-white"></i> Users</a></li>
+            <li><a href="/admin/users/all" title="Manage Users"><i class="icon-th-large icon-white"></i> Users</a></li>
             <li class="divider-vertical"></li>
             {% endif %}
             {% if 'username' in session %}

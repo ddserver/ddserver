@@ -76,16 +76,8 @@ class DelHostnameSchema(formencode.Schema):
                           validators.HostnameOwner())
 
 
-
-class ActivateUserSchema(formencode.Schema):
-  ''' schema for validation of the administrative user activation action
-  '''
-  uid = formencode.validators.Int(not_empty = True)
-
-
-
-class DeleteUserSchema(formencode.Schema):
-  ''' schema for validation of the administrative user delete action
+class IsUserSchema(formencode.Schema):
+  ''' schema for validating a user id
   '''
   uid = formencode.validators.Int(not_empty = True)
 
