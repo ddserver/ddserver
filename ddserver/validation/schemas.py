@@ -44,15 +44,13 @@ def validated(cls, target):
                                                      for k
                                                      in bottle.request.POST})
 
+        func(*args, **kwargs)
+
       except formencode.Invalid, e:
         session['msg'] = ('error', e)
 
-      else:
-        func(*args, **kwargs)
-
-      finally:
-        session.save()
-        bottle.redirect(target)
+      session.save()
+      bottle.redirect(target)
 
 
     return wrapped
