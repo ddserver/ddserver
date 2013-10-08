@@ -76,7 +76,9 @@ def authorized(var = 'username'):
     def __(*args, **kwargs):
       session = request.environ.get('beaker.session')
 
-      if var not in session or session[var]:
+      if var not in session or not session[var]:
+        session['msg'] = ('error', 'Not authorized!')
+        session.save()
         redirect('/')
 
       else:
