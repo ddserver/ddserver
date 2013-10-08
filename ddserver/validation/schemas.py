@@ -65,6 +65,8 @@ class AddHostnameSchema(formencode.Schema):
                                                      max = 255),
                             validators.UniqueHostname(),
                             validators.MaxHostnames())
+  suffix = formencode.All(formencode.validators.Int(not_empty = True),
+                          validators.ExistingSuffixId())
   address = formencode.validators.IPAddress()
 
 

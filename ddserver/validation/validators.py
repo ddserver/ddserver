@@ -122,9 +122,10 @@ class HostnameOwner(validators.FancyValidator):
         AND user_id = %(user_id)s
       ''', {'host_id': value,
             'user_id': session['userid']})
+      result = cur.fetchone()
 
-      if len(cur.fetchone()) != 1:
-        raise Invalid(self.message('nonexistend', value), value, state)
+    if len(result) != 1:
+      raise Invalid(self.message('nonexistend', value), value, state)
 
 
 
@@ -255,4 +256,25 @@ class UniqueSuffix(validators.FancyValidator):
 
     if result != None:
       raise Invalid(self.message('not_uniq', value), value, state)
+
+
+
+class ExistingSuffixId(validators.FancyValidator):
+  ''' check whether the entered entered is unique
+  '''
+  messages = {
+    'nonexistend': 'This suffix does not exist.'
+  }
+
+  def validate_python(self, value, state):
+    with db.cursor() as cur:
+      cur.execute('''
+          SELECT name
+          FROM suffixes
+          WHERE id = %(suffixid)s
+      ''', {'suffixid': value})
+      result = cur.fetchone()
+
+    if len(result) != 1:
+      raise Invalid(self.message('nonexistend', value), value, state)
 

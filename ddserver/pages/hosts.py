@@ -36,6 +36,16 @@ def hosts_display():
   '''
   session = request.environ.get('beaker.session')
 
+  # get available suffixes
+  with db.cursor() as cur:
+    cur.execute('''
+        SELECT *
+        FROM suffixes
+        WHERE 1 = 1
+    ''')
+    suffixes = cur.fetchall()
+
+  # get users hostnames
   with db.cursor() as cur:
     cur.execute('''
         SELECT *
@@ -47,6 +57,7 @@ def hosts_display():
   template = templates.get_template('hosts.html')
   return template.render(session = session,
                          hosts = hosts,
+                         suffixes = suffixes,
                          origin = config.dns_suffix,
                          max_hostnames = config.dns_max_hosts)
 
@@ -84,9 +95,11 @@ def hosts_add():
       INSERT INTO `hosts`
       SET `hostname` = %(hostname)s,
           `address` = %(address)s,
-          `user_id` = %(user_id)s
+          `user_id` = %(user_id)s,
+          `suffix_id` = %(suffix_id)s
     ''', {'hostname': request.POST.get('hostname'),
           'address': request.POST.get('address'),
-          'user_id' : session['userid']})
+          'user_id' : session['userid'],
+          'suffix_id': request.POST.get('suffix')})
 
   session['msg'] = ('success', 'Ok, done.')
