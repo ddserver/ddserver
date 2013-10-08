@@ -16,8 +16,9 @@
 -- along with ddserver.  If not, see <http://www.gnu.org/licenses/>.
 
 
-DROP TABLE IF EXISTS `hosts`;
 DROP TABLE IF EXISTS `users`;
+DROP TABLE IF EXISTS `suffixes`;
+DROP TABLE IF EXISTS `hosts`;
 
 
 --
@@ -35,17 +36,31 @@ CREATE TABLE `users` (
 ) ENGINE=InnoDB DEFAULT CHARACTER SET utf8;
 
 
+-- 
+-- table suffixes
+-- 
+CREATE TABLE `suffixes` (
+  `id`          INT             NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `name`        VARCHAR(255)    NOT NULL UNIQUE,
+  
+  INDEX (`name`),
+  
+) ENGINE=InnoDB DEFAULT CHARACTER SET utf8;
+
+
 --
 -- table hosts
 --
 CREATE TABLE `hosts` (
   `id`          INT             NOT NULL AUTO_INCREMENT PRIMARY KEY,
   `user_id`     INT             NOT NULL,
+  `suffix_id`   INT             NOT NULL,
   `hostname`    VARCHAR(255)    NOT NULL UNIQUE,
   `address`     VARCHAR(15)     NULL,
   `updated`     TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
   
-  FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
+  FOREIGN KEY (`user_id`)       REFERENCES `users` (`id`),
+  FOREIGN KEY (`suffix_id`)     REFERENCES `suffixes` (`id`),
   
   INDEX (`hostname`),
   INDEX (`address`),
@@ -54,9 +69,15 @@ CREATE TABLE `hosts` (
 ) ENGINE=InnoDB DEFAULT CHARACTER SET utf8;
 
 ALTER TABLE `hosts`
-  ADD CONSTRAINT `hosts_ibfk_2` 
+  ADD CONSTRAINT `hosts_ibfk_1` 
   FOREIGN KEY (`user_id`) 
   REFERENCES `users` (`id`) 
+  ON DELETE CASCADE;
+
+ALTER TABLE `hosts`
+  ADD CONSTRAINT `hosts_ibfk_2` 
+  FOREIGN KEY (`suffix_id`) 
+  REFERENCES `suffixes` (`id`) 
   ON DELETE CASCADE;
 
 
