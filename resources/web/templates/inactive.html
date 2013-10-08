@@ -23,14 +23,17 @@
             <td>{{u['username']}}</td>
             <td>{{u['email']}}</td>
             <td>{{u['created']}}</td>
-            <td width="80px">
+            <td width="70px">
               <form action="/admin/activateUser" method="post">
                 <input type="hidden" name="uid" value="{{u['id']}}">
                 <input type="submit" class="btn btn-success" value="Activate">
               </form>
             </td>
-            <td width="70px" style="border-left: 0px">
-              <button class="btn btn-danger">Delete</button>
+            <td width="60px" style="border-left: 0px">
+              <form action="/admin/deleteUser" method="post">
+                <input type="hidden" name="uid" value="{{u['id']}}">
+                <input type="submit" class="btn btn-danger" value="Delete">
+              </form>
             </td>
           </tr>  
         {% endfor %}
