@@ -66,6 +66,14 @@ td.noresults {
   text-align: center;
 }
 
+/*
+ *
+ */
+.navbar-inverse .divider-vertical {
+  border-left-color: #111111;
+  border-right-color: #333333;
+}
+
 
 /*
  * recaptcha
