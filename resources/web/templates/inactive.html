@@ -24,8 +24,8 @@
             <td>{{u['email']}}</td>
             <td>{{u['created']}}</td>
             <td width="80px">
-              <form action="/hosts" method="post">
-                <input type="hidden" name="userid" value="{{u['id']}}">
+              <form action="/admin/activateUser" method="post">
+                <input type="hidden" name="uid" value="{{u['id']}}">
                 <input type="submit" class="btn btn-success" value="Activate">
               </form>
             </td>

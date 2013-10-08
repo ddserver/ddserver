@@ -26,9 +26,9 @@ from ddserver.validation.schemas import *
 
 
 
-@route('/admin')
+@route('/admin/inactiveUsers')
 @authorized_admin
-def pending_list():
+def inactive_users_display():
   ''' display a list of users that are waiting for account activation
   '''
   session = request.environ.get('beaker.session')
@@ -44,5 +44,25 @@ def pending_list():
   template = templates.get_template('inactive.html')
   return template.render(session = session,
                          users = users)
+
+
+
+@route('/admin/activateUser', method = 'POST')
+@authorized_admin
+@validated(ActivateUserSchema, '/admin/inactiveUsers')
+def user_activate():
+  ''' activate a users account
+  '''
+  session = request.environ.get('beaker.session')
+
+  with db.cursor() as cur:
+    cur.execute('''
+      UPDATE users
+      SET `active` = 1
+      WHERE `id` = %(user_id)s
+    ''', { 'user_id': request.POST.get('uid') })
+
+  session['msg'] = ('success', 'Ok, done.')
+
 
 
