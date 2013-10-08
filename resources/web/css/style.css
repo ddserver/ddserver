@@ -65,3 +65,24 @@ td.noresults {
   line-height: 50px;
   text-align: center;
 }
+
+/*
+ *
+ */
+.navbar-inverse .divider-vertical {
+  border-left-color: #111111;
+  border-right-color: #333333;
+}
+
+
+/*
+ * recaptcha
+ */
+#recaptcha_image {
+  border: 1px solid #ddd;
+  margin-top: 10px;
+}
+
+#recaptcha_widget a {
+  padding-left: 10px;
+}

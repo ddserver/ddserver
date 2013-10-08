@@ -1,0 +1,99 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+  <div class="row">
+    <div class="span12"><h1>Welcome to ddserver</h1></div>
+  </div>
+
+  <div class="row-fluid">
+    <div class="span6">
+      <h3>Create an account</h3>
+      <p>
+        If you are a member of <i>Cafe Chaos Computerclub Fulda (c4fd)</i> you 
+        may sign up for free. Otherwise, become a member :) 
+      </p>
+    </div>
+    
+    
+    {% if 'username' not in session %}
+      
+    {% if recaptcha_enabled == '1' %}
+    <script type="text/javascript">
+      var RecaptchaOptions = { theme : 'custom', custom_theme_widget: 'recaptcha_widget' };
+    </script>
+    {% endif %}
+      
+    <div class="span6">
+      <h3>Sign up</h3>
+      <div class="box">
+        <form class="form-horizontal" action="/signup" method="post">
+          <div class="control-group">
+            <label class="control-label" for="inputUsername">Username</label>
+            <div class="controls">
+              <div class="input-prepend">
+                <span class="add-on"><i class="icon-user"></i></span>
+                <input type="text" id="signupUsername" placeholder="Username" name="username" required="required">
+              </div>
+            </div>
+          </div>
+          <div class="control-group">
+            <label class="control-label" for="inputEmail">Email address</label>
+            <div class="controls">
+              <div class="input-prepend">
+                <span class="add-on"><i class="icon-envelope"></i></span>
+                <input type="text" id="inputEmail" name="email" placeholder="user@example.com" required="required" type="email">
+              </div>
+            </div>
+          </div>              
+          <div class="control-group">
+            <label class="control-label" for="signupPassword">Password</label>
+            <div class="controls">
+              <div class="input-prepend">
+                <span class="add-on"><i class="icon-lock"></i></span>
+                <input type="password" id="signupPassword" placeholder="Password" name="password" required="required">
+              </div>
+            </div>
+          </div>
+          <div class="control-group">
+            <label class="control-label" for="signupPassword2">Retype</label>
+            <div class="controls">
+              <div class="input-prepend">
+                <span class="add-on"><i class="icon-lock"></i></span>
+                <input type="password" id="signupPassword2" placeholder="Retype" name="password_confirm" required="required">
+              </div>
+            </div>
+          </div>
+          {% if recaptcha_enabled == '1' %}
+          <div class="control-group">
+            <label class="control-label" for="signupPassword2">Human check</label>
+            <div class="controls">
+              <div id="recaptcha_widget" style="display:none">
+                <div class="input-prepend">
+                  <span class="add-on"><i class="icon-eye-open"></i></span>
+                  <input type="text" id="recaptcha_response_field" placeholder="Enter the words above" name="recaptcha_response_field">
+                  <a href="javascript:Recaptcha.reload()"><i class="icon-repeat" title="Get another CAPTCHA"></i></a>
+                  <a href="javascript:Recaptcha.showhelp()"><i class="icon-question-sign" title="Help"></i></a>
+                </div>
+                <div id="recaptcha_image"></div>
+              </div>
+              <script type="text/javascript" src="http://api.recaptcha.net/challenge?k={{recaptcha_public_key}}"></script>
+              <noscript>Please enable JavaScript to sign up.</noscript>
+            </div>
+          </div>
+          {% endif %}
+          <div class="control-group">
+            <div class="controls">
+              <button type="submit" class="btn btn-success btn-primary">Signup</button>
+              <a class="btn" href="/">Go back</a>
+            </div>
+          </div>
+        </form>
+      </div>
+      
+    </div>
+    {% endif %}
+    
+  </div>  
+  
+{% endblock %}

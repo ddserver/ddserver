@@ -22,34 +22,37 @@ from passlib.apps import custom_app_context as pwd
 from bottle import route, request, redirect
 
 from ddserver.db import database as db
+from ddserver.validation.schemas import *
 
 
 
 @route('/login', method = 'POST')
+@validated(LoginSchema, '/')
 def login():
   ''' handles user authentication. redirects to index in any case.
   '''
   session = request.environ.get('beaker.session')
 
-  username = request.POST.get('username', '')
-  password = request.POST.get('password', '')
-
   with db.cursor() as cur:
-    cur.execute('SELECT id, username, password FROM users WHERE username = %s',
-                (username,))
+    cur.execute('''
+      SELECT *
+        FROM users
+       WHERE username = %(username)s
+    ''', {'username': request.POST.get('username')})
     row = cur.fetchone()
 
-  if row and pwd.verify(password, row['password']):
-    session['username'] = row['username']
-    session['userid'] = row['id']
-    session['msg'] = ('success', 'Welcome, %s' % row['username'])
+  if row and pwd.verify(request.POST.get('password'), row['password']):
+    if row['active'] == True:
+      session['username'] = row['username']
+      session['userid'] = row['id']
+      session['admin'] = row['admin']
+      session['msg'] = ('success', 'Welcome, %s' % row['username'])
+
+    else:
+      session['msg'] = ('error', 'This account has not yet been activated.')
 
   else:
     session['msg'] = ('error', 'Login incorrect.')
-
-  session.save()
-
-  redirect('/')
 
 
 
@@ -61,20 +64,29 @@ def logout():
 
   del session['username']
   del session['userid']
+  del session['admin']
   session.save()
 
   redirect('/')
 
 
 
-def authorized(func):
-  def __(*args, **kwargs):
-    session = request.environ.get('beaker.session')
+def authorized(var = 'username'):
+  def __(func):
+    def __(*args, **kwargs):
+      session = request.environ.get('beaker.session')
 
-    if 'username' not in session:
-      redirect('/')
+      if var not in session or not session[var]:
+        session['msg'] = ('error', 'Not authorized!')
+        session.save()
+        redirect('/')
 
-    else:
-      func(*args, **kwargs)
+      else:
+        return func(*args, **kwargs)
 
+    return __
   return __
+
+
+authorized_admin = authorized('admin')
+authorized_uesr = authorized('username')

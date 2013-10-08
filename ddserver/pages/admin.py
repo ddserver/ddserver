@@ -19,74 +19,67 @@ along with ddserver.  If not, see <http://www.gnu.org/licenses/>.
 
 from bottle import route, request, redirect
 
-import formencode
-
 from ddserver.db import database as db
 from ddserver import templates
-from ddserver.config import config
-from ddserver.pages.session import authorized_uesr
+from ddserver.pages.session import authorized_admin
 from ddserver.validation.schemas import *
 
 
 
-@route('/hosts')
-@authorized_uesr
-def hosts_display():
-  ''' display the users hostnames and a form for adding new ones.
+@route('/admin/inactiveUsers')
+@authorized_admin
+def inactive_users_display():
+  ''' display a list of users that are waiting for account activation
   '''
   session = request.environ.get('beaker.session')
 
   with db.cursor() as cur:
     cur.execute('''
-        SELECT *
-        FROM hosts
-        WHERE user_id = %(user_id)s
-    ''', {'user_id': session['userid']})
-    hosts = cur.fetchall()
+      SELECT *
+      FROM users
+      WHERE `active` = 0
+    ''')
+    users = cur.fetchall()
 
-  template = templates.get_template('hosts.html')
+  template = templates.get_template('inactive.html')
   return template.render(session = session,
-                         hosts = hosts,
-                         origin = config.dns_suffix,
-                         max_hostnames = config.dns_max_hosts)
+                         users = users)
 
 
 
-@route('/hosts', method = 'POST')
-@authorized_uesr
-@validated(DelHostnameSchema, '/hosts')
-def hosts_delete():
-  ''' delete a hostname.
+@route('/admin/activateUser', method = 'POST')
+@authorized_admin
+@validated(ActivateUserSchema, '/admin/inactiveUsers')
+def user_activate():
+  ''' activate a users account
   '''
   session = request.environ.get('beaker.session')
 
   with db.cursor() as cur:
     cur.execute('''
-        DELETE
-        FROM hosts
-        WHERE id = %(host_id)s
-    ''', {'host_id': request.POST.get('hostid')})
+      UPDATE users
+      SET `active` = 1
+      WHERE `id` = %(user_id)s
+    ''', { 'user_id': request.POST.get('uid') })
 
   session['msg'] = ('success', 'Ok, done.')
 
 
 
-@route('/hosts/add', method = 'POST')
-@authorized_uesr
-@validated(AddHostnameSchema, '/hosts')
-def hosts_add():
-  ''' add a new hostname
+@route('/admin/deleteUser', method = 'POST')
+@authorized_admin
+@validated(DeleteUserSchema, '/admin/inactiveUsers')
+def user_delete():
+  ''' activate a users account
   '''
   session = request.environ.get('beaker.session')
 
   with db.cursor() as cur:
     cur.execute('''
-      INSERT INTO `hosts`
-      SET `hostname` = %(hostname)s,
-          `address` = %(address)s,
-          `user_id` = %(user_id)s
-    ''', {'hostname': request.POST.get('hostname'),
-          'address': request.POST.get('address'),
-          'user_id' : session['userid']})
+      DELETE FROM users
+      WHERE `id` = %(user_id)s
+    ''', { 'user_id': request.POST.get('uid') })
 
   session['msg'] = ('success', 'Ok, done.')
+
+
