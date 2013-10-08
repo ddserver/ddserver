@@ -23,6 +23,8 @@ import formencode
 
 import validators
 
+from ddserver.config import config
+
 
 
 def validated(cls, target):
@@ -100,17 +102,26 @@ class CreateUserSchema(formencode.Schema):
   username = formencode.All(validators.ValidUsername(min = 1,
                                                      max = 255),
                             validators.UniqueUsername())
+
   email = formencode.validators.Email()
+
   password = validators.SecurePassword(min = 8)
   password_confirm = formencode.validators.String()
+
+
   chained_validators = [formencode.validators.FieldsMatch('password',
                                                           'password_confirm')]
-  # captcha = [validators.ValidCaptcha('recaptcha_challenge_field',
-  #                                   'recaptcha_response_field')]
+
+  if config.recaptcha_enabled == '1':
+    recaptcha_challenge_field = formencode.validators.String()
+    recaptcha_response_field = formencode.validators.String()
+
+    chained_validators.append(validators.ValidCaptcha('recaptcha_challenge_field',
+                                                      'recaptcha_response_field'))
 
 
 class LoginSchema(formencode.Schema):
-  ''' schema for validation of the login form 
+  ''' schema for validation of the login form
   '''
   username = validators.ValidUsername(min = 1,
                                       max = 255)

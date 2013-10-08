@@ -28,6 +28,7 @@ from formencode.api import Invalid
 
 from ddserver.db import database as db
 from ddserver.config import config
+import bottle
 
 
 
@@ -193,33 +194,20 @@ class ValidCaptcha(validators.FancyValidator):
     'invalid': 'Captcha invalid'
   }
 
-  field_names = None
-  validate_partial_form = True
+  challenge = response = None
 
-  __unpackargs__ = ('*', 'field_names')
-
-  def __init__(self, *args, **kw):
-    super(ValidCaptcha, self).__init__(*args, **kw)
-    if len(self.field_names) < 2:
-      raise TypeError('FieldsMatch() requires at least two field names')
-
-  def validate_partial(self, field_dict, state):
-    for name in self.field_names:
-      if name not in field_dict:
-        return
-    self.validate_python(field_dict, state)
+  __unpackargs__ = ('challenge', 'response')
 
   def validate_python(self, field_dict, state):
-    print "lalala"
-    print self.field_names[0]
-    print self.field_names[1]
+    response = captcha.submit(
+      field_dict[self.challenge],
+      field_dict[self.response],
+      config.recaptcha_private_key,
+      bottle.request.remote_addr
+    )
 
-#    response = captcha.submit(
-#        req.args['recaptcha_challenge_field'],
-#        req.args['recaptcha_response_field'],
-#        self.private_key,
-#        req.remote_addr,
-#        )
+    if not response.is_valid:
+      raise Invalid(self.message('invalid', field_dict), field_dict, state)
 
 
 
