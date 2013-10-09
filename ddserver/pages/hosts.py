@@ -48,9 +48,16 @@ def hosts_display():
   # get users hostnames
   with db.cursor() as cur:
     cur.execute('''
-        SELECT *
-        FROM hosts
-        WHERE user_id = %(user_id)s
+        SELECT
+          `host`.`id` AS `id`,
+          `host`.`hostname` AS `hostname`,
+          `suffix`.`name` AS `suffix`,
+          `host`.`address` AS `address`,
+          `host`.`updated` AS `updated`
+        FROM `hosts` AS `host`
+        LEFT JOIN `suffixes` AS `suffix`
+          ON ( `suffix`.`id` = `host`.`suffix_id` )
+        WHERE `user_id` = %(user_id)s
     ''', {'user_id': session['userid']})
     hosts = cur.fetchall()
 

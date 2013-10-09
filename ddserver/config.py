@@ -56,11 +56,6 @@ class Config(object):
                           help = 'path to the config file to load')
 
   arg_parser_dns = arg_parser.add_argument_group(title = 'DNS options')
-  arg_parser_dns.add_argument('--dns-suffix',
-                              dest = 'dns_suffix',
-                              type = str,
-                              metavar = 'SUFFIX',
-                              help = 'the dynamic domain suffix')
   arg_parser_dns.add_argument('--dns-max-hosts',
                               dest = 'dns_max_hosts',
                               type = str,
@@ -114,7 +109,6 @@ class Config(object):
   arg_parser_db.add_argument('--db-pass',
                              dest = 'database_password',
                              type = str,
-                             required = True,
                              metavar = 'PASS',
                              help = 'the database password to connect with')
 

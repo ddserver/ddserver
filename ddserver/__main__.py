@@ -47,10 +47,6 @@ def main():
   # Initialize logging
   logging.basicConfig(level = logging.DEBUG if config.verbose else logging.INFO)
 
-  # Ensure the suffix has a leading dot
-  if config.dns_suffix and not config.dns_suffix.startswith('.'):
-      config.dns_suffix = '.%s' % config.dns_suffix
-
   # Connect to the database
   database.setup(dbhost = config.database_host,
                  dbport = int(config.database_port),

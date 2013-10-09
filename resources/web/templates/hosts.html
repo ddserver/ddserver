@@ -47,7 +47,7 @@
               <div class="controls">
                 <div class="input-prepend">
                   <span class="add-on"><i class="icon-th-large"></i></span>
-                  <select name="suffixid">
+                  <select name="suffix">
                     {% for s in suffixes %}
                     <option value="{{s['id']}}">{{s['name']}}</option>
                     {% endfor %}
@@ -90,7 +90,7 @@
         </tr>
         {% for h in hosts %}
           <tr>
-            <td>{{h['hostname']}}<span class="origin">.{{origin}}</span></td>
+            <td>{{h['hostname']}}<span class="origin">.{{h['suffix']}}</span></td>
             <td>{{h['address']}}</td>
             <td>{{h['updated']}}</td>
             <td>

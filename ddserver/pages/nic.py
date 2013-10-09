@@ -106,10 +106,14 @@ def update(username, password, hostnames, address):
         # Get the host entry for the current hostname from the database
         with db.cursor() as cur:
           cur.execute('''
-              SELECT `id`, `address`
-              FROM `hosts`
-              WHERE `user_id` = %(user_id)s
-                AND `hostname` = %(hostname)s
+              SELECT
+                `host`.`id`,
+                `host`.`address`
+              FROM `hosts` AS `host`
+              LEFT JOIN `suffixes` AS `suffix`
+                ON ( `suffix`.`id` = `host`.`suffix_id` )
+              WHERE `host`.`user_id` = %(user_id)s
+                AND CONCAT(`host`.`hostname`, '.', `suffix`.`name`) = %(hostname)s
           ''', {'user_id': user['id'],
                 'hostname': hostname})
           host = cur.fetchone()
