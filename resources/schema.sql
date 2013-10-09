@@ -85,4 +85,4 @@ ALTER TABLE `hosts`
 -- default user admin with password admin
 --
 INSERT INTO `users` 
-  VALUES (1, 'admin', '$6$rounds=65488$jZYVZUGK9mNdQeTj$2MTmn67qFtmg.xKbonwE4OcwCe9z64duk0vgh3nCP6yIBiERxk3t4hFYuytxZF0jmwbpSyq.B3DKtb6CyQ2tG.', 'admin@example.com', 0, NOW());
+  VALUES (1, 'admin', '$6$rounds=65488$jZYVZUGK9mNdQeTj$2MTmn67qFtmg.xKbonwE4OcwCe9z64duk0vgh3nCP6yIBiERxk3t4hFYuytxZF0jmwbpSyq.B3DKtb6CyQ2tG.', 'admin@example.com', 1, 1, NOW());
