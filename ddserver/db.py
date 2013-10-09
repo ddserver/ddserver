@@ -66,6 +66,7 @@ class DatabaseManager(object):
 
     except:
       connection.rollback()
+      raise
 
     else:
       connection.commit()
