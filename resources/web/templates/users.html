@@ -46,7 +46,7 @@
             {% else %}
               <form action="/admin/users/activate" method="post">
                 <input type="hidden" name="username" value="{{u['username']}}">
-                {% if u['authcode'] %}
+                {% if u['authcode'] == None %}
                 <input type="submit" class="btn btn-success" value="Activate" style="width: 70px;">
                 {% else %}
                 <input type="submit" class="btn btn-success" value="Pending.." style="width: 70px;" disabled="disabled">
