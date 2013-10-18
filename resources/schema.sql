@@ -32,6 +32,7 @@ CREATE TABLE `users` (
   `admin`       BOOLEAN        NOT NULL DEFAULT FALSE,
   `active`      BOOLEAN        NOT NULL DEFAULT FALSE,
   `created`     TIMESTAMP      NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `authcode`    VARCHAR(36)    NULL COMMENT 'Challenge for email interaction' 
   
   INDEX (`username`)
 ) ENGINE=InnoDB DEFAULT CHARACTER SET utf8;

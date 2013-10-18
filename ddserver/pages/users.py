@@ -23,6 +23,7 @@ from ddserver.db import database as db
 from ddserver import templates
 from ddserver.pages.session import authorized_admin
 from ddserver.validation.schemas import *
+from ddserver.mail import Email
 
 
 
@@ -58,18 +59,14 @@ def users_display(mode = 'all'):
 
 @route('/admin/users/activate', method = 'POST')
 @authorized_admin
-@validated(IsUserSchema, '/admin/users/all')
+@validated(AdminActivateUserSchema, '/admin/users/all')
 def user_activate():
   ''' activate a users account
   '''
   session = request.environ.get('beaker.session')
 
-  with db.cursor() as cur:
-    cur.execute('''
-      UPDATE users
-      SET `active` = 1
-      WHERE `id` = %(user_id)s
-    ''', { 'user_id': request.POST.get('uid') })
+  email = Email(username = request.POST.get('username'))
+  email.account_activation()
 
   session['msg'] = ('success', 'Ok, done.')
 

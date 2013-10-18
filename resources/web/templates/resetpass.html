@@ -1,0 +1,108 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+  <div class="row">
+    <div class="span12"><h1>Password recovery</h1></div>
+  </div>
+
+  <div class="row-fluid">
+    <div class="box">
+      <div class="span12"><h3>Set a new password</h3></div>
+    
+      <div class="row-fluid">
+        <div class="span6">
+          <p>
+            Please use secure passwords, consisting of upper- and lowercase
+            characters, as well as numbers or special characters. The minimum
+            password length is {{passwd_min_chars}} characters.
+          </p>
+        </div>
+      
+        {% if recaptcha_enabled == '1' %}
+        <script type="text/javascript">
+          var RecaptchaOptions = { theme : 'custom', custom_theme_widget: 'recaptcha_widget' };
+        </script>
+        {% endif %}
+      
+        <div class="span6">
+          <form class="form-horizontal" action="/lostpass/setnew" method="post">
+            <div class="control-group">
+              <label class="control-label" for="inputPassword1">New Password</label>
+              <div class="controls">
+                <div class="input-prepend">
+                  <span class="add-on"><i class="icon-lock"></i></span>
+                  <input type="password" id="inputPassword1" placeholder="Password" name="password">
+                </div>
+              </div>
+            </div>
+            <div class="control-group">
+              <label class="control-label" for="inputPassword2">Retype</label>
+              <div class="controls">
+                <div class="input-prepend">
+                  <span class="add-on"><i class="icon-lock"></i></span>
+                  <input type="password" id="inputPassword2" placeholder="Retype" name="password_confirm">
+                </div>
+              </div>
+            </div>
+            {% if recaptcha_enabled == '1' %}
+            <div class="control-group">
+              <label class="control-label" for="signupPassword2">Human check</label>
+              <div class="controls">
+                <div id="recaptcha_widget" style="display:none">
+                  <div class="input-prepend">
+                    <span class="add-on"><i class="icon-eye-open"></i></span>
+                    <input type="text" id="recaptcha_response_field" placeholder="Enter the words above" name="recaptcha_response_field">
+                    <a href="javascript:Recaptcha.reload()"><i class="icon-repeat" title="Get another CAPTCHA"></i></a>
+                    <a href="javascript:Recaptcha.showhelp()"><i class="icon-question-sign" title="Help"></i></a>
+                  </div>
+                  <div id="recaptcha_image"></div>
+                </div>
+                <script type="text/javascript" src="http://api.recaptcha.net/challenge?k={{recaptcha_public_key}}"></script>
+                <noscript>Please enable JavaScript to sign up.</noscript>
+              </div>
+            </div>
+            {% endif %}
+            <input type="hidden" name="username" value="{{username}}">
+            <input type="hidden" name="authcode" value="{{authcode}}">
+            <div class="control-group">
+              <div class="controls">
+                <button type="submit" class="btn btn-success btn-primary">Set new password</button>
+                <a class="btn" href="/">Go back</a>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="row-fluid">
+    <div class="box">
+      <div class="span12"><h3>Cancel password reset</h3></div>
+  
+      <div class="row-fluid">
+        <div class="span6">
+          <p>
+            If you did not request a password reset for your ddserver account, 
+            you may cancel the password reset process by clicking the button
+            on the right. 
+          </p>
+        </div>
+    
+        <div class="span6">
+          <form class="form-horizontal" action="/lostpass/cancel" method="post">
+            <input type="hidden" name="username" value="{{username}}">
+            <input type="hidden" name="authcode" value="{{authcode}}">
+            <div class="control-group">
+              <div class="controls">
+                <button type="submit" class="btn btn-danger btn-primary">Cancel Password Reset</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+{% endblock %}

@@ -27,6 +27,7 @@ from ddserver.db import database as db
 from ddserver.config import config
 from ddserver import templates
 
+from ddserver.mail import Email
 from ddserver.validation.schemas import *
 
 
@@ -48,6 +49,9 @@ def index():
   return template.render(session = session)
 
 
+#
+# signup
+#
 
 @route('/signup')
 def signup():
@@ -71,9 +75,13 @@ def account_create():
 
   encrypted_password = pwd.encrypt(request.POST.get('password'))
 
+  username = request.POST.get('username')
+  email_address = request.POST.get('email')
+  email_domain = email_address.split("@")
+
   with db.cursor() as cur:
     cur.execute('''
-      INSERT 
+      INSERT
       INTO users
       SET `username` = %(username)s,
           `password` = %(password)s,
@@ -81,10 +89,135 @@ def account_create():
           `admin` = 0,
           `active` = 0,
           `created` = CURRENT_TIMESTAMP
-    ''', {'username': request.POST.get('username'),
+    ''', {'username': username,
           'password': encrypted_password,
-          'email': request.POST.get('email')})
+          'email': email_address})
 
-  session['msg'] = ('success', 'Your account has been created, but is inactive at the moment. ')
+  if email_domain[1] in config.auth_allowed_maildomains:
+    email = Email(username = username)
+    email.account_activation()
 
+    session['msg'] = ('success', 'Your account has been created. You should receive an activation mail in some minutes.')
+
+  else:
+    session['msg'] = ('success', 'Your account has been created, but is inactive at the moment.')
+
+
+
+@route('/signup/activate/<username>/<authcode>')
+def activate_form(username,
+             authcode):
+  session = request.environ.get('beaker.session')
+
+  template = templates.get_template('activate.html')
+  return template.render(session = session,
+                         recaptcha_enabled = config.recaptcha_enabled,
+                         recaptcha_public_key = config.recaptcha_public_key,
+                         username = username,
+                         authcode = authcode)
+
+
+@route('/signup/activate', method = 'POST')
+@validated(ActivateAccountSchema, '/')
+def activate():
+  session = request.environ.get('beaker.session')
+
+  with db.cursor() as cur:
+    cur.execute('''
+      UPDATE users
+      SET `active` = 1
+      WHERE `username` = %(username)s
+    ''', { 'username': request.POST.get('username') })
+
+  session['msg'] = ('success', 'Your account is active now. Please login.')
+
+
+
+@route('/signup/cancel', method = 'POST')
+@validated(CancelActivateAccountSchema, '/')
+def signup_cancel():
+  session = request.environ.get('beaker.session')
+
+  with db.cursor() as cur:
+    cur.execute('''
+      DELETE
+      FROM users
+      WHERE `username` = %(username)s
+    ''', { 'username': request.POST.get('username') })
+
+  session['msg'] = ('success', 'Signup cancelled. Your account has been removed.')
+
+
+
+
+#
+# password recovery
+#
+
+@route('/lostpass')
+def lostpass():
+  session = request.environ.get('beaker.session')
+
+  template = templates.get_template('lostpass.html')
+  return template.render(session = session,
+                         recaptcha_enabled = config.recaptcha_enabled,
+                         recaptcha_public_key = config.recaptcha_public_key)
+
+
+@route('/lostpass', method = 'POST')
+@validated(LostPasswordSchema, '/')
+def lostpass_sendmail():
+  session = request.environ.get('beaker.session')
+
+  email = Email(username = request.POST.get('username'))
+  email.password_reminder()
+
+  session['msg'] = ('success', 'Password recovery email has been sent.')
+
+
+@route('/lostpass/recover/<username>/<authcode>', method = 'GET')
+def lostpass_setnew_form(username,
+                         authcode):
+  session = request.environ.get('beaker.session')
+
+  template = templates.get_template('resetpass.html')
+  return template.render(session = session,
+                         recaptcha_enabled = config.recaptcha_enabled,
+                         recaptcha_public_key = config.recaptcha_public_key,
+                         username = username,
+                         authcode = authcode)
+
+
+@route('/lostpass/setnew', method = 'POST')
+@validated(ResetPasswordSchema, '/')
+def lostpass_setnew():
+  session = request.environ.get('beaker.session')
+
+  encrypted_password = pwd.encrypt(request.POST.get('password'))
+
+  with db.cursor() as cur:
+    cur.execute('''
+      UPDATE users
+      SET `password` = %(encrypted_password)s,
+          `authcode` = 0
+      WHERE `username` = %(username)s
+    ''', {'encrypted_password': encrypted_password,
+          'username': request.POST.get('username')})
+
+  session['msg'] = ('success', 'Your new password has been set.')
+
+
+@route('/lostpass/cancel', method = 'POST')
+@validated(ResetPasswordCancelSchema, '/')
+def lostpass_cancel():
+  session = request.environ.get('beaker.session')
+
+  with db.cursor() as cur:
+    cur.execute('''
+      UPDATE users
+      SET `authcode` = 0
+      WHERE `username` = %(username)s
+    ''', {'username': request.POST.get('username')})
+
+  session['msg'] = ('success', 'Your password reset request has been cancelled.')
 

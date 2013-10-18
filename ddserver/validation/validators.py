@@ -173,6 +173,24 @@ class UniqueUsername(validators.FancyValidator):
       raise Invalid(self.message('not_uniq', value), value, state)
 
 
+class ExistendUsername(validators.FancyValidator):
+  messages = {
+    'nonexistend': 'This username does not exist.'
+  }
+
+  def validate_python(self, value, state):
+    with db.cursor() as cur:
+      cur.execute('''
+          SELECT username
+          FROM users
+          WHERE username = %(username)s
+      ''', {'username': value})
+      result = cur.fetchone()
+
+    if result == None:
+      raise Invalid(self.message('nonexistend', value), value, state)
+
+
 
 class SecurePassword(validators.FancyValidator):
   ''' check whether the password entered is a good password
@@ -277,4 +295,37 @@ class ExistingSuffixId(validators.FancyValidator):
 
     if len(result) != 1:
       raise Invalid(self.message('nonexistend', value), value, state)
+
+
+class ValidAuthcode(validators.FancyValidator):
+  ''' check whether the authcode a user is using to activate his account or
+      reset a password is valid
+  '''
+  messages = {
+    'username': 'The username is invalid.',
+    'no_authcode': 'No authcode was requested to validate this action.',
+    'authcode': 'The authcode used to validate this action is invalid.'
+  }
+
+  username = authcode = None
+
+  __unpackargs__ = ('username', 'authcode')
+
+  def validate_python(self, field_dict, state):
+    with db.cursor() as cur:
+      cur.execute('''
+          SELECT authcode
+          FROM users
+          WHERE username = %(username)s
+      ''', {'username': field_dict[self.username]})
+      result = cur.fetchone()
+
+    if len(result) != 1:
+      raise Invalid(self.message('username', field_dict), field_dict, state)
+
+    if result['authcode'] == '0':
+      raise Invalid(self.message('no_authcode', field_dict), field_dict, state)
+
+    if field_dict[self.authcode] != result['authcode']:
+      raise Invalid(self.message('authcode', field_dict), field_dict, state)
 

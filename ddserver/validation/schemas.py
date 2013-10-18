@@ -84,6 +84,27 @@ class IsUserSchema(formencode.Schema):
   uid = formencode.validators.Int(not_empty = True)
 
 
+class AdminActivateUserSchema(formencode.Schema):
+  username = validators.ExistendUsername()
+
+
+class ActivateAccountSchema(formencode.Schema):
+  username = formencode.validators.String()
+  authcode = formencode.validators.String()
+
+  chained_validators = [validators.ValidAuthcode('username',
+                                                 'authcode')]
+
+
+
+class CancelActivateAccountSchema(formencode.Schema):
+  username = formencode.validators.String()
+  authcode = formencode.validators.String()
+
+  chained_validators = [validators.ValidAuthcode('username',
+                                                 'authcode')]
+
+
 
 class UpdateUserSchema(formencode.Schema):
   ''' schema for validation of the form for editing account information
@@ -132,6 +153,46 @@ class LoginSchema(formencode.Schema):
   username = validators.ValidUsername(min = 1,
                                       max = 255)
   password = formencode.validators.String()
+
+
+class LostPasswordSchema(formencode.Schema):
+  username = validators.ExistendUsername()
+
+  if config.recaptcha_enabled == '1':
+    recaptcha_challenge_field = formencode.validators.String()
+    recaptcha_response_field = formencode.validators.String()
+
+    chained_validators = [validators.ValidCaptcha('recaptcha_challenge_field',
+                                                  'recaptcha_response_field')]
+
+
+class ResetPasswordSchema(formencode.Schema):
+  password = validators.SecurePassword(min = 8)
+  password_confirm = formencode.validators.String()
+
+  username = formencode.validators.String()
+  authcode = formencode.validators.String()
+
+  chained_validators = [formencode.validators.FieldsMatch('password',
+                                                          'password_confirm'),
+                        validators.ValidAuthcode('username',
+                                                 'authcode')]
+
+  if config.recaptcha_enabled == '1':
+    recaptcha_challenge_field = formencode.validators.String()
+    recaptcha_response_field = formencode.validators.String()
+
+    chained_validators.append(validators.ValidCaptcha('recaptcha_challenge_field',
+                                                      'recaptcha_response_field'))
+
+
+
+class ResetPasswordCancelSchema(formencode.Schema):
+  username = formencode.validators.String()
+  authcode = formencode.validators.String()
+
+  chained_validators = [validators.ValidAuthcode('username',
+                                                 'authcode')]
 
 
 class AddSuffixSchema(formencode.Schema):
