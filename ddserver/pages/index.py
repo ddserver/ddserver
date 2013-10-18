@@ -93,7 +93,8 @@ def account_create():
           'password': encrypted_password,
           'email': email_address})
 
-  if email_domain[1] in config.auth_allowed_maildomains:
+  if (config.auth_allowed_maildomains == 'any' or
+      email_domain[1] in config.auth_allowed_maildomains):
     email = Email(username = username)
     email.account_activation()
 
