@@ -67,13 +67,11 @@ def signup():
 
 
 @route('/signup', method = 'POST')
-@validated(CreateUserSchema, '/signup')
+@validated(SignupSchema, '/signup')
 def account_create():
   ''' create a new user account
   '''
   session = request.environ.get('beaker.session')
-
-  encrypted_password = pwd.encrypt(request.POST.get('password'))
 
   username = request.POST.get('username')
   email_address = request.POST.get('email')
@@ -84,13 +82,11 @@ def account_create():
       INSERT
       INTO users
       SET `username` = %(username)s,
-          `password` = %(password)s,
           `email` = %(email)s,
           `admin` = 0,
           `active` = 0,
           `created` = CURRENT_TIMESTAMP
     ''', {'username': username,
-          'password': encrypted_password,
           'email': email_address})
 
   if (config.auth_allowed_maildomains == 'any' or
@@ -98,7 +94,7 @@ def account_create():
     email = Email(username = username)
     email.account_activation()
 
-    session['msg'] = ('success', 'Your account has been created. You should receive an activation mail in some minutes.')
+    session['msg'] = ('success', 'Your account has been created. You should receive an activation email in some minutes.')
 
   else:
     session['msg'] = ('success', 'Your account has been created, but is inactive at the moment.')
@@ -123,12 +119,16 @@ def activate_form(username,
 def activate():
   session = request.environ.get('beaker.session')
 
+  encrypted_password = pwd.encrypt(request.POST.get('password'))
+
   with db.cursor() as cur:
     cur.execute('''
       UPDATE users
-      SET `active` = 1
+      SET `active` = 1,
+          `password` = %(encrypted_password)s
       WHERE `username` = %(username)s
-    ''', { 'username': request.POST.get('username') })
+    ''', {'encrypted_password': encrypted_password,
+          'username': request.POST.get('username') })
 
   session['msg'] = ('success', 'Your account is active now. Please login.')
 

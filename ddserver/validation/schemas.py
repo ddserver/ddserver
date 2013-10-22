@@ -92,9 +92,21 @@ class ActivateAccountSchema(formencode.Schema):
   username = formencode.validators.String()
   authcode = formencode.validators.String()
 
-  chained_validators = [validators.ValidAuthcode('username',
+  password = validators.SecurePassword(min = 8)
+  password_confirm = formencode.validators.String()
+
+  chained_validators = [formencode.validators.FieldsMatch('password',
+                                                          'password_confirm'),
+                        validators.ValidAuthcode('username',
                                                  'authcode')]
 
+
+class AdminCreateUserSchema(formencode.Schema):
+  username = formencode.All(validators.ValidUsername(min = 1,
+                                                     max = 255),
+                            validators.UniqueUsername())
+
+  email = formencode.validators.Email()
 
 
 class CancelActivateAccountSchema(formencode.Schema):
@@ -121,30 +133,21 @@ class UpdatePasswordSchema(formencode.Schema):
                                                           'password_confirm')]
 
 
-class CreateUserSchema(formencode.Schema):
+class SignupSchema(formencode.Schema):
   ''' schema for validation of the form for creating a new account
   '''
-  allow_extra_fields = True
-
   username = formencode.All(validators.ValidUsername(min = 1,
                                                      max = 255),
                             validators.UniqueUsername())
 
   email = formencode.validators.Email()
 
-  password = validators.SecurePassword(min = 8)
-  password_confirm = formencode.validators.String()
-
-
-  chained_validators = [formencode.validators.FieldsMatch('password',
-                                                          'password_confirm')]
-
   if config.recaptcha_enabled == '1':
     recaptcha_challenge_field = formencode.validators.String()
     recaptcha_response_field = formencode.validators.String()
 
-    chained_validators.append(validators.ValidCaptcha('recaptcha_challenge_field',
-                                                      'recaptcha_response_field'))
+    chained_validators = [validators.ValidCaptcha('recaptcha_challenge_field',
+                                                  'recaptcha_response_field')]
 
 
 class LoginSchema(formencode.Schema):

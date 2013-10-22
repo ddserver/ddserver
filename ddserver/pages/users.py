@@ -127,3 +127,43 @@ def user_rmadmin():
   session['msg'] = ('success', 'Ok, done.')
 
 
+
+@route('/admin/adduser')
+@authorized_admin
+def adduser_form():
+  ''' form for adding a new user
+  '''
+  session = request.environ.get('beaker.session')
+
+  template = templates.get_template('adduser.html')
+  return template.render(session = session)
+
+
+@route('/admin/adduser', method = 'POST')
+@authorized_admin
+@validated(AdminCreateUserSchema, '/admin/adduser')
+def adduser():
+  ''' add a new user
+  '''
+  session = request.environ.get('beaker.session')
+
+  username = request.POST.get('username')
+  email_address = request.POST.get('email')
+
+  with db.cursor() as cur:
+    cur.execute('''
+      INSERT
+      INTO users
+      SET `username` = %(username)s,
+          `email` = %(email)s,
+          `admin` = 0,
+          `active` = 0,
+          `created` = CURRENT_TIMESTAMP
+    ''', {'username': username,
+          'email': email_address})
+
+    email = Email(username = username)
+    email.account_activation()
+
+    session['msg'] = ('success', 'Account created. The user will get an activation email.')
+
