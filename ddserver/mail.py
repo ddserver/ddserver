@@ -35,8 +35,6 @@ class Email(object):
 
     self.username = username
 
-    self.mail_rcpt = Email.get_mailaddress(username)
-
 
   @staticmethod
   def get_mailaddress(username):
@@ -89,7 +87,7 @@ class Email(object):
            self.uuid,
            config.admin)
 
-    self.send()
+    self.send(mail_rcpt = self.get_mailaddress(self.username))
 
 
   def password_reminder(self):
@@ -117,18 +115,36 @@ class Email(object):
            self.uuid,
            config.admin)
 
-    self.send()
+    self.send(mail_rcpt = self.get_mailaddress(self.username))
 
 
-  def send(self):
+  def notify_admin(self):
+    self.mail_subject = "ddserver: New user account"
+    self.mail_text = '''
+    Hi %s,
+
+    a new user registered for a ddserver account with the following data:
+
+    The username is: %s (%s)
+
+    Sincerely.
+    ''' % (config.admin,
+           self.username,
+           self.get_mailaddress(self.username))
+
+    self.send(mail_rcpt = config.admin_email)
+
+
+  def send(self,
+           mail_rcpt):
     msg = MIMEText(self.mail_text)
     msg['Subject'] = self.mail_subject
     msg['From'] = self.mail_from
-    msg['To'] = self.mail_rcpt
+    msg['To'] = mail_rcpt
 
     s = smtplib.SMTP(host = self.smtp_host,
                      port = self.smtp_port)
     s.sendmail(self.mail_from,
-               [self.mail_rcpt],
+               [mail_rcpt],
                msg.as_string())
     s.quit()

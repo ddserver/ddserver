@@ -99,6 +99,9 @@ def account_create():
   else:
     session['msg'] = ('success', 'Your account has been created, but is inactive at the moment.')
 
+  # notify admin
+  if config.auth_notify_admin:
+    email.notify_admin()
 
 
 @route('/signup/activate/<username>/<authcode>')
