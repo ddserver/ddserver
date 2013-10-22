@@ -59,11 +59,14 @@
         </form>
       </div>
       
+      {% if config.enable_registration %}
       <h3>Signup</h3>
       <div class="box">
         Want to use dynamic DNS?
         <a class="btn btn-primary" href="/signup">Create an account</a>
       </div>
+      {% endif %}
+      
     </div>
     {% endif %}
     

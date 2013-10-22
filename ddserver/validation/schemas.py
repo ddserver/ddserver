@@ -138,7 +138,8 @@ class SignupSchema(formencode.Schema):
   '''
   username = formencode.All(validators.ValidUsername(min = 1,
                                                      max = 255),
-                            validators.UniqueUsername())
+                            validators.UniqueUsername(),
+                            validators.RegistrationEnabled())
 
   email = formencode.validators.Email()
 

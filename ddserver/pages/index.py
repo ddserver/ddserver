@@ -46,7 +46,8 @@ def index():
   session = request.environ.get('beaker.session')
 
   template = templates.get_template('index.html')
-  return template.render(session = session)
+  return template.render(session = session,
+                         config = config)
 
 
 #
@@ -59,8 +60,13 @@ def signup():
   '''
   session = request.environ.get('beaker.session')
 
-  template = templates.get_template('signup.html')
+  if config.auth_enable_registration == '1':
+    template = templates.get_template('signup.html')
+  else:
+    template = templates.get_template('nosignup.html')
+
   return template.render(session = session,
+                         config = config,
                          recaptcha_enabled = config.recaptcha_enabled,
                          recaptcha_public_key = config.recaptcha_public_key)
 

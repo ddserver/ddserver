@@ -59,6 +59,17 @@ class ValidHostname(validators.FancyValidator):
       raise Invalid(self.message('non_letter', value), value, state)
 
 
+class RegistrationEnabled(validators.FancyValidator):
+  ''' check whether the hostname entered is unique
+  '''
+  messages = {
+    'error': 'User registration is not possible. Sorry.'
+  }
+
+  def validate_python(self, value, state):
+    if config.auth_enable_registration != '1':
+      raise Invalid(self.message('error', value), value, state)
+
 
 class UniqueHostname(validators.FancyValidator):
   ''' check whether the hostname entered is unique
