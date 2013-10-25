@@ -84,6 +84,7 @@ def update(username, password, hostnames, address):
           SELECT `id`, `password`
           FROM `users`
           WHERE `username` = %(username)s
+            AND `active` = 1
       ''', {'username': username})
       user = cur.fetchone()
 
