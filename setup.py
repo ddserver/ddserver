@@ -38,12 +38,14 @@ setuptools.setup(
     keywords = 'ddserver ddns',
 
     install_requires = [
+        'enum >= 0.4',
         'beaker >= 1.6',
         'bottle >= 0.11',
         'jinja2 >= 2.6',
         'formencode >= 1.2',
         'passlib >= 1.6',
-        'recaptcha-client >= 1.0'
+        'recaptcha-client >= 1.0',
+        'MySQL-python >= 1.2.0'
     ],
 
     data_files = [
@@ -53,7 +55,9 @@ setuptools.setup(
 
     entry_points = {
         'console_scripts' : [
-            'ddserver = ddserver.__main__:main',
+            'ddserver-interface = ddserver.interface.__main__:main',
+            'ddserver-updater = ddserver.updater.__main__:main',
+            'ddserver-recursor = ddserver.recursor.__main__:main',
         ]
     },
 )

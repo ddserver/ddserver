@@ -20,44 +20,51 @@ along with ddserver. If not, see <http://www.gnu.org/licenses/>.
 import contextlib
 import threading
 
-import MySQLdb
+import MySQLdb.cursors
+
+from ddserver.utils.deps import extend, export, require
 
 
 
-class DatabaseManager(object):
+@extend('ddserver.config:ConfigDeclaration')
+def config_db(config_decl):
+  with config_decl.declare('db') as s:
+    s('host',
+      conv = str,
+      default = 'localhost')
+    s('port',
+      conv = int,
+      default = 3306)
+    s('name',
+      conv = str,
+      default = 'ddserver')
+    s('username',
+      conv = str,
+      default = 'ddserver')
+    s('password',
+      conv = str)
+
+
+
+@export()
+class Database(object):
 
   thread_local = threading.local()
 
 
-  def __init__(self):
-    pass
-
-
-  def setup(self,
-            dbhost,
-            dbport,
-            dbname,
-            dbuser,
-            dbpass):
-    self.dbhost = dbhost
-    self.dbport = dbport
-    self.dbname = dbname
-    self.dbuser = dbuser
-    self.dbpass = dbpass
-
-
   @contextlib.contextmanager
-  def cursor(self):
-    if not hasattr(DatabaseManager.thread_local, 'db_connection'):
-        setattr(DatabaseManager.thread_local, 'db_connection',
-                MySQLdb.connect(self.dbhost,
-                                self.dbuser,
-                                self.dbpass,
-                                self.dbname,
-                                self.dbport,
+  @require(config = 'ddserver.config:Config')
+  def cursor(self, config):
+    if not hasattr(self.thread_local, 'connection'):
+        setattr(self.thread_local, 'connection',
+                MySQLdb.connect(host = config.db.host,
+                                port = config.db.port,
+                                user = config.db.username,
+                                passwd = config.db.password,
+                                db = config.db.name,
                                 cursorclass = MySQLdb.cursors.DictCursor))
 
-    connection = getattr(DatabaseManager.thread_local, 'db_connection')
+    connection = getattr(self.thread_local, 'connection')
 
     cursor = connection.cursor()
 
@@ -73,7 +80,3 @@ class DatabaseManager(object):
 
     finally:
       cursor.close()
-
-
-
-database = DatabaseManager()

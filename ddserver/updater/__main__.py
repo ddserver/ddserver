@@ -1,5 +1,5 @@
 '''
-Copyright 2013 Sven Reissmann <sven@0x80.io>
+Copyright 2013 Dustin Frisch<fooker@lab.sh>
 
 This file is part of ddserver.
 
@@ -16,3 +16,18 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with ddserver. If not, see <http://www.gnu.org/licenses/>.
 '''
+
+from ddserver.utils.deps import require
+
+import ddserver.updater.nic  # @UnusedImport: for web application
+
+
+
+@require(web = 'ddserver.web:Web')
+def main(web):
+  # Set up web server and run it
+  web.run()
+
+
+if __name__ == '__main__':
+    main()

@@ -1,4 +1,4 @@
-{% extends "layout.html" %}
+{% extends "base.html" %}
 
 {% block content %}
 
@@ -7,8 +7,6 @@
   </div>
   
   <div class="row-fluid">
-
-    {% if users %}
     <div class="box">
       <h3><i class="icon-tag"></i> Users waiting for activation</h3>
       
@@ -18,54 +16,54 @@
         <li {% if mode == 'admins' %}class="active" {% endif %}><a href="/admin/users/admins">Administrators</a></li>
       </ul>
       
-      <table class="table table-bordered table-striped table-hover">
-        <tr>
-          <th>Username</th>
-          <th>Email</th>
-          <th width="160px">Created</th>
-          <th width="120px" colspan="2">Actions</th>
-        </tr>
-        {% for u in users %}
+      {% if users %}
+        <table class="table table-bordered table-striped table-hover">
           <tr>
-            <td>{{u['username']}}</td>
-            <td>{{u['email']}}</td>
-            <td>{{u['created']}}</td>
-            <td width="70px">
-            {% if u['active'] == 1 %}
-              {% if u['admin'] == 0 %}
-              <form action="/admin/users/makeAdmin" method="post">
-                <input type="hidden" name="uid" value="{{u['id']}}">
-                <input type="submit" class="btn" value="&nbsp;User&nbsp;" style="width: 70px;">
-              </form>
-              {% else %}
-              <form action="/admin/users/removeAdmin" method="post">
-                <input type="hidden" name="uid" value="{{u['id']}}">
-                <input type="submit" class="btn btn-inverse" value="Admin" style="width: 70px;">
-              </form>
-              {% endif %}
-            {% else %}
-              <form action="/admin/users/activate" method="post">
-                <input type="hidden" name="username" value="{{u['username']}}">
-                {% if u['authcode'] == None %}
-                <input type="submit" class="btn btn-success" value="Activate" style="width: 70px;">
+            <th>Username</th>
+            <th>Email</th>
+            <th width="160px">Created</th>
+            <th width="120px" colspan="2">Actions</th>
+          </tr>
+          {% for user in users %}
+            <tr>
+              <td>{{user.username}}</td>
+              <td>{{user.email}}</td>
+              <td>{{user.created}}</td>
+              <td width="70px">
+              {% if user.active == 1 %}
+                {% if user.admin == 0 %}
+                <form action="/admin/users/mkadmin" method="post">
+                  <input type="hidden" name="user_id" value="{{user.id}}">
+                  <input type="submit" class="btn" value="&nbsp;User&nbsp;" style="width: 70px;">
+                </form>
                 {% else %}
-                <input type="submit" class="btn btn-success" value="Pending.." style="width: 70px;" disabled="disabled">
+                <form action="/admin/users/rmadmin" method="post">
+                  <input type="hidden" name="user_id" value="{{user.id}}">
+                  <input type="submit" class="btn btn-inverse" value="Admin" style="width: 70px;">
+                </form>
                 {% endif %}
-              </form>
-            {% endif %}
-            </td>
-            <td width="70px" style="border-left: 0px">
-              <form action="/admin/users/delete" method="post">
-                <input type="hidden" name="uid" value="{{u['id']}}">
-                <input type="submit" class="btn btn-danger" value="Delete" style="width: 70px;">
-              </form>
-            </td>
-          </tr>  
-        {% endfor %}
-      </table>
+              {% else %}
+                <form action="/admin/users/activate" method="post">
+                  <input type="hidden" name="username" value="{{user.username}}">
+                  {% if user.authcode == None %}
+                  <input type="submit" class="btn btn-success" value="Activate" style="width: 70px;">
+                  {% else %}
+                  <input type="submit" class="btn btn-success" value="Pending.." style="width: 70px;" disabled="disabled">
+                  {% endif %}
+                </form>
+              {% endif %}
+              </td>
+              <td width="70px" style="border-left: 0px">
+                <form action="/admin/users/delete" method="post">
+                  <input type="hidden" name="user_id" value="{{user.id}}">
+                  <input type="submit" class="btn btn-danger" value="Delete" style="width: 70px;">
+                </form>
+              </td>
+            </tr>
+          {% endfor %}
+        </table>
+      {% endif %}
     </div>
-    {% endif %}
-    
   </div>
   
 {% endblock %}

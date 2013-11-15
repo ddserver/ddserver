@@ -1,5 +1,5 @@
 '''
-Copyright 2013 Sven Reissmann <sven@0x80.io>
+Copyright 2013 Dustin Frisch <fooker@lab.sh>
 
 This file is part of ddserver.
 

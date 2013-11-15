@@ -1,0 +1,15 @@
+{% extends "base.mail" %}
+
+{% block subject %}
+ddserver: New user account
+{% endblock %}
+
+{% block content %}
+Hi {{config.contact.name}},
+
+a new user registered for a ddserver account:
+  {{user.username}} <{{user.email}}>
+
+Sincerely,
+ddserver
+{% endblock %}

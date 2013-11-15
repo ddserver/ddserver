@@ -1,4 +1,4 @@
-{% extends "layout.html" %}
+{% extends "base.html" %}
 
 {% block content %}
 
@@ -31,7 +31,7 @@
               <div class="controls">
                 <div class="input-prepend">
                   <span class="add-on"><i class="icon-th-large"></i></span>
-                  <input type="text" id="inputSuffix" placeholder="Suffix" name="suffixname" required="required">
+                  <input type="text" id="inputSuffix" placeholder="Suffix" name="suffix_name" required="required">
                 </div>
               </div>
             </div>
@@ -54,12 +54,12 @@
           <th>Suffix</th>
           <th width="100px">Actions</th>
         </tr>
-        {% for s in suffixes %}
+        {% for suffix in suffixes %}
           <tr>
-            <td>{{s['name']}}</td>
+            <td>{{suffix.name}}</td>
             <td>
-              <form action="/admin/suffixes" method="post">
-                <input type="hidden" name="suffixid" value="{{s['id']}}">
+              <form action="/admin/suffixes/delete" method="post">
+                <input type="hidden" name="suffix_id" value="{{suffix.id}}">
                 <input type="submit" class="btn btn-danger" value="Delete">
               </form>
             </td>

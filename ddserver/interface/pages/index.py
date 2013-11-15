@@ -16,3 +16,31 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with ddserver. If not, see <http://www.gnu.org/licenses/>.
 '''
+
+import os
+
+import bottle
+
+from ddserver.web import route
+
+from ddserver.utils.deps import require
+
+
+
+@route('/static/<path:path>', method = 'GET')
+def get_static(path):
+  ''' Provides a route to static files (like css, images, etc). '''
+
+  return bottle.static_file(path,
+                            os.path.join(os.getcwd(),
+                                         'resources',
+                                         'web'))
+
+
+
+@route('/', method = 'GET')
+@require(templates = 'ddserver.interface.template:TemplateManager')
+def get_index(templates):
+  ''' Display the index page. '''
+
+  return templates['index.html']()

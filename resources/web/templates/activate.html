@@ -1,14 +1,6 @@
-{% extends "layout.html" %}
+{% extends "base.html" %}
 
 {% block content %}
-
-  {% if recaptcha_enabled == '1' %}
-  <script type="text/javascript">
-    var RecaptchaOptions = { theme : 'custom', custom_theme_widget: 'recaptcha_widget' };
-  </script>
-  {% endif %}
-
-
   <div class="row">
     <div class="span12"><h1>Account activation</h1></div>
   </div>
@@ -24,7 +16,9 @@
         </div>
     
         <div class="span6">
-          <form class="form-horizontal" action="/signup/activate" method="post"> 
+          <form class="form-horizontal"
+                action="/signup/activate?username={{username}}&authcode={{authcode}}"
+                method="post"> 
             <div class="control-group">
               <label class="control-label" for="signupPassword">Password</label>
               <div class="controls">
@@ -43,26 +37,6 @@
                 </div>
               </div>
             </div>
-            {% if recaptcha_enabled == '1' %}
-            <div class="control-group">
-              <label class="control-label" for="signupPassword2">Human check</label>
-              <div class="controls">
-                <div id="recaptcha_widget" style="display:none">
-                  <div class="input-prepend">
-                    <span class="add-on"><i class="icon-eye-open"></i></span>
-                    <input type="text" id="recaptcha_response_field" placeholder="Enter the words above" name="recaptcha_response_field">
-                    <a href="javascript:Recaptcha.reload()"><i class="icon-repeat" title="Get another CAPTCHA"></i></a>
-                    <a href="javascript:Recaptcha.showhelp()"><i class="icon-question-sign" title="Help"></i></a>
-                  </div>
-                  <div id="recaptcha_image"></div>
-                </div>
-                <script type="text/javascript" src="http://api.recaptcha.net/challenge?k={{recaptcha_public_key}}"></script>
-                <noscript>Please enable JavaScript to sign up.</noscript>
-              </div>
-            </div>
-            {% endif %}
-            <input type="hidden" name="username" value="{{username}}">
-            <input type="hidden" name="authcode" value="{{authcode}}">
             <div class="control-group">
               <div class="controls">
                 <button type="submit" class="btn btn-success btn-primary">Activate account</button>
@@ -89,9 +63,9 @@
         </div>
     
         <div class="span6">
-          <form class="form-horizontal" action="/signup/cancel" method="post">
-            <input type="hidden" name="username" value="{{username}}">
-            <input type="hidden" name="authcode" value="{{authcode}}">
+          <form class="form-horizontal"
+                action="/signup/cancel?username={{username}}&authcode={{authcode}}"
+                method="post">
             <div class="control-group">
               <div class="controls">
                 <button type="submit" class="btn btn-danger btn-primary">Cancel Signup</button>

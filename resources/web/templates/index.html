@@ -1,7 +1,6 @@
-{% extends "layout.html" %}
+{% extends "base.html" %}
 
 {% block content %}
-
   <div class="row">
     <div class="span12"><h1>Welcome to ddserver</h1></div>
   </div>
@@ -16,8 +15,9 @@
       </p>
       <p>
         The update protocol of this application is compatible to the dyndns2
-        protocol, allowing you to use your homerouters DDNS service or a tool
-        like ddclient to send updates of your address.
+        protocol, allowing you to use your home routers DDNS service or a tool
+        like <a href="http://sourceforge.net/p/ddclient/wiki/Home/">ddclient</a>
+        to send updates of your address.
       </p>
       <h3>Developers</h3>
       <p>
@@ -26,8 +26,7 @@
       </p>
     </div>
     
-    
-    {% if 'username' not in session %}
+    {% if not user %}
     <div class="span6">
       <h3>Login</h3>
       <div class="box">
@@ -59,17 +58,14 @@
         </form>
       </div>
       
-      {% if config.enable_registration %}
+      {% if config.signup.enabled %}
       <h3>Signup</h3>
       <div class="box">
         Want to use dynamic DNS?
         <a class="btn btn-primary" href="/signup">Create an account</a>
       </div>
       {% endif %}
-      
     </div>
     {% endif %}
-    
   </div>  
-  
 {% endblock %}

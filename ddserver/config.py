@@ -17,136 +17,145 @@ You should have received a copy of the GNU Affero General Public License
 along with ddserver. If not, see <http://www.gnu.org/licenses/>.
 '''
 
-from ConfigParser import SafeConfigParser
+import ConfigParser as configparser
 
-import argparse
+import collections
+import contextlib
 
-
-
-# Define a argument arg_parser
-
+from ddserver.utils.deps import export
 
 
-class Config(object):
-  ''' Parses command line arguments and a config file.
 
-      Tthe command line arguments defined will be parsed. If a config file is
-      specified in the arguments, it will be read and mixed up with the command
-      line arguments by overwriting the defaults but net the specified values.
+@export()
+class ConfigDeclaration(object):
+  ''' Declaration of the configuration.
 
-      The transformation between the values in the config file and the arguments
-      uses the following pattern:
-        For the general section, the key is used. For every other section, the
-        section name is combined with the value name separated with an
-        underscore. If the name contains any score, it is replaced with an
-        underscore (see 'argparse' 'dest' transformation rules).
+      The declaration consists of sections where each section can contain
+      arbitrary options.
+
+      An option must have a converter which is a function used to convert the
+      raw string value from the configuration file to a value. Additionally, a
+      default value can be specified, which makes the option optional.
   '''
 
-  arg_parser = argparse.ArgumentParser()
-  arg_parser.add_argument('-v', '--verbose',
-                          const = True,
-                          default = False,
-                          action = 'store_const',
-                          dest = 'verbose',
-                          help = 'show more verbose messages')
-  arg_parser.add_argument('-c', '--config',
-                          type = file,
-                          metavar = 'FILE',
-                          dest = 'config',
-                          help = 'path to the config file to load')
-
-  arg_parser_dns = arg_parser.add_argument_group(title = 'DNS options')
-  arg_parser_dns.add_argument('--dns-max-hosts',
-                              dest = 'dns_max_hosts',
-                              type = str,
-                              metavar = 'N',
-                              help = 'the maximum number of hosts per user')
-
-  arg_parser_wsgi = arg_parser.add_argument_group(title = 'WSGI options')
-  arg_parser_wsgi.add_argument('--wsgi-standalone',
-                               dest = 'wsgi_standalone',
-                               const = True,
-                               action = 'store_const',
-                               help = 'run in stand-alone mode')
-  arg_parser_wsgi.add_argument('--wsgi-host',
-                               dest = 'wsgi_host',
-                               type = str,
-                               default = 'localhost',
-                               metavar = 'HOST',
-                               help = 'the WSGI host to listen on')
-  arg_parser_wsgi.add_argument('--wsgi-port',
-                               dest = 'wsgi_port',
-                               type = int,
-                               default = '8080',
-                               metavar = 'PORT',
-                               help = 'the WSGI port to listen on')
-
-  arg_parser_db = arg_parser.add_argument_group(title = 'Database options')
-  arg_parser_db.add_argument('--db-host',
-                             dest = 'database_host',
-                             type = str,
-                             default = '127.0.0.1',
-                             metavar = 'HOST',
-                             help = 'the database host to connect to')
-  arg_parser_db.add_argument('--db-port',
-                             dest = 'database_port',
-                             type = int,
-                             default = '3306',
-                             metavar = 'PORT',
-                             help = 'the database port to connect to')
-  arg_parser_db.add_argument('--db-name',
-                             dest = 'database_name',
-                             type = str,
-                             default = 'ddserver',
-                             metavar = 'HOST',
-                             help = 'the database name to connect to')
-  arg_parser_db.add_argument('--db-user',
-                             dest = 'database_username',
-                             type = str,
-                             default = 'ddserver',
-                             metavar = 'USER',
-                             help = 'the database username to connect with')
-  arg_parser_db.add_argument('--db-pass',
-                             dest = 'database_password',
-                             type = str,
-                             metavar = 'PASS',
-                             help = 'the database password to connect with')
-
-  arg_parser_auth = arg_parser.add_argument_group(title = 'Authentication options')
-  arg_parser_auth.add_argument('--auth-passwd-min-chars',
-                               dest = 'auth_passwd_min_chars',
-                               type = int,
-                               default = '8',
-                               metavar = 'N',
-                               help = 'the minimal number of password characters')
+  REQUIRED = object()
+  ''' Special value for the default field of a option making it required. '''
 
 
-  @staticmethod
-  def conf_to_arg(section, key):
-    if section == 'general':
-      return key.replace('-', '_')
-
-    else:
-      return '%s_%s' % (section, key.replace('-', '_'))
+  Option = collections.namedtuple('Option', ['conv',
+                                             'default'])
+  ''' Declaration of an option. '''
 
 
   def __init__(self):
-    # Parse the command line arguments
-    args, _ = Config.arg_parser.parse_known_args()
-
-    # Create the config parser and load config file
-    conf_parser = SafeConfigParser()
-    if args.config:
-      conf_parser.readfp(args.config)
-
-    # Update defaults using the values from config file
-    for section in conf_parser.sections():
-      Config.arg_parser.set_defaults(**{Config.conf_to_arg(section, key) : value
-                                        for key, value
-                                        in conf_parser.items(section)})
-
-    # Parse remaining arguments using new parser
-    Config.arg_parser.parse_args(namespace = self)
+    self.__sections = {}
 
 
-config = Config()
+  @contextlib.contextmanager
+  def declare(self, section_name):
+    ''' Declare a section.
+
+        The section declaration is a context manager where the context is a
+        function, which can be used to declare a option. Example:
+
+        with config_decl.declare('my_section') as my:
+          my('my_option',
+             conv = str,
+             default = 'my_default')
+          ...
+    '''
+
+    # Create a section declaration if it does not exists
+    if section_name not in self.__sections:
+      section = self.__sections[section_name] = {}
+
+    else:
+      section = self.__sections[section_name]
+
+    # The option declaration function returned as the context
+    def declarator(option_name,
+                   conv = str,
+                   default = self.REQUIRED):
+      # Check if the section already contains the option
+      if option_name in section:
+        raise KeyError('Duplicated option declaration %s:%s' % (section_name, option_name))
+
+      # Add the option to the section
+      self.__sections[section_name][option_name] = self.Option(conv = conv,
+                                                               default = default)
+
+    # Return the function as context
+    yield declarator
+
+
+  @property
+  def declarations(self):
+    ''' Returns the declarations. '''
+    return self.__sections
+
+
+
+
+class Namespace(object):
+  def __getitem__(self, key):
+    return self.__dict__[key]
+
+
+  def __setitem__(self, key, value):
+    self.__dict__[key] = value
+
+
+  def __contains__(self, key):
+    return key in self.__dict__
+
+
+  __getattr__ = __getitem__
+  __setattr__ = __setitem__
+
+
+
+
+@export(config_decl = 'ddserver.config:ConfigDeclaration')
+def Config(config_decl):
+  ''' Parses a configuration file.
+
+      The configuration declaration is used to parse the configuration file.
+  '''
+
+  # Create a namespace object containing the parsed configuration
+  ns = Namespace()
+
+  # Opens and loads the configuration file
+  config_file = configparser.SafeConfigParser()
+  config_file.read('/etc/ddserver.conf')
+
+  # Parse all sections
+  for section_name, options in config_decl.declarations.iteritems():
+    # Ensure a namespace object for the section exists
+    if section_name in ns:
+      nss = ns[section_name]
+
+    else:
+      nss = ns[section_name] = Namespace()
+
+    # Parse the options in the section
+    for option_name, option in options.iteritems():
+      if config_file.has_option(section_name, option_name):
+        # Load the raw value from the config file
+        raw_value = config_file.get(section_name, option_name)
+
+        # Parse the value
+        value = option.conv(raw_value)
+
+      elif option.default != config_decl.REQUIRED:
+        # Use the default value as value
+        value = option.default
+
+      else:
+        # Value is required - throwing an exception
+        raise KeyError('Missing option %s:%s' % (section_name, option_name))
+
+      # Set the value to the section namespace
+      nss[option_name] = value
+
+  return ns

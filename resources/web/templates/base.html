@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html">
+<head>
+  <title>ddserver</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+
+  <script type="text/javascript" src="/static/js/jquery.min.js"></script>
+  <script type="text/javascript" src="/static/js/bootstrap.min.js"></script>
+    
+  <link rel="stylesheet" href="/static/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/static/css/bootstrap-responsive.min.css">
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+
+<body>
+  <div class="navbar navbar-inverse navbar-fixed-top">
+    <div class="navbar-inner">
+      <div class="container">
+        <a class="brand" href="/">ddserver</a>
+        <div class="nav-collapse collapse">
+          <ul class="nav pull-right">
+            {% if user %}
+              {% if user.admin %}
+              <li><a href="/admin/users/all" title="Manage Users"><i class="icon-th-large icon-white"></i> Users</a></li>
+              <li><a href="/admin/suffixes" title="Manage Users"><i class="icon-th-large icon-white"></i> Suffixes</a></li>
+              <li class="divider-vertical"></li>
+              {% endif %}
+            <li><a href="/user/hosts" title="Manage Hostnames"><i class="icon-th-large icon-white"></i> Hostnames</a></li>
+            <li><a href="/user/account" title="Manage Account"><i class="icon-user icon-white"></i> {{user.username}}</a></li>
+            <li class="divider-vertical"></li>
+            <li><a href="/logout" title="Logout"><i class="icon-off icon-white"></i> Logout</a></li>
+            {% endif %}
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="container main">
+    {% for message in messages.popall() %}
+      <div class="alert alert-block alert-{{message.level}}">
+        <a class="close" data-dismiss="alert" href="#">×</a>
+          {{message.message}}
+      </div>
+    {% endfor %}
+    
+    {% block content %}
+    {% endblock %}
+  </div>  
+</body>
+</html>

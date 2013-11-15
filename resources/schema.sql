@@ -32,7 +32,7 @@ CREATE TABLE `users` (
   `admin`       BOOLEAN        NOT NULL DEFAULT FALSE,
   `active`      BOOLEAN        NOT NULL DEFAULT FALSE,
   `created`     TIMESTAMP      NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `authcode`    VARCHAR(36)    NULL COMMENT 'Challenge for email interaction' 
+  `authcode`    VARCHAR(36)    NULL,
   
   INDEX (`username`)
 ) ENGINE=InnoDB DEFAULT CHARACTER SET utf8;
@@ -85,5 +85,18 @@ ALTER TABLE `hosts`
 --
 -- default user admin with password admin
 --
-INSERT INTO `users` 
-  VALUES (1, 'admin', '$6$rounds=65488$jZYVZUGK9mNdQeTj$2MTmn67qFtmg.xKbonwE4OcwCe9z64duk0vgh3nCP6yIBiERxk3t4hFYuytxZF0jmwbpSyq.B3DKtb6CyQ2tG.', 'admin@example.com', 1, 1, NOW());
+INSERT INTO `users` (
+  `id`,
+  `username`,
+  `password`,
+  `email`,
+  `admin`,
+  `active`
+) VALUES (
+  1,
+  'admin',
+  '$6$rounds=65488$jZYVZUGK9mNdQeTj$2MTmn67qFtmg.xKbonwE4OcwCe9z64duk0vgh3nCP6yIBiERxk3t4hFYuytxZF0jmwbpSyq.B3DKtb6CyQ2tG.',
+  'admin@example.com',
+  1,
+  1
+);

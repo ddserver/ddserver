@@ -1,8 +1,8 @@
-{% extends "layout.html" %}
+{% extends "base.html" %}
 
 {% block content %}
   
-  {% if recaptcha_enabled == '1' %}
+  {% if config.captcha.enabled %}
   <script type="text/javascript">
     var RecaptchaOptions = { theme : 'custom', custom_theme_widget: 'recaptcha_widget' };
   </script>
@@ -41,7 +41,7 @@
               </div>
             </div>
           </div>
-          {% if recaptcha_enabled == '1' %}
+          {% if config.captcha.enabled %}
           <div class="control-group">
             <label class="control-label" for="signupPassword2">Human check</label>
             <div class="controls">
@@ -54,7 +54,7 @@
                 </div>
                 <div id="recaptcha_image"></div>
               </div>
-              <script type="text/javascript" src="http://api.recaptcha.net/challenge?k={{recaptcha_public_key}}"></script>
+              <script type="text/javascript" src="http://api.recaptcha.net/challenge?k={{config.captcha.recaptcha_public_key}}"></script>
               <noscript>Please enable JavaScript to sign up.</noscript>
             </div>
           </div>
