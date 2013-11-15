@@ -73,76 +73,157 @@ formatter = FormatterDeclaration(splitter = '\t',
 @require(logger = 'ddserver.utils.logger:Logger')
 def receiver(logger):
   # Read lines from standard input
-  for line in sys.stdin:
+  while True:
+    # Read a line
+    line = sys.stdin.readline()
+    if not line:
+      break
+
     # Lex the line
     message = lexer(line)
 
+    # Check if we got a message
     if message is None:
       logger.error('Unknown tag: %s', line)
       continue
 
     logger.debug('Received message: %s', message)
 
+    # Forward the message
     yield message
 
 
 
-@require(db = 'ddserver.db:Database',
-         logger = 'ddserver.utils.logger:Logger')
-def handler(db, logger):
-  messages = receiver()
+@require(logger = 'ddserver.utils.logger:Logger')
+def send(cls,
+         logger,
+         **kwargs):
+  # Create message
+  message = cls(**kwargs)
 
-  for message in messages:
-    if message.tag == 'HELO':
-      if message.version != 1:
-        logger.error('Unappropriate ABI version: %s', message.version)
-        yield formatter.FAIL()
+  logger.debug('Responding message: %s', message)
 
-      yield formatter.OK(banner = 'ddserver')
+  # Format the response
+  line = formatter(message)
 
-      break
+  # Send line to standard output
+  sys.stdout.write(line + '\n')
+  sys.stdout.flush()
 
-    else:
-      logger.error('Missing HELO before command: %s', message.tag)
-      yield formatter.FAIL()
 
-  for message in messages:
-    if message.tag == 'HELO':
-      logger.error('Duplicated HELO')
-      yield formatter.FAIL()
 
-    elif message.tag == 'Q':
-      yield formatter.END()
+@require(db = 'ddserver.db:Database')
+def answer_soa(query,
+               db):
+  # Handle SOA records and response with defined suffixes
+  with db.cursor() as cur:
+    cur.execute('''
+      SELECT *
+      FROM `suffixes`
+      WHERE `name` = %(name)s
+    ''', {'name': query.qname})
+    suffix = cur.fetchone()
 
-    elif message.tag == 'AXFR':
-      # We do not support transfer by now
-      yield formatter.FAIL()
+    if suffix:
+      send(formatter.DATA, qname = query.qname,
+                           qclass = query.qclass,
+                           qtype = 'SOA',
+                           ttl = 3600,
+                           id = query.id,
+                           content = ' '.join(('ns.' + query.qname,
+                                               'webmaster.' + query.qname,
+                                               '0',
+                                               '86400',  # 24h
+                                               '7200',  # 2h
+                                               '3600000',  # 1000h
+                                               '172800')))  # 2d
 
-    elif message.tag == 'PING':
-      # Ping does not require any data response
-      yield formatter.END()
 
-    else:
-      logger.error('Unhandled message tag: %s', message)
-      yield formatter.FAIL()
+
+@require(db = 'ddserver.db:Database')
+def answer_a(query,
+             db):
+  with db.cursor() as cur:
+    cur.execute('''
+        SELECT
+          `host`.`hostname` AS `hostname`,
+          `suffix`.`name` AS `suffix`,
+          `host`.`address` AS `address`
+        FROM `hosts` AS `host`
+        LEFT JOIN `suffixes` AS `suffix`
+          ON ( `suffix`.`id` = `host`.`suffix_id` )
+        WHERE `host`.`address` IS NOT NULL
+          AND CONCAT(`host`.`hostname`, '.', `suffix`.`name`) = %(name)s
+    ''', {'name': query.qname})
+    host = cur.fetchone()
+
+    if host:
+      send(formatter.DATA, qname = query.qname,
+                           qclass = query.qclass,
+                           qtype = 'A',
+                           ttl = 3600,
+                           id = query.id,
+                           content = host['address'])
+
+
+
+def answer(query):
+  if query.qtype == 'SOA' or query.qtype == 'ANY':
+    answer_soa(query)
+
+  if query.qtype == 'A' or query.qtype == 'ANY':
+    answer_a(query)
+
+  else:
+    # Ignore all other queries
+    pass
 
 
 
 @require(logger = 'ddserver.utils.logger:Logger')
-def run(logger):
-  for message in handler():
-    logger.debug('Responding message: %s', message)
+def main(logger):
+  messages = receiver()
 
-    # Format the response
-    line = formatter(message)
+  # Handle messages until HELO was received
+  for message in messages:
+    # Handle HELO message
+    if message.tag == 'HELO':
+      # Expecting ABI version 1
+      if message.version != 1:
+        logger.error('Unappropriate ABI version: %s', message.version)
+        send(formatter.FAIL)
 
-    # Send line to standard output
-    sys.stdout.write(line + '\n')
+      send(formatter.OK,
+           banner = 'ddserver')
+      break
 
+    else:
+      logger.error('Missing HELO before command: %s', message.tag)
+      send(formatter.FAIL)
 
+  # Handle all messages after HELO
+  for message in messages:
+    if message.tag == 'HELO':
+      logger.error('Duplicated HELO')
+      send(formatter.FAIL)
 
-def main():
-  run()
+    elif message.tag == 'Q':
+      # Handle query
+      answer(query = message)
+
+      send(formatter.END)
+
+    elif message.tag == 'AXFR':
+      # We do not support transfer by now
+      send(formatter.END)
+
+    elif message.tag == 'PING':
+      # Ping does not require any data response
+      send(formatter.END)
+
+    else:
+      logger.error('Unhandled message tag: %s', message)
+      send(formatter.FAIL)
 
 
 
