@@ -1,0 +1,40 @@
+[db]
+;host = localhost
+;port = 3306
+;name = ddserver
+;username = ddserver
+password = ddserver
+
+[logging]
+;verbose = False
+;file = /var/log/ddserver.log
+
+[auth]
+;password_min_chars = 8
+
+[dns]
+;max_hosts = 5
+
+[signup]
+;enabled = True
+;allowed_maildomains = any
+;notify_admin = True
+
+[wsgi]
+;baseurl = http://localhost:8080
+;host = 0.0.0.0
+;port = 8080
+;debug = False
+
+[smtp]
+host = mail.lab.sh
+;port = 25
+
+[contact]
+name = Dustin Frisch
+email = fooker@lab.sh
+
+[captcha]
+;enabled = False
+;recaptcha_public_key = 
+;recaptcha_private_key = 
