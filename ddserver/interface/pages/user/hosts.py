@@ -28,6 +28,8 @@ from ddserver.interface.user import authorized
 from ddserver.interface import validation
 from ddserver.interface.validation import validate
 
+from passlib.apps import custom_app_context as pwd
+
 
 
 @extend('ddserver.config:ConfigDeclaration')
@@ -81,7 +83,10 @@ def get_hosts_display(user,
 @validate('/user/hosts',
           hostname = validation.UniqueHostname(),
           suffix = validation.Int(not_empty = True),
-          address = validation.IPAddress())
+          address = validation.IPAddress(),
+          password = validation.SecurePassword(min = 8),
+          password_confirm = validation.String(),
+          chained_validators = [validation.FieldsMatch('password', 'password_confirm')])
 @require(db = 'ddserver.db:Database',
          config = 'ddserver.config:Config',
          messages = 'ddserver.interface.message:MessageManager')
@@ -93,6 +98,8 @@ def post_hosts_add(user,
   ''' Add a new hostname. '''
 
   # We do net check passed suffix, as mysql will tell us later on
+
+  encrypted_password = pwd.encrypt(data.password)
 
   with db.cursor() as cur:
     cur.execute('''
@@ -110,10 +117,12 @@ def post_hosts_add(user,
       INTO `hosts`
       SET `hostname` = %(hostname)s,
           `address` = %(address)s,
+          `password` = %(password)s,
           `user_id` = %(user_id)s,
           `suffix_id` = %(suffix_id)s
     ''', {'hostname': data.hostname,
           'address': data.address,
+          'password': encrypted_password,
           'user_id' : user.id,
           'suffix_id': data.suffix})
 

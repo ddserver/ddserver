@@ -93,11 +93,11 @@ def update(logger, db, username, password, hostnames, address):
     user = cur.fetchone()
 
   # Check if we have a valid user
-  if not user or not pwd.verify(password, user['password']):
-    logger.warning('Mismatching credentials for user %s', username)
+  if not user:
+    logger.warning('Invalid username %s', username)
     return resp_badauth()
 
-  logger.debug('Fund user in DB: %s', user)
+  logger.debug('Found user in DB: %s', user)
 
   # The specification allows to give multiple hosts separated by comma
   responses = []
@@ -109,7 +109,8 @@ def update(logger, db, username, password, hostnames, address):
       cur.execute('''
           SELECT
             `host`.`id`,
-            `host`.`address`
+            `host`.`address`,
+            `host`.`password`
           FROM `hosts` AS `host`
           LEFT JOIN `suffixes` AS `suffix`
             ON ( `suffix`.`id` = `host`.`suffix_id` )
@@ -125,6 +126,11 @@ def update(logger, db, username, password, hostnames, address):
 
       responses.append(resp_nohost())
       continue
+
+    # Check the users credentials (passwords are assigned to hosts)
+    if not pwd.verify(password, host['password']):
+      logger.warning('Mismatching credentials for host %s', hostname)
+      return resp_badauth()
 
     # Check if the address has changed
     if host['address'] == address:

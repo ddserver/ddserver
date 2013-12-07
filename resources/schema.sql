@@ -58,6 +58,8 @@ CREATE TABLE `hosts` (
   `suffix_id`   INT             NOT NULL,
   `hostname`    VARCHAR(255)    NOT NULL UNIQUE,
   `address`     VARCHAR(15)     NULL,
+  `description` VARCHAR(255)    NULL,
+  `password`    VARCHAR(255)    NOT NULL,
   `updated`     TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
   
   FOREIGN KEY (`user_id`)       REFERENCES `users` (`id`),
