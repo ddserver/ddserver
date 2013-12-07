@@ -71,17 +71,16 @@ CREATE TABLE `hosts` (
   INDEX (`user_id`, `hostname`)
 ) ENGINE=InnoDB DEFAULT CHARACTER SET utf8;
 
-ALTER TABLE `hosts`
-  ADD CONSTRAINT `hosts_ibfk_1` 
-  FOREIGN KEY (`user_id`) 
-  REFERENCES `users` (`id`) 
-  ON DELETE CASCADE;
 
 ALTER TABLE `hosts`
-  ADD CONSTRAINT `hosts_ibfk_2` 
-  FOREIGN KEY (`suffix_id`) 
-  REFERENCES `suffixes` (`id`) 
-  ON DELETE CASCADE;
+  ADD FOREIGN KEY ( `user_id` )
+  REFERENCES `users` (`id`)
+  ON DELETE CASCADE ;
+
+ALTER TABLE `hosts`
+  ADD FOREIGN KEY ( `suffix_id` )
+  REFERENCES `suffixes` (`id`)
+  ON DELETE CASCADE ;
 
 
 --
