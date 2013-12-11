@@ -41,8 +41,10 @@ def get_suffixes(user,
 
   with db.cursor() as cur:
     cur.execute('''
-      SELECT *
-      FROM `suffixes`
+      SELECT `suffixes`.*, COUNT(`hosts`.`id`) AS count
+        FROM `suffixes`
+      LEFT JOIN `hosts`
+        ON `suffixes`.`id` = `hosts`.`suffix_id`
     ''')
     suffixes = cur.fetchall()
 
