@@ -1,0 +1,68 @@
+#!/bin/sh
+
+### BEGIN INIT INFO
+# Provides:          ddserver
+# Required-Start:    $network pdns $local_fs
+# Required-Stop:     $network pdns $local_fs
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Start the ddserver-bundle application
+# Description:       Start the ddserver-bundle application providing the 
+#                    ddserver webui and the ddns update interface.
+### END INIT INFO
+
+#
+# Author: Sven Reissmann <sven@0x80.io>
+#
+
+NAME="ddserver"
+DESC="dynamic DNS daemon"
+DAEMON=/usr/local/bin/ddserver-bundle
+DAEMON_ARGS=""
+PIDFILE=/var/run/$NAME.pid
+
+SCRIPTNAME=/etc/init.d/$NAME
+
+# Exit if the package is not installed
+[ -x "$DAEMON" ] || exit 0
+
+# Define LSB log_* functions.
+. /lib/lsb/init-functions
+
+
+do_start() {
+  log_daemon_msg "Starting $DESC" "$NAME"
+  
+  start-stop-daemon --start --quiet \
+    --pidfile $PIDFILE --exec $DAEMON -- $DAEMON_ARGS &>/dev/null
+
+}
+
+do_stop() {
+  log_daemon_msg "Stopping $DESC" "$NAME"
+  
+  start-stop-daemon --stop --quiet \
+    --retry=TERM/30/KILL/5 --pidfile $PIDFILE --exec $DAEMON &>/dev/null
+}
+
+
+case "$1" in
+  start)
+        do_start
+        ;;
+        
+  stop)
+        do_stop
+        ;;
+        
+  restart|force-reload)
+        do_stop
+        sleep 1
+        do_start
+        ;;
+        
+  *)
+        echo "Usage: /etc/init.d/ddserver {start|stop|restart}"
+        exit 2
+        ;;
+esac

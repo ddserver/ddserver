@@ -62,7 +62,10 @@ setuptools.setup(
     include_package_data = True,
 
     data_files = [
-        ('/etc/ddserver', ['ddserver/resources/ddserver.conf.example'])
+        ('/etc/ddserver', ['ddserver/resources/doc/ddserver.conf.example']),
+        ('/etc/init.d', ['ddserver/resources/doc/init.d/ddserver']),
+        ('/usr/share/doc/ddserver', ['ddserver/resources/doc/schema.sql',
+                                     'README', 'VERSION', 'LICENSE'])
     ],
 
     entry_points = {
