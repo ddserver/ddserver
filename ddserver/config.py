@@ -127,7 +127,7 @@ def Config(config_decl):
 
   # Opens and loads the configuration file
   config_file = configparser.SafeConfigParser()
-  config_file.read('/etc/ddserver.conf')
+  config_file.read('/etc/ddserver/ddserver.conf')
 
   # Parse all sections
   for section_name, options in config_decl.declarations.iteritems():
