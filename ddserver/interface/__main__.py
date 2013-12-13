@@ -23,6 +23,7 @@ import ddserver.interface.pages.lostpasswd  # @UnusedImport: for web application
 import ddserver.interface.pages.login  # @UnusedImport: for web application
 import ddserver.interface.pages.user.account  # @UnusedImport: for web application
 import ddserver.interface.pages.user.hosts  # @UnusedImport: for web application
+import ddserver.interface.pages.user.host  # @UnusedImport: for web application
 import ddserver.interface.pages.admin.users  # @UnusedImport: for web application
 import ddserver.interface.pages.admin.suffixes  # @UnusedImport: for web application
 

@@ -37,7 +37,7 @@ h3 {
   border: 1px solid #ddd;
   background: #f9f9f9;
   border-radius: 5px;
-  padding: 20px 10px 10px 10px;
+  padding: 10px;
   margin-bottom: 20px;
 }
 
@@ -86,4 +86,12 @@ td.noresults {
 
 #recaptcha_widget a {
   padding-left: 10px;
+}
+
+/*
+ * use current ip button
+ */
+#curIPbutton {
+  margin-left: 5px;
+  border-radius: 3px;
 }
