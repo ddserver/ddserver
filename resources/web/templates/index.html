@@ -28,8 +28,8 @@
     
     {% if not user %}
     <div class="span6">
-      <h3>Login</h3>
       <div class="box">
+        <h3><i class="icon-tag"></i> Login</h3>
         <form class="form-horizontal" action="/login" method="post">
           <div class="control-group">
             <label class="control-label" for="loginUsername">Username</label>
@@ -59,10 +59,10 @@
       </div>
       
       {% if config.signup.enabled %}
-      <h3>Signup</h3>
       <div class="box">
-        Want to use dynamic DNS?
-        <a class="btn btn-primary" href="/signup">Create an account</a>
+        <h3><i class="icon-tag"></i> Signup</h3>
+        <p class="c">Want to use dynamic DNS?</p>
+        <p class="c"><a class="btn btn-primary" href="/signup">Create an account</a></p>
       </div>
       {% endif %}
     </div>
