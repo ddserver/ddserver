@@ -68,8 +68,12 @@ td.noresults {
 }
 
 /*
- *
+ * navigation bar
  */
+.navbar {
+  box-shadow: 0px 3px 4px rgba(0, 0, 0, 0.4);
+}
+
 .navbar-inverse .divider-vertical {
   border-left-color: #111111;
   border-right-color: #333333;
