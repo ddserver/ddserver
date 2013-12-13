@@ -23,7 +23,7 @@ import setuptools
 version = open('./VERSION').read().strip()
 
 setuptools.setup(
-    license = 'GNU GPLv3',
+    license = 'GNU AGPLv3',
 
     name = 'ddserver',
     version = version,
@@ -48,9 +48,21 @@ setuptools.setup(
         'MySQL-python >= 1.2.0'
     ],
 
+    packages = setuptools.find_packages(),
+
+    package_data = {
+        'ddserver.resources': [
+            'email/*.mail',
+            'web/css/*.html',
+            'web/img/*.png',
+            'web/js/*.js',
+            'web/templates/*.html',
+        ],
+    },
+    include_package_data = True,
+
     data_files = [
-        ('/etc/ddserver', ['resources/config/settings.conf']),
-        ('/usr/share/ddserver', ['resources/web', 'resources/schema.sql']),
+        ('/etc/ddserver', ['ddserver/resources/ddserver.conf.example'])
     ],
 
     entry_points = {

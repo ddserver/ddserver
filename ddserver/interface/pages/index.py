@@ -33,6 +33,7 @@ def get_static(path):
 
   return bottle.static_file(path,
                             os.path.join(os.getcwd(),
+                                         'ddserver',
                                          'resources',
                                          'web'))
 

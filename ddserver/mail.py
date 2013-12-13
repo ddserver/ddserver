@@ -52,8 +52,8 @@ def config_email(config_decl):
 @export()
 class EmailManager(object):
   def __init__(self):
-    self.__environment = jinja2.Environment(loader = jinja2.PackageLoader('resources',
-                                                                          'email'))
+    self.__environment = jinja2.Environment(loader = jinja2.PackageLoader('ddserver.resources',
+                                                                          'ddserver.email'))
 
 
   @require(config = 'ddserver.config:Config')
