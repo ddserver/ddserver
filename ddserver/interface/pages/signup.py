@@ -71,7 +71,7 @@ def get_signup(config,
           email = validation.Email())
 @require(db = 'ddserver.db:Database',
          users = 'ddserver.interface.user:UserManager',
-         emails = 'ddserver.email:EmailManager',
+         emails = 'ddserver.mail:EmailManager',
          config = 'ddserver.config:Config',
          messages = 'ddserver.interface.message:MessageManager')
 def post_signup(data,
