@@ -57,6 +57,7 @@ setuptools.setup(
         'console_scripts' : [
             'ddserver-interface = ddserver.interface.__main__:main',
             'ddserver-updater = ddserver.updater.__main__:main',
+            'ddserver-bundle = ddserver.__main__:main',
             'ddserver-recursor = ddserver.recursor.__main__:main',
         ]
     },

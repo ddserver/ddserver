@@ -47,7 +47,7 @@ def get_lostpass(config,
 @captcha_check('/lostpass')
 @validate(username = validation.ExistendUsername())
 @require(users = 'ddserver.interface.user:UserManager',
-         emails = 'ddserver.email:EmailManager',
+         emails = 'ddserver.mail:EmailManager',
          messages = 'ddserver.interface.message:MessageManager')
 def post_lostpass(data,
                   users,

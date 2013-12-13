@@ -52,11 +52,13 @@
       <table class="table table-bordered table-striped table-hover">
         <tr>
           <th>Suffix</th>
+          <th width="200px">Usage</th>
           <th width="100px">Actions</th>
         </tr>
         {% for suffix in suffixes %}
           <tr>
             <td>{{suffix.name}}</td>
+            <td>{{suffix.count}} Hostnames</td>
             <td>
               <form action="/admin/suffixes/delete" method="post">
                 <input type="hidden" name="suffix_id" value="{{suffix.id}}">

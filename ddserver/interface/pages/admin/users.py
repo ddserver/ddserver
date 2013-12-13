@@ -78,7 +78,7 @@ def get_users(user,
 #           email = validators.Email())
 # @require(db = 'ddserver.db:Database',
 #          users = 'ddserver.interface.user:UserManager',
-#          emails = 'ddserver.email:EmailManager',
+#          emails = 'ddserver.mail:EmailManager',
 #          messages = 'ddserver.interface.message:MessageManager')
 # def post_user_add(username,
 #                   email,
@@ -118,7 +118,7 @@ def get_users(user,
           username = validation.ValidUsername(min = 1, max = 255))
 @require(db = 'ddserver.db:Database',
          users = 'ddserver.interface.user:UserManager',
-         emails = 'ddserver.email:EmailManager',
+         emails = 'ddserver.mail:EmailManager',
          messages = 'ddserver.interface.message:MessageManager')
 def post_users_activate(user,
                         data,

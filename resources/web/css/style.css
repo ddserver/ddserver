@@ -37,7 +37,7 @@ h3 {
   border: 1px solid #ddd;
   background: #f9f9f9;
   border-radius: 5px;
-  padding: 20px 10px 10px 10px;
+  padding: 10px;
   margin-bottom: 20px;
 }
 
@@ -68,8 +68,12 @@ td.noresults {
 }
 
 /*
- *
+ * navigation bar
  */
+.navbar {
+  box-shadow: 0px 3px 4px rgba(0, 0, 0, 0.4);
+}
+
 .navbar-inverse .divider-vertical {
   border-left-color: #111111;
   border-right-color: #333333;
@@ -86,4 +90,12 @@ td.noresults {
 
 #recaptcha_widget a {
   padding-left: 10px;
+}
+
+/*
+ * use current ip button
+ */
+#curIPbutton {
+  margin-left: 5px;
+  border-radius: 3px;
 }

@@ -41,7 +41,7 @@ def config_auth(config_decl):
 
 
 
-@route('/user/hosts', method = 'GET')
+@route('/user/hosts/list', method = 'GET')
 @authorized()
 @require(db = 'ddserver.db:Database',
          templates = 'ddserver.interface.template:TemplateManager')
@@ -51,13 +51,6 @@ def get_hosts_display(user,
   ''' Display the users hostnames and a form for adding new ones. '''
 
   with db.cursor() as cur:
-    # Get all available suffixes
-    cur.execute('''
-        SELECT *
-        FROM `suffixes`
-    ''')
-    suffixes = cur.fetchall()
-
     # Get hosts of the user
     cur.execute('''
         SELECT
@@ -73,14 +66,46 @@ def get_hosts_display(user,
     ''', {'user_id': user.id})
     hosts = cur.fetchall()
 
-  return templates['hosts.html'](hosts = hosts,
-                                 suffixes = suffixes)
+  return templates['hosts.html'](hosts = hosts)
+
+
+
+@route('/user/hosts/add', method = 'GET')
+@authorized()
+@require(db = 'ddserver.db:Database',
+         config = 'ddserver.config:Config',
+         templates = 'ddserver.interface.template:TemplateManager')
+def get_hosts_add(user,
+                  db,
+                  config,
+                  templates):
+  ''' form for adding new hostnames '''
+
+  with db.cursor() as cur:
+    # Get all available suffixes
+    cur.execute('''
+        SELECT *
+        FROM `suffixes`
+    ''')
+    suffixes = cur.fetchall()
+
+    # Get number of hosts of the user
+    cur.execute('''
+        SELECT
+          COUNT(`host`.`id`) AS `count`
+        FROM `hosts` AS `host`
+        WHERE `user_id` = %(user_id)s
+    ''', {'user_id': user.id})
+    hosts = cur.fetchone()
+
+  return templates['addhost.html'](hosts = hosts,
+                                   suffixes = suffixes)
 
 
 
 @route('/user/hosts/add', method = 'POST')
 @authorized()
-@validate('/user/hosts',
+@validate('/user/hosts/add',
           hostname = validation.UniqueHostname(),
           suffix = validation.Int(not_empty = True),
           address = validation.IPAddress(),
@@ -128,13 +153,13 @@ def post_hosts_add(user,
 
   messages.success('Ok, done.')
 
-  bottle.redirect('/user/hosts')
+  bottle.redirect('/user/hosts/list')
 
 
 
 @route('/user/hosts/delete', method = 'POST')
 @authorized()
-@validate('/user/hosts',
+@validate('/user/hosts/list',
           host_id = validation.Int(not_empty = True))
 @require(db = 'ddserver.db:Database',
          messages = 'ddserver.interface.message:MessageManager')
@@ -158,4 +183,4 @@ def post_hosts_delete(user,
 
   messages.success('Ok, done.')
 
-  bottle.redirect('/user/hosts')
+  bottle.redirect('/user/hosts/list')

@@ -1,5 +1,5 @@
 '''
-Copyright 2013 Dustin Frisch<fooker@lab.sh>
+Copyright 2013 Sven Reissmann <sven@0x80.io>
 
 This file is part of ddserver.
 
@@ -17,6 +17,8 @@ You should have received a copy of the GNU Affero General Public License
 along with ddserver. If not, see <http://www.gnu.org/licenses/>.
 '''
 
+from ddserver.utils.deps import require
+
 import ddserver.interface.pages.index  # @UnusedImport: for web application
 import ddserver.interface.pages.signup  # @UnusedImport: for web application
 import ddserver.interface.pages.lostpasswd  # @UnusedImport: for web application
@@ -27,7 +29,7 @@ import ddserver.interface.pages.user.host  # @UnusedImport: for web application
 import ddserver.interface.pages.admin.users  # @UnusedImport: for web application
 import ddserver.interface.pages.admin.suffixes  # @UnusedImport: for web application
 
-from ddserver.utils.deps import require
+import ddserver.updater.nic  # @UnusedImport: for web application
 
 
 
