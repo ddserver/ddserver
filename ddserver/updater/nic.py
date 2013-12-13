@@ -130,7 +130,9 @@ def update(logger, db, username, password, hostnames, address):
     # Check the users credentials (passwords are assigned to hosts)
     if not pwd.verify(password, host['password']):
       logger.warning('Mismatching credentials for host %s', hostname)
-      return resp_badauth()
+
+      responses.append(resp_badauth())
+      continue
 
     # Check if the address has changed
     if host['address'] == address:
@@ -166,9 +168,9 @@ def get_ip():
 
 
 
-@route('/nic/update', method = 'POST')
+@route('/nic/update', method = 'GET')
 @require(logger = 'ddserver.utils.logger:Logger')
-def post_update(logger):
+def get_update(logger):
   ''' Handles an update request from a ddclient implementation. '''
 
   # Extract the hostnames separated by comma, the new IP address and the offline
