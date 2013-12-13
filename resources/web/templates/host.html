@@ -153,17 +153,34 @@
                     With OpenWRT 12.09 you can use the LuCI Web-UI or configure dynamic DNS using
                     the command line to edit <i>/etc/config/ddns</i>.
                   </p>
+                  <h4>Using the Web-UI</h4>
                   <p>
-                    If you want to use LuCI, you need to install the <i>luci-app-ddns</i> package.
-                    You will then find the configuration by navigating to                
-                    <pre>Services &rarr; Dynamic DNS</pre>
+                    To use DDNS from inside the LuCI Web-UI, you have to install 
+                    the <i>luci-app-ddns</i> package. This will automatically 
+                    install the package ddns-scripts, which contains the scripts
+                    that actually update the dynamic DNS name.
                   </p>
+                    After <i>luci-app-ddns</i> has been installed, you will find
+                    the DDNS configuration by navigating to                
+                    <pre>Services &rarr; Dynamic DNS</pre>
+                    
+                    Use the following settings, to update your DDNS hostname:
+                    <pre>
+                      
+                    </pre>  
+                  </p>
+                  
+                  <h4>Using the CLI</h4>
                   <p>
-                    To use <i>ddns-scripts</i> directly, first install the needed packages:
+                    To use <i>ddns-scripts</i> directly, first install the 
+                    needed packages:
                     <pre>opkg update<br>opkg install ddns-scripts</pre>
                     
-                    In <i>/etc/config/ddns</i> add the following:
-                    <pre>blablabla</pre>
+                    Now edit the configuration file <i>/etc/config/ddns</i> and
+                    add the following:
+                    <pre>
+                      
+                    </pre>
                   </p>
                   
                   
@@ -193,6 +210,32 @@
               </div>
               <div id="collapse4" class="accordion-body collapse">
                 <div class="accordion-inner">
+                  If you are from germany, using a fritz.box, navigating to:
+                  <pre>Internet &rarr; Freigaben &rarr; Dynamic DNS</pre>
+                  
+                  Please use the following settings to update your dynamic hostnames:
+                  <table class="table">
+                    <tr>
+                      <td>Dynamic DNS-Anbieter</td>
+                      <td>Benutzerdefiniert</td>
+                    </tr>
+                    <tr>
+                      <td>Update-URL</td>
+                      <td>http://server:port/nic/update?hostname=&lt;domain&gt;&amp;myip=&lt;ipaddr&gt;</td>
+                    </tr>
+                    <tr>
+                      <td>Domainname</td>
+                      <td>{{host.hostname}}.{{host.suffix}}</td>
+                    </tr>
+                    <tr>
+                      <td>Benutzername</td>
+                      <td>{{session.username}}</td>
+                    </tr>
+                    <tr>
+                      <td>Kennwort</td>
+                      <td><i>Your hostnames password</i></td>
+                    </tr>
+                  </table> 
                 </div>
               </div>
             </div>
