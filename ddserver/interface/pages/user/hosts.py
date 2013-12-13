@@ -99,7 +99,8 @@ def get_hosts_add(user,
     hosts = cur.fetchone()
 
   return templates['addhost.html'](hosts = hosts,
-                                   suffixes = suffixes)
+                                   suffixes = suffixes,
+                                   current_ip = bottle.request.remote_addr)
 
 
 
