@@ -1,0 +1,5 @@
+include README LICENSE VERSION
+include setup.cfg setup.py
+recursive-include ddserver *
+recursive-exclude docs *.pyc
+recursive-exclude docs *.pyo
