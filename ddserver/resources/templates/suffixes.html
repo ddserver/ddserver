@@ -58,7 +58,7 @@
         {% for suffix in suffixes %}
           <tr>
             <td>{{suffix.name}}</td>
-            <td>{{suffix.count}} Hostnames</td>
+            <td><a href="/admin/suffix/{{suffix.id}}">{{suffix.count}} Hostnames</a></td>
             <td>
               <form action="/admin/suffixes/delete" method="post">
                 <input type="hidden" name="suffix_id" value="{{suffix.id}}">

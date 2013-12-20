@@ -109,3 +109,64 @@ def post_suffix_delete(user,
   messages.success('Ok, done.')
 
   bottle.redirect('/admin/suffixes')
+
+
+@route('/admin/suffix/<suffix_id>', method = 'GET')
+@authorized_admin()
+@require(db = 'ddserver.db:Database',
+         templates = 'ddserver.interface.template:TemplateManager')
+def get_suffix_hostnames(user,
+                         db,
+                         templates,
+                         suffix_id):
+  ''' Display a list of hostnames for a given suffixes. '''
+
+  with db.cursor() as cur:
+    cur.execute('''
+      SELECT `suffixes`.`name` AS suffixname
+        FROM `suffixes`
+      WHERE `suffixes`.`id` = %(suffix_id)s
+    ''', {'suffix_id': suffix_id})
+    suffixname = cur.fetchone()
+
+    cur.execute('''
+      SELECT `suffixes`.`name` AS suffixname,
+             `users`.`username` AS username,
+             `hosts`.*
+        FROM `suffixes`
+      LEFT JOIN `hosts`
+        ON `suffixes`.`id` = `hosts`.`suffix_id`
+      LEFT JOIN `users`
+        ON `hosts`.`user_id` = `users`.`id`
+      WHERE `suffixes`.`id` = %(suffix_id)s
+    ''', {'suffix_id': suffix_id})
+    hostlist = cur.fetchall()
+
+  return templates['suffix_hosts.html'](suffix = suffixname,
+                                        hostlist = hostlist)
+
+
+
+
+@route('/admin/suffix/deleteHost', method = 'POST')
+@authorized_admin()
+@validate('/admin/suffixes',
+          host_id = validation.Int(not_empty = True))
+@require(db = 'ddserver.db:Database',
+         messages = 'ddserver.interface.message:MessageManager')
+def post_hosts_delete(user,
+                      data,
+                      db,
+                      messages):
+  ''' Delete a hostname administratively. '''
+
+  with db.cursor() as cur:
+    cur.execute('''
+        DELETE
+        FROM hosts
+        WHERE id = %(host_id)s
+    ''', {'host_id': data.host_id})
+
+  messages.success('Ok, done.')
+
+  bottle.redirect('/admin/suffixes')

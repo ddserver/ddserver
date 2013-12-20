@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+  <div class="row-fluid">
+    <div class="span12"><h1>Suffix: {{suffix.suffixname}}</h1></div>
+  </div>
+  
+  <div class="row-fluid">
+    <div class="box">
+      <h3><i class="icon-tag"></i> Hostnames</h3>
+        
+      {% if hostlist %}
+        <table class="table table-bordered table-striped table-hover">
+          <tr>
+            <th>Hostname</th>
+            <th>User</th> 
+            <th>Address</th>
+            <th>Updated</th>
+            <th width="100px">Actions</th>
+          </tr>
+          {% for host in hostlist %}
+            <tr>
+              <td>{{host.hostname}}</td>
+              
+              <td>{{host.username}}</td>
+              
+              <td>
+                {% if host.address %}
+                  {{host.address}}
+                {% else %}
+                  <span class="muted">-</span>
+                {% endif %}
+              </td>
+              
+              <td>{{host.updated}}</td>
+              
+              <td>
+                <a href="#modal{{host.id}}" class="btn btn-danger" data-toggle="modal">Delete</a>
+                <div class="modal hide fade" id="modal{{host.id}}">
+                  <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h3>Delete hostname</h3>
+                  </div>
+                  <div class="modal-body">
+                    <p>
+                      Do you really want to delete this hostname?
+                    </p>
+                    <p>
+                      Hostname: <b>{{host.hostname}}</b><br />
+                      Owner: <b>{{host.username}}</b>
+                    </p>
+                  </div>
+                  <div class="modal-footer">
+                    <form class="form-horizontal" action="/admin/suffix/deleteHost" method="post">
+                      <input type="hidden" name="host_id" value="{{host.id}}">
+                      <div class="control-group">
+                        <div class="controls">
+                          <a href="#modal{{host.id}}" class="btn" data-toggle="modal">Cancel</a>
+                          <button type="submit" class="btn btn-primary btn-danger">Delete</button>
+                        </div>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+                
+              </td>
+            </tr>
+          {% endfor %}
+        </table>
+        
+      {% else %}
+      
+        <p>
+          No hostnames defined for this suffix.
+        </p>
+      
+      {% endif %}
+      
+      </div>
+    
+  </div>
+{% endblock %}
