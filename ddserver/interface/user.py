@@ -79,7 +79,7 @@ class UserManager(object):
     user = self[username]
 
     if not user or not pwd.verify(password, user.password):
-      messages.error('Login incorrect.')
+      messages.error('The username or password you entered was incorrect.')
 
       return False
 
@@ -108,7 +108,7 @@ class UserManager(object):
     session.username = None
     session.save()
 
-    messages.success('Good by.')
+    messages.success('Good bye.')
 
 
   @require(db = 'ddserver.db:Database')
@@ -153,7 +153,7 @@ def authorized(admin = False):
       user = users.authorized
 
       if not user or (admin and not user.admin):
-        messages.error('Not authorized!')
+        messages.error('You are not authorized to display this page!')
         bottle.redirect('/')
 
       # Inject the user in the wrapped function
@@ -185,7 +185,7 @@ def authorized_by_code():
       user = users[username]
 
       if user.authcode != authcode:
-        messages.error('Invalid auth code!')
+        messages.error('The auth code you provided was invalid!')
         bottle.redirect('/')
 
       # Inject the user in the wrapped function
