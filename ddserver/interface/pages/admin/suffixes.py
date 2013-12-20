@@ -131,13 +131,12 @@ def get_suffix_hostnames(user,
     suffixname = cur.fetchone()
 
     cur.execute('''
-      SELECT `suffixes`.`name` AS suffixname,
-             `users`.`username` AS username,
+      SELECT `users`.`username` AS username,
              `hosts`.*
         FROM `suffixes`
-      LEFT JOIN `hosts`
+      RIGHT JOIN `hosts`
         ON `suffixes`.`id` = `hosts`.`suffix_id`
-      LEFT JOIN `users`
+      RIGHT JOIN `users`
         ON `hosts`.`user_id` = `users`.`id`
       WHERE `suffixes`.`id` = %(suffix_id)s
     ''', {'suffix_id': suffix_id})
