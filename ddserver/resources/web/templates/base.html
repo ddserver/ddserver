@@ -24,8 +24,8 @@
             {% if user %}
             <li><a href="/user/hosts/add" title="Manage Hostnames"><i class="icon-th-large icon-white"></i> Hostnames</a></li>
             <li><a href="/user/account" title="Manage Account"><i class="icon-user icon-white"></i> Account</a></li>
-              <li class="divider-vertical"></li>
               {% if user.admin %}
+              <li class="divider-vertical"></li>
               <li><a href="/admin/users/all" title="Manage Users"><i class="icon-th-large icon-white"></i> Users</a></li>
               <li><a href="/admin/suffixes" title="Manage Suffixes"><i class="icon-th-large icon-white"></i> Suffixes</a></li>
               {% endif %}
