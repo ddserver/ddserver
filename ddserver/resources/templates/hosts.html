@@ -12,9 +12,10 @@
   </ul>
   
   <div class="row-fluid">
-    {% if hosts %}
-      <div class="box">
-        <h3><i class="icon-tag"></i> Your Hostnames</h3>
+    <div class="box">
+      <h3><i class="icon-tag"></i> Your Hostnames</h3>
+
+      {% if hosts %}
         <table class="table table-bordered table-striped table-hover">
           <tr>
             <th>Hostname</th>
@@ -41,16 +42,46 @@
               <td>{{host.updated}}</td>
               
               <td>
-                <form action="/user/hosts/delete" method="post">
-                  <input type="hidden" name="host_id" value="{{host.id}}">
-                  <input type="submit" class="btn btn-danger" value="Delete">
-                </form>
+                <a href="#modal{{host.id}}" class="btn btn-danger" data-toggle="modal">Delete</a>
+                <div class="modal hide fade" id="modal{{host.id}}">
+                  <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h3>Delete hostname</h3>
+                  </div>
+                  <div class="modal-body">
+                    <p>
+                      Do you really want to delete this hostname?
+                    </p>
+                    <p>
+                      Hostname: <b>{{host.hostname}}</b>
+                    </p>
+                  </div>
+                  <div class="modal-footer">
+                    <form class="form-horizontal" action="/user/hosts/delete" method="post">
+                      <input type="hidden" name="host_id" value="{{host.id}}">
+                      <div class="control-group">
+                        <div class="controls">
+                          <a href="#modal{{host.id}}" class="btn" data-toggle="modal">Cancel</a>
+                          <button type="submit" class="btn btn-primary btn-danger">Delete</button>
+                        </div>
+                      </div>
+                    </form>
+                  </div>
+                </div>
               </td>
             </tr>
           {% endfor %}
         </table>
+
+      {% else %}
+
+        <p>
+          You have not added any hostnames so far.
+        </p>
+        
+      {% endif %}
+
       </div>
-    {% endif %}
-    
+
   </div>
 {% endblock %}

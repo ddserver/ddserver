@@ -9,7 +9,7 @@
   <div class="row-fluid">
     <div class="box">
       <h3><i class="icon-tag"></i> Hostnames</h3>
-        
+
       {% if hostlist %}
         <table class="table table-bordered table-striped table-hover">
           <tr>
@@ -63,21 +63,20 @@
                     </form>
                   </div>
                 </div>
-                
               </td>
             </tr>
           {% endfor %}
         </table>
-        
+
       {% else %}
-      
+
         <p>
           No hostnames defined for this suffix.
         </p>
-      
+
       {% endif %}
-      
+
       </div>
-    
+
   </div>
 {% endblock %}
