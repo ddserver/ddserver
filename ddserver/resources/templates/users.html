@@ -54,10 +54,32 @@
               {% endif %}
               </td>
               <td width="70px" style="border-left: 0px">
-                <form action="/admin/users/delete" method="post">
-                  <input type="hidden" name="user_id" value="{{user.id}}">
-                  <input type="submit" class="btn btn-danger" value="Delete" style="width: 70px;">
-                </form>
+                <a href="#modal{{user.id}}" class="btn btn-danger" data-toggle="modal">Delete</a>
+                <div class="modal hide fade" id="modal{{user.id}}">
+                  <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h3>Delete hostname</h3>
+                  </div>
+                  <div class="modal-body">
+                    <p>
+                      Do you really want to delete this user?
+                    </p>
+                    <p>
+                      Username: <b>{{user.username}}</b>
+                    </p>
+                  </div>
+                  <div class="modal-footer">
+                    <form class="form-horizontal" action="/admin/users/delete" method="post">
+                      <input type="hidden" name="user_id" value="{{user.id}}">
+                      <div class="control-group">
+                        <div class="controls">
+                          <a href="#modal{{user.id}}" class="btn" data-toggle="modal">Cancel</a>
+                          <button type="submit" class="btn btn-primary btn-danger">Delete</button>
+                        </div>
+                      </div>
+                    </form>
+                  </div>
+                </div>
               </td>
             </tr>
           {% endfor %}
