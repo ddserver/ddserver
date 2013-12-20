@@ -45,6 +45,7 @@ def get_suffixes(user,
         FROM `suffixes`
       LEFT JOIN `hosts`
         ON `suffixes`.`id` = `hosts`.`suffix_id`
+      GROUP BY `suffixes`.`id`
     ''')
     suffixes = cur.fetchall()
 

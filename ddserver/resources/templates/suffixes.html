@@ -60,12 +60,40 @@
             <td>{{suffix.name}}</td>
             <td><a href="/admin/suffix/{{suffix.id}}">{{suffix.count}} Hostnames</a></td>
             <td>
-              <form action="/admin/suffixes/delete" method="post">
-                <input type="hidden" name="suffix_id" value="{{suffix.id}}">
-                <input type="submit" class="btn btn-danger" value="Delete">
-              </form>
+              <a href="#modal{{suffix.id}}" class="btn btn-danger" data-toggle="modal">Delete</a>
+              <div class="modal hide fade" id="modal{{suffix.id}}">
+                <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                  <h3>Delete suffix</h3>
+                </div>
+                <div class="modal-body">
+                  <p>
+                    Do you really want to delete this suffix?
+                  </p>
+                  {% if suffix.count > 0 %}
+                  <p>
+                    Be aware, that this will also delete {{suffix.count}} hostnames
+                    that are using this suffix!
+                  <p>
+                  {% endif %}
+                  <p>
+                    Suffix: <b>{{suffix.name}}</b>
+                  </p>
+                </div>
+                <div class="modal-footer">
+                  <form class="form-horizontal" action="/admin/suffixes/delete" method="post">
+                    <input type="hidden" name="suffix_id" value="{{suffix.id}}">
+                    <div class="control-group">
+                      <div class="controls">
+                        <a href="#modal{{suffix.id}}" class="btn" data-toggle="modal">Cancel</a>
+                        <button type="submit" class="btn btn-primary btn-danger">Delete</button>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+              </div>
             </td>
-          </tr>  
+          </tr>
         {% endfor %}
       </table>
     </div>
