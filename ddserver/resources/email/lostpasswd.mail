@@ -1,8 +1,6 @@
 {% extends "base.mail" %}
 
-{% block subject %}
-ddserver: Your password reset request
-{% endblock %}
+{% block subject %}ddserver: Your password reset request{% endblock %}
 
 {% block content %}
 Hi {{user.username}},

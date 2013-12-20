@@ -1,8 +1,6 @@
 {% extends "base.mail" %}
 
-{% block subject %}
-ddserver: Activate your account
-{% endblock %}
+{% block subject %}ddserver: Activate your account{% endblock %}
 
 {% block content %}
 Hi {{user.username}},

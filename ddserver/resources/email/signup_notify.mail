@@ -1,8 +1,6 @@
 {% extends "base.mail" %}
 
-{% block subject %}
-ddserver: New user account
-{% endblock %}
+{% block subject %}ddserver: New user account{% endblock %}
 
 {% block content %}
 Hi {{config.contact.name}},
