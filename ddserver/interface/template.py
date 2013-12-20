@@ -28,7 +28,7 @@ import jinja2
 class TemplateManager(object):
   def __init__(self):
     self.__environment = jinja2.Environment(loader = jinja2.PackageLoader('ddserver.resources',
-                                                                          'web/templates'))
+                                                                          'templates'))
 
     self.__globals = {}
 

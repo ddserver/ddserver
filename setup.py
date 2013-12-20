@@ -56,7 +56,7 @@ setuptools.setup(
             'web/css/*.html',
             'web/img/*.png',
             'web/js/*.js',
-            'web/templates/*.html',
+            'templates/*.html',
         ],
     },
     include_package_data = True,

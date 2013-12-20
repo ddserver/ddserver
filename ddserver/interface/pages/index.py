@@ -23,19 +23,27 @@ import bottle
 
 from ddserver.web import route
 
-from ddserver.utils.deps import require
+from ddserver.utils.deps import require, extend
+
+
+
+@extend('ddserver.config:ConfigDeclaration')
+def config_wsgi(config_decl):
+  with config_decl.declare('wsgi') as s:
+    s('static_files',
+      conv = str,
+      default = '/usr/share/ddserver/static')
 
 
 
 @route('/static/<path:path>', method = 'GET')
-def get_static(path):
+@require(config = 'ddserver.config:Config')
+def get_static(path,
+               config):
   ''' Provides a route to static files (like css, images, etc). '''
 
   return bottle.static_file(path,
-                            os.path.join(os.getcwd(),
-                                         'ddserver',
-                                         'resources',
-                                         'web'))
+                            root = config.wsgi.static_files)
 
 
 
