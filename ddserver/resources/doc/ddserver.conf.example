@@ -3,7 +3,7 @@
 ;port = 3306
 ;name = ddserver
 ;username = ddserver
-password = ddserver
+password = YourDatabasePassword
 
 [logging]
 ;verbose = False
@@ -28,12 +28,12 @@ password = ddserver
 ;static_files = /usr/share/ddserver/static
 
 [smtp]
-host = mail.lab.sh
+host = 127.0.0.1
 ;port = 25
 
 [contact]
-name = Dustin Frisch
-email = fooker@lab.sh
+name = Administrator
+email = admin@example.com
 
 [captcha]
 ;enabled = False
