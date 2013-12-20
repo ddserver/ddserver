@@ -64,6 +64,13 @@ setuptools.setup(
     data_files = [
         ('/etc/ddserver', ['ddserver/resources/doc/ddserver.conf.example']),
         ('/etc/init.d', ['ddserver/resources/doc/init.d/ddserver']),
+        ('/usr/share/ddserver/static/css', ['ddserver/resources/web/css/bootstrap.min.css',
+                                            'ddserver/resources/web/css/bootstrap-responsive.min.css',
+                                            'ddserver/resources/web/css/ddserver.css']),
+        ('/usr/share/ddserver/static/img', ['ddserver/resources/web/img/glyphicons-halflings.png',
+                                            'ddserver/resources/web/img/glyphicons-halflings-white.png']),
+        ('/usr/share/ddserver/static/js', ['ddserver/resources/web/js/bootstrap.min.js',
+                                           'ddserver/resources/web/js/jquery.min.js']),
         ('/usr/share/doc/ddserver', ['ddserver/resources/doc/schema.sql',
                                      'README', 'VERSION', 'LICENSE'])
     ],
