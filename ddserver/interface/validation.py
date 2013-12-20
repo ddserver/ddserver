@@ -79,7 +79,8 @@ def validate(__on_error__ = '/',
              **kwargs)
 
       except formencode.Invalid, e:
-        messages.error(e)
+        for msg in e.error_dict.itervalues():
+          messages.error(msg)
 
       bottle.redirect(__on_error__)
 
