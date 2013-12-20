@@ -55,7 +55,7 @@ def get_account(user,
 
 @route('/user/account', method = 'POST')
 @authorized()
-@validate('/account',
+@validate('/user/account',
           email = validation.Email())
 @require(db = 'ddserver.db:Database',
          messages = 'ddserver.interface.message:MessageManager')
@@ -81,7 +81,7 @@ def post_account_edit(user,
 
 @route('/user/account/password', method = 'POST')
 @authorized()
-@validate('/account',
+@validate('/user/account',
           password = validation.SecurePassword(min = 8),
           password_confirm = validation.String(),
           chained_validators = [validation.FieldsMatch('password', 'password_confirm')])
