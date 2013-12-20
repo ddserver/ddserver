@@ -11,7 +11,16 @@
       <div class="row-fluid">
         <div class="span6">
           <p>
-            Please choose a password and click the button to activate your account.
+            Hi {{username}},
+          </p>
+          <p>
+            You registered for a ddserver account. To finish the registration 
+            process and to be able to login, you need to set a password.
+          </p>
+          <p>
+            Please choose a secure password, using upper- and lowercase characters, 
+            as well as numbers or special characters. The minimum password 
+            length is {{config.auth.password_min_chars}} characters.
           </p>
         </div>
     
@@ -56,8 +65,8 @@
       <div class="row-fluid">
         <div class="span6">
           <p>
-            If you did not signup for a ddserver account, you may cancel the
-            signup process now by clicking the button on the right. This will
+            If you did not register for a ddserver account, you may cancel the
+            signup process by clicking the button on the right. This will
             remove all your personal information from our system.
           </p>
         </div>

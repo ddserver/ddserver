@@ -179,6 +179,11 @@ def authorized_by_code():
                 messages,
                 *args,
                 **kwargs):
+      if (bottle.request.query.username == "" or
+         bottle.request.query.authcode == ""):
+        messages.error('You have to provide username and authcode!')
+        bottle.redirect('/')
+
       username = bottle.request.query.username
       authcode = bottle.request.query.authcode
 
