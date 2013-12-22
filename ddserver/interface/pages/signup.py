@@ -122,10 +122,10 @@ def post_signup(data,
 
       messages.success('Your account has been created and will be reviewed by an administrator.')
 
-      # Notify the admin about the new account
-      if config.signup.notify_admin:
-        emails.to_admin('signup_notify.mail',
-                        user = user)
+    # Notify the admin about the new account
+    if config.signup.notify_admin:
+      emails.to_admin('signup_notify.mail',
+                      user = user)
 
   bottle.redirect('/')
 

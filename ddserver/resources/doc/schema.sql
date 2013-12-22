@@ -27,7 +27,7 @@ DROP TABLE IF EXISTS `hosts`;
 CREATE TABLE `users` (
   `id`          INT            NOT NULL AUTO_INCREMENT PRIMARY KEY,
   `username`    VARCHAR(255)   NOT NULL UNIQUE,
-  `password`    VARCHAR(255)   NOT NULL,
+  `password`    VARCHAR(255)   NULL,
   `email`       VARCHAR(255)   NOT NULL,
   `admin`       BOOLEAN        NOT NULL DEFAULT FALSE,
   `active`      BOOLEAN        NOT NULL DEFAULT FALSE,

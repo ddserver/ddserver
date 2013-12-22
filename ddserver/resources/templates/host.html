@@ -121,7 +121,7 @@
                     </tr>
                     <tr>
                       <td>DYNDNS Server</td>
-                      <td></td>
+                      <td>{{config.wsgi.baseurl}}</td>
                     </tr>
                     <tr>
                       <td>Username</td>
@@ -166,7 +166,8 @@
                     
                     Use the following settings, to update your DDNS hostname:
                     <pre>
-                      
+  TODO 
+  (If you are using OpenWRT please send us your experience.)
                     </pre>  
                   </p>
                   
@@ -179,7 +180,8 @@
                     Now edit the configuration file <i>/etc/config/ddns</i> and
                     add the following:
                     <pre>
-                      
+  TODO
+  (If you are using OpenWRT please send us your experience.)
                     </pre>
                   </p>
                   
@@ -197,6 +199,7 @@
               </div>
               <div id="collapse3" class="accordion-body collapse">
                 <div class="accordion-inner">
+                  TODO (If you are using Tomato please send us your experience.)
                 </div>
               </div>
             </div>
@@ -221,7 +224,7 @@
                     </tr>
                     <tr>
                       <td>Update-URL</td>
-                      <td>http://server:port/nic/update?hostname=&lt;domain&gt;&amp;myip=&lt;ipaddr&gt;</td>
+                      <td>{{config.wsgi.baseurl}}/nic/update?hostname=&lt;domain&gt;&amp;myip=&lt;ipaddr&gt;</td>
                     </tr>
                     <tr>
                       <td>Domainname</td>
@@ -262,7 +265,7 @@
   
   # == Update server
   protocol=noip, \
-  server=XXXX, \
+  server={{config.wsgi.baseurl}}, \
   login={{username}}, \
   password=<i>YourHostnamePassword</i> \
   {{host.hostname}}.{{host.suffix}}
