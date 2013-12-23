@@ -94,8 +94,9 @@ class ValidHostname(FancyValidator):
 
   messages = {
     'too_short': 'Hostname can not be empty',
-    'too_long': 'Hostname can not exceed 255 characters',
-    'non_letter': 'Hostname can only consist of a-z, 0-9, -, .'
+    'too_long': 'Hostname can not exceed 63 characters',
+    'non_letter': 'Hostname can only consist of a-z, 0-9, -, .',
+    'invalid_start': 'Hostnames must start with an aplhanumeric character'
   }
 
   letter_regex = re.compile(r'[a-z0-9\-\.]+')
@@ -109,7 +110,7 @@ class ValidHostname(FancyValidator):
                                value,
                                state)
 
-    if len(value) > 255:
+    if len(value) > 63:
       raise formencode.Invalid(self.message("too_long",
                                             value),
                                value,
@@ -117,6 +118,12 @@ class ValidHostname(FancyValidator):
 
     if not self.letter_regex.match(value):
       raise formencode.Invalid(self.message('non_letter',
+                                            value),
+                               value,
+                               state)
+
+    if value[0] == '-' or value[0] == '.':
+      raise formencode.Invalid(self.message('invalid_start',
                                             value),
                                value,
                                state)
