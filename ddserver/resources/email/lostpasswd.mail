@@ -10,7 +10,7 @@ We've heard you lost your ddserver password.
 Don't panic, changing your password is simple. Please click the link below to
 set a new password for your account.
 
-{{config.wsgi.baseurl}}/lostpass/recover?username={{user.username}}&authcode={{user.authcode}}
+{{config.wsgi.protocol}}{{config.wsgi.basename}}/lostpass/recover?username={{user.username}}&authcode={{user.authcode}}
 
 If you did not request a password reset, please use the same link to cancel the
 password reset request.

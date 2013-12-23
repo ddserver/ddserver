@@ -43,9 +43,14 @@ def config_email(config_decl):
       conv = str)
 
   with config_decl.declare('wsgi') as s:
-    s('baseurl',
+    s('protocol',
       conv = str,
-      default = 'http://localhost:8080')
+      default = 'http://')
+
+  with config_decl.declare('wsgi') as s:
+    s('basename',
+      conv = str,
+      default = 'localhost:8080')
 
 
 

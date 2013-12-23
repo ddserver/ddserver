@@ -121,7 +121,7 @@
                     </tr>
                     <tr>
                       <td>DYNDNS Server</td>
-                      <td>{{config.wsgi.baseurl}}</td>
+                      <td>{{config.wsgi.protocol}}{{config.wsgi.basename}}</td>
                     </tr>
                     <tr>
                       <td>Username</td>
@@ -224,7 +224,7 @@
                     </tr>
                     <tr>
                       <td>Update-URL</td>
-                      <td>{{config.wsgi.baseurl}}/nic/update?hostname=&lt;domain&gt;&amp;myip=&lt;ipaddr&gt;</td>
+                      <td>{{config.wsgi.protocol}}{{config.wsgi.basename}}/nic/update?hostname=&lt;domain&gt;&amp;myip=&lt;ipaddr&gt;</td>
                     </tr>
                     <tr>
                       <td>Domainname</td>
@@ -262,11 +262,12 @@
   mail=root
   mail-failure=root
   ssl=yes
+  use=if, if=<i>YourExternalInterface</i>
   
   # == Update server
   protocol=noip, \
-  server={{config.wsgi.baseurl}}, \
-  login={{username}}, \
+  server={{config.wsgi.basename}}, \
+  login={{session.username}}, \
   password=<i>YourHostnamePassword</i> \
   {{host.hostname}}.{{host.suffix}}
                   </pre>

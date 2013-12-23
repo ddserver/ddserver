@@ -8,7 +8,7 @@ Hi {{user.username}},
 Thank you for registering for a ddserver account.
 Your account has been created. Please use the link below to activate it.
 
-{{config.wsgi.baseurl}}/signup/activate?username={{user.username}}&authcode={{user.authcode}}
+{{config.wsgi.protocol}}{{config.wsgi.basename}}/signup/activate?username={{user.username}}&authcode={{user.authcode}}
 
 If you did not signup for a ddserver account yourself, you can delete the
 account using the same link.
