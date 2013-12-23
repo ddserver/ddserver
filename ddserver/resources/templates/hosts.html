@@ -21,7 +21,7 @@
             <th>Hostname</th>
             <th width="20%">Address</th>
             <th width="160px">Updated</th>
-            <th width="100px">Actions</th>
+            <th width="145px">Actions</th>
           </tr>
           {% for host in hosts %}
             <tr>
@@ -42,6 +42,8 @@
               <td>{{host.updated}}</td>
               
               <td>
+                <a class="btn" href="/user/host/{{host.id}}" rel="tooltip" data-toggle="tooltip" title="Show details">Details</a>
+
                 <a href="#modal{{host.id}}" class="btn btn-danger" data-toggle="modal">Delete</a>
                 <div class="modal hide fade" id="modal{{host.id}}">
                   <div class="modal-header">
