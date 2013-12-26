@@ -63,7 +63,7 @@ setuptools.setup(
 
     data_files = [
         ('/etc/ddserver', ['ddserver/resources/doc/ddserver.conf.example']),
-        ('/etc/init.d', ['ddserver/resources/doc/init.d/ddserver']),
+        ('/etc/init.d', ['ddserver/resources/doc/debian.init.d/ddserver']),
         ('/usr/share/ddserver/static/css', ['ddserver/resources/web/css/bootstrap.min.css',
                                             'ddserver/resources/web/css/bootstrap-responsive.min.css',
                                             'ddserver/resources/web/css/ddserver.css']),
