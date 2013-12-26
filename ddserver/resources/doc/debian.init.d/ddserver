@@ -7,7 +7,7 @@
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
 # Short-Description: Start the ddserver-bundle application
-# Description:       Start the ddserver-bundle application providing the 
+# Description:       Start the ddserver-bundle application providing the
 #                    ddserver webui and the ddns update interface.
 ### END INIT INFO
 
@@ -32,17 +32,16 @@ SCRIPTNAME=/etc/init.d/$NAME
 
 do_start() {
   log_daemon_msg "Starting $DESC" "$NAME"
-  
-  start-stop-daemon --start --quiet \
-    --pidfile $PIDFILE --exec $DAEMON -- $DAEMON_ARGS &>/dev/null
+
+  start-stop-daemon --start --quiet --oknodo --background \
+    --make-pidfile --pidfile $PIDFILE --exec $DAEMON -- $DAEMON_ARGS
 
 }
 
 do_stop() {
   log_daemon_msg "Stopping $DESC" "$NAME"
-  
-  start-stop-daemon --stop --quiet \
-    --retry=TERM/30/KILL/5 --pidfile $PIDFILE --exec $DAEMON &>/dev/null
+
+  start-stop-daemon --stop --quiet --oknodo --pidfile $PIDFILE
 }
 
 
@@ -50,17 +49,17 @@ case "$1" in
   start)
         do_start
         ;;
-        
+
   stop)
         do_stop
         ;;
-        
+
   restart|force-reload)
         do_stop
         sleep 1
         do_start
         ;;
-        
+
   *)
         echo "Usage: /etc/init.d/ddserver {start|stop|restart}"
         exit 2
