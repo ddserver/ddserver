@@ -72,6 +72,25 @@
               <div class="input-prepend">
                 <span class="add-on"><i class="icon-lock"></i></span>
                 <input type="password" id="hostPassword" placeholder="Password" name="password" required="required">
+                <button class="btn" type="button" title="Generate a random password" id="generatePasswordButton">
+                      <i class="icon-gift"></i>
+                    </button>
+                    <script type="text/javascript">
+                      $('#generatePasswordButton').click(function() {
+                        var password = '';
+                        var possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+
+                        for( var i=0; i < 12; i++ )
+                          password += possible.charAt(Math.floor(Math.random() * possible.length));
+                        
+                        $('#hostPassword').get(0).type = 'text';
+                        $('#hostPassword').val(password);
+                        
+                        $('#hostPassword2').get(0).type = 'text';
+                        $('#hostPassword2').prop('readonly', true);
+                        $('#hostPassword2').val(password);
+                      });
+                    </script>
               </div>
             </div>
           </div>
@@ -87,7 +106,14 @@
           <div class="control-group">
             <div class="controls">
               <button type="submit" class="btn btn-success btn-primary">Update password</button>
-              <button type="reset" class="btn">Cancel</button>
+              <button type="reset" class="btn" id="resetFormButton">Cancel</button>
+              <script type="text/javascript">
+                $('#resetFormButton').click(function() {
+                  $('#hostPassword').get(0).type = 'password';
+                  $('#hostPassword2').get(0).type = 'password';
+                  $('#hostPassword2').prop('readonly', false);
+                });
+              </script>
             </div>
           </div>
         </form>
