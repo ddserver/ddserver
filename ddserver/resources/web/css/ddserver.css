@@ -104,6 +104,13 @@ td.noresults {
   border-radius: 3px;
 }
 
+/*
+ * use generate password button
+ */
+#generatePasswordButton {
+  margin-left: 5px;
+  border-radius: 3px;
+}
 
 .brand span.beta {
     margin: 0 0 0 10px;
