@@ -50,6 +50,8 @@ setuptools.setup(
 
     packages = setuptools.find_packages(),
 
+    zip_safe = False,
+
     package_data = {
         'ddserver.resources': [
             'email/*.mail',
