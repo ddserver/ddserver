@@ -225,7 +225,28 @@
               </div>
               <div id="collapse3" class="accordion-body collapse">
                 <div class="accordion-inner">
-                  TODO (If you are using Tomato please send us your experience.)
+                  Using the Tomato Web-UI, navigate to
+                  <pre>Basic &rarr; DDNS</pre>
+                  
+                  Use these settings:
+                  <table class="table">
+                    <tr>
+                      <td>Service</td>
+                      <td>Custom URL</td>
+                    </tr>
+                    <tr>
+                      <td>URL</td>
+                      <td>{{config.wsgi.protocol}}{{session.username}}:<i>YourHostnamePassword</i>@{{config.wsgi.basename}}/nic/update?hostname={{host.hostname}}.{{host.suffix}}&myip=@IP</td>
+                    </tr>
+                    <tr>
+                      <td>Username</td>
+                      <td>{{session.username}}</td>
+                    </tr>
+                    <tr>
+                      <td>Password</td>
+                      <td><i>YourHostnamePassword</i></td>
+                    </tr>
+                  </table> 
                 </div>
               </div>
             </div>
