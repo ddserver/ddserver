@@ -66,6 +66,10 @@ form {
   padding:0;
 }
 
+.table td {
+  vertical-align: middle;
+}
+
 td.noresults {
   line-height: 50px;
   text-align: center;
