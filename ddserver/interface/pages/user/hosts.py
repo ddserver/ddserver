@@ -134,7 +134,7 @@ def post_hosts_add(user,
       WHERE `user_id` = %(user_id)s
     ''', {'user_id': user.id})
 
-    if cur.rowcount >= config.dns.max_hosts:
+    if (not user.admin) or (cur.rowcount >= config.dns.max_hosts):
       messages.error('Maximum number of hosts reached')
       bottle.redirect('/user/hosts')
 
