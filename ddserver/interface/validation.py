@@ -130,33 +130,41 @@ class ValidHostname(FancyValidator):
 
 
 
-class UniqueHostname(ValidHostname):
-  ''' Check whether the hostname entered is unique. '''
+class UniqueHostname(FancyValidator):
+  ''' Check whether the hostname entered is unique
+      in the given zone (suffix). '''
 
   messages = {
-    'not_uniq': 'This hostname already exists.'
+    'not_uniq': 'Sorry, this hostname already exists.'
   }
+
+  hostname = suffix = None
+
+  __unpackargs__ = ('hostname', 'suffix')
 
   @require(db = 'ddserver.db:Database')
   def validate_python(self,
-                      value,
+                      field_dict,
                       state,
                       db):
-    ValidHostname.validate_python(self, value, state)
-
     with db.cursor() as cur:
       cur.execute('''
-          SELECT hostname
-          FROM hosts
-          WHERE hostname = %(hostname)s
-      ''', {'hostname': value})
+          SELECT 1
+          FROM `hosts` AS `host`
+          LEFT JOIN `suffixes` AS `suffix`
+            ON ( `suffix`.`id` = `host`.`suffix_id` )
+          WHERE `host`.`hostname` = %(hostname)s
+            AND `host`.`suffix_id` = %(suffix_id)s
+      ''', {'hostname': field_dict[self.hostname],
+            'suffix_id': field_dict[self.suffix]})
       result = cur.fetchone()
 
     if result != None:
-      raise formencode.Invalid(self.message('not_uniq',
-                                            value),
-                               value,
-                               state)
+      msg = self.message('not_uniq', state)
+      raise formencode.Invalid(msg,
+                               field_dict,
+                               state,
+                               error_dict = {field_dict[self.hostname]: msg})
 
 
 

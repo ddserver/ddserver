@@ -56,7 +56,7 @@ CREATE TABLE `hosts` (
   `id`          INT             NOT NULL AUTO_INCREMENT PRIMARY KEY,
   `user_id`     INT             NOT NULL,
   `suffix_id`   INT             NOT NULL,
-  `hostname`    VARCHAR(255)    NOT NULL UNIQUE,
+  `hostname`    VARCHAR(255)    NOT NULL,
   `address`     VARCHAR(15)     NULL,
   `description` VARCHAR(255)    NULL,
   `password`    VARCHAR(255)    NOT NULL,
@@ -65,6 +65,8 @@ CREATE TABLE `hosts` (
   FOREIGN KEY (`user_id`)       REFERENCES `users` (`id`),
   FOREIGN KEY (`suffix_id`)     REFERENCES `suffixes` (`id`),
   
+  UNIQUE (`hostname`, `suffix_id`),
+
   INDEX (`hostname`),
   INDEX (`address`),
   

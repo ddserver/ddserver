@@ -107,12 +107,13 @@ def get_hosts_add(user,
 @route('/user/hosts/add', method = 'POST')
 @authorized()
 @validate('/user/hosts/add',
-          hostname = validation.UniqueHostname(),
+          hostname = validation.ValidHostname(),
           suffix = validation.Int(not_empty = True),
           address = validation.IPAddress(),
           password = validation.SecurePassword(min = 8),
           password_confirm = validation.String(),
-          chained_validators = [validation.FieldsMatch('password', 'password_confirm')])
+          chained_validators = [validation.FieldsMatch('password', 'password_confirm'),
+                                validation.UniqueHostname('hostname', 'suffix')])
 @require(db = 'ddserver.db:Database',
          config = 'ddserver.config:Config',
          messages = 'ddserver.interface.message:MessageManager')
