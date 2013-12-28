@@ -260,31 +260,6 @@ class SecurePassword(FancyValidator):
 
 
 
-class ValidCaptcha(FancyValidator):
-  ''' Validate the recaptcha from the login form. '''
-
-  messages = {
-    'invalid': 'Captcha invalid'
-  }
-
-  challenge = response = None
-
-  __unpackargs__ = ('challenge', 'response')
-
-  @require(config = 'ddserver.config:Config')
-  def validate_python(self, field_dict, state, config):
-    response = captcha.submit(
-      field_dict[self.challenge],
-      field_dict[self.response],
-      config.recaptcha_private_key,
-      bottle.request.remote_addr
-    )
-
-    if not response.is_valid:
-      raise formencode.Invalid(self.message('invalid', field_dict), field_dict, state)
-
-
-
 class ValidSuffix(FancyValidator):
   ''' Check for valid suffix. '''
 
