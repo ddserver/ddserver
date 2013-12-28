@@ -177,7 +177,7 @@ class ValidUsername(FancyValidator):
     'non_letter': 'Username can only consist of a-z, 0-9, -, .',
   }
 
-  letter_regex = re.compile(r'[a-z0-9\-\.]+')
+  letter_regex = re.compile(r'[A-Za-z0-9\-\.]+')
 
   def validate_python(self, value, state):
     if len(value) < 1:
