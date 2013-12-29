@@ -137,7 +137,7 @@ def post_hosts_add(user,
 
     if (not user.admin) or (cur.rowcount >= config.dns.max_hosts):
       messages.error('Maximum number of hosts reached')
-      bottle.redirect('/user/hosts')
+      bottle.redirect('/user/hosts/list')
 
     cur.execute('''
       INSERT
