@@ -95,11 +95,11 @@ class ValidHostname(FancyValidator):
   messages = {
     'too_short': 'Hostname can not be empty',
     'too_long': 'Hostname can not exceed 63 characters',
-    'non_letter': 'Hostname can only consist of a-z, 0-9, -, .',
+    'non_letter': 'Hostname can only consist of a-z, 0-9 or the minus (-) character',
     'invalid_start': 'Hostnames must start with an aplhanumeric character'
   }
 
-  letter_regex = re.compile(r'[a-z0-9\-\.]+')
+  letter_regex = re.compile(r'^[a-z0-9\-]+$')
 
   def validate_python(self,
                       value,
@@ -122,7 +122,7 @@ class ValidHostname(FancyValidator):
                                value,
                                state)
 
-    if value[0] == '-' or value[0] == '.':
+    if value[0] == '-':
       raise formencode.Invalid(self.message('invalid_start',
                                             value),
                                value,
@@ -173,11 +173,11 @@ class ValidUsername(FancyValidator):
 
   messages = {
     'too_short': 'Username can not be empty',
-    'too_long': 'Username can not exceed 30 characters.',
+    'too_long': 'Username can not exceed 255 characters.',
     'non_letter': 'Username can only consist of a-z, 0-9, -, .',
   }
 
-  letter_regex = re.compile(r'[A-Za-z0-9\-\.]+')
+  letter_regex = re.compile(r'^[A-Za-z0-9\-\.]+$')
 
   def validate_python(self, value, state):
     if len(value) < 1:
@@ -274,9 +274,9 @@ class ValidSuffix(FancyValidator):
   # TODO: validate hostname, tld, at least one dot, ...
 
   messages = {
-    'too_short': 'Suffix can not be empty',
-    'too_long': 'Suffix can not exceed 255 characters',
-    'non_letter': 'Suffix can only consist of a-z, 0-9, -, .'
+    'too_short': 'The name of the zone can not be empty',
+    'too_long': 'The name of the zone can not exceed 255 characters',
+    'non_letter': 'The name of the zone can only consist of a-z, 0-9, -, .'
   }
 
   letter_regex = re.compile(r'[a-z0-9\-\.]+')
@@ -308,7 +308,7 @@ class UniqueSuffix(ValidSuffix):
   ''' Check whether the entered entered is unique. '''
 
   messages = {
-    'not_uniq': 'This suffix already exists.'
+    'not_uniq': 'This zone already exists.'
   }
 
   @require(db = 'ddserver.db:Database')

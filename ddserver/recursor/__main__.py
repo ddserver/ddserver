@@ -19,7 +19,7 @@ along with ddserver. If not, see <http://www.gnu.org/licenses/>.
 
 import sys
 
-from ddserver.utils.deps import require
+from ddserver.utils.deps import require, extend
 from ddserver.utils.txtprot import (LexerDeclaration,
                                     FormatterDeclaration,
                                     MessageDeclaration,
@@ -67,6 +67,15 @@ formatter = FormatterDeclaration(splitter = '\t',
 
                                              MessageDeclaration('END'),
                                              MessageDeclaration('FAIL')))
+
+
+
+@extend('ddserver.config:ConfigDeclaration')
+def config_dns(config_decl):
+  with config_decl.declare('dns') as s:
+    s('ttl',
+       conv = int,
+       default = 60)
 
 
 
@@ -140,9 +149,11 @@ def answer_soa(query,
 
 
 
-@require(db = 'ddserver.db:Database')
+@require(db = 'ddserver.db:Database',
+         config = 'ddserver.config:Config')
 def answer_a(query,
-             db):
+             db,
+             config):
   with db.cursor() as cur:
     cur.execute('''
         SELECT
@@ -161,7 +172,7 @@ def answer_a(query,
       send(formatter.DATA, qname = query.qname,
                            qclass = query.qclass,
                            qtype = 'A',
-                           ttl = 3600,
+                           ttl = config.dns.ttl,
                            id = query.id,
                            content = host['address'])
 

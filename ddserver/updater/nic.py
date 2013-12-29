@@ -20,6 +20,8 @@ along with ddserver. If not, see <http://www.gnu.org/licenses/>.
 import functools
 import bottle
 
+import formencode
+
 from passlib.apps import custom_app_context as pwd
 
 from ddserver.utils.deps import require
@@ -70,8 +72,9 @@ resp_911 = functools.partial(Response, '911', None)
 def update(logger, db, username, password, hostnames, address):
   ''' Update the records.
 
-      The very first step is to check username and password. If they do not
-      match, a bad credentials answer is returned.
+      The very first step is to check username and password. If they are not
+      provided or the username does not exist, a bad credentials answer is
+      returned.
 
       If the credentials are checked, for each given hostname, the address is
       stored in the database.
@@ -99,6 +102,15 @@ def update(logger, db, username, password, hostnames, address):
 
   logger.debug('Found user in DB: %s', user)
 
+  # Validate the IP address
+  try:
+    validator = formencode.validators.IPAddress()
+    validator.to_python(address)
+
+  except formencode.Invalid:
+    logger.warning('Invalid IP address in update request: %s', address)
+    return resp_abuse()
+
   # The specification allows to give multiple hosts separated by comma
   responses = []
   for hostname in hostnames:
@@ -122,7 +134,7 @@ def update(logger, db, username, password, hostnames, address):
 
     # Check if we got a host entry for the queried hostname
     if not host:
-      logger.debug('No such host entry found: %s', hostname)
+      logger.warning('No such host entry found: %s', hostname)
 
       responses.append(resp_nohost())
       continue
@@ -151,7 +163,7 @@ def update(logger, db, username, password, hostnames, address):
       ''', {'id': host['id'],
             'address': address})
 
-    logger.debug('Host entry updated: %s = %s', hostname, address)
+    logger.info('Host entry updated: %s = %s', hostname, address)
 
     responses.append(resp_good(value = address))
 
@@ -175,36 +187,42 @@ def get_update(logger):
 
   # Extract the hostnames separated by comma, the new IP address and the offline
   # flag from the query
-  hostnames = bottle.request.query.get('hostname', None).split(',')
-  address = bottle.request.query.get('myip', None)
-  offline = bottle.request.query.get('offline', 'NO') == 'YES'
+  hostnames = bottle.request.query.get('hostname', None)
+  if hostnames:
+    hostnames = hostnames.split(',')
+    address = bottle.request.query.get('myip', None)
+    offline = bottle.request.query.get('offline', 'NO') == 'YES'
 
-  # Fetch the the credentials from HTTP header
-  if bottle.request.auth:
-    username, password = bottle.request.auth
+    # Fetch the the credentials from HTTP header
+    if bottle.request.auth:
+      username, password = bottle.request.auth
+
+    else:
+      username, password = None, None
+
+    # Clear the address if the offline flag is set
+    if offline:
+      address = None
+
+    logger.debug('Update request for %s as %s', hostnames, address)
+
+    # Call the update function
+    try:
+      responses = update(username = username,
+                         password = password,
+                         hostnames = hostnames,
+                         address = address)
+
+    except:
+      responses = resp_911()
+
+    # Blow up responses if we got a single response
+    if isinstance(responses, Response):
+      responses = [responses] * len(hostnames)
 
   else:
-    username, password = None, None
-
-  # Clear the address if the offline flag is set
-  if offline:
-    address = None
-
-  logger.debug('Update request for %s as %s', hostnames, address)
-
-  # Call the update function
-  try:
-    responses = update(username = username,
-                       password = password,
-                       hostnames = hostnames,
-                       address = address)
-
-  except:
-    responses = resp_911()
-
-  # Blow up responses if we got a single response
-  if isinstance(responses, Response):
-    responses = [responses] * len(hostnames)
+    responses = resp_abuse()
+    responses = [responses]
 
   logger.debug('Update responses: %s', responses)
 

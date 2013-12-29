@@ -37,7 +37,8 @@ class UserManager(object):
                                          'admin',
                                          'active',
                                          'created',
-                                         'authcode'])
+                                         'authcode',
+                                         'maxhosts'])
 
 
   @require(db = 'ddserver.db:Database')
