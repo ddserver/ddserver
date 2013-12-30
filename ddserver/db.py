@@ -46,36 +46,42 @@ def config_db(config_decl):
 
 
 
-@export(config = 'ddserver.config:Config')
+@export()
 class Database(object):
 
-  def __init__(self,
-               config):
-    self.__connection = MySQLdb.connect(host = config.db.host,
-                                       port = config.db.port,
-                                       user = config.db.username,
-                                       passwd = config.db.password,
-                                       db = config.db.name,
-                                       cursorclass = MySQLdb.cursors.DictCursor)
-
-
-  def __del__(self):
-    self.__connection.close()
-
+  thread_local = threading.local()
 
   @contextlib.contextmanager
-  def cursor(self):
-    cursor = self.__connection.cursor()
+  @require(config = 'ddserver.config:Config')
+  def cursor(self, config):
+    # Ensure we have a connection for this thread
+    if not hasattr(self.thread_local, 'connection'):
+      connection = MySQLdb.connect(host = config.db.host,
+                                   port = config.db.port,
+                                   user = config.db.username,
+                                   passwd = config.db.password,
+                                   db = config.db.name,
+                                   cursorclass = MySQLdb.cursors.DictCursor)
+      setattr(self.thread_local, 'connection', connection)
+
+    else:
+      # Use existing connection
+      connection = getattr(self.thread_local, 'connection')
+
+      # Reconnect if connection is down
+      connection.ping(True)
+
+    cursor = connection.cursor()
 
     try:
       yield cursor
 
     except:
-      self.__connection.rollback()
+      connection.rollback()
       raise
 
     else:
-      self.__connection.commit()
+      connection.commit()
 
     finally:
       cursor.close()
