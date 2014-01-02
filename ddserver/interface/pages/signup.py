@@ -51,13 +51,22 @@ def config_signup(config_decl):
 
 @route('/signup', method = 'GET')
 @require(config = 'ddserver.config:Config',
-         templates = 'ddserver.interface.template:TemplateManager')
+         templates = 'ddserver.interface.template:TemplateManager',
+         messages = 'ddserver.interface.message:MessageManager',
+         session = 'ddserver.interface.session:SessionManager')
 def get_signup(config,
-               templates):
+               templates,
+               messages,
+               session):
   ''' Display the sign up page. '''
 
   if config.signup.enabled:
-    return templates['signup.html']()
+    if not session.username:
+      return templates['signup.html']()
+
+    else:
+      messages.error('You can not signup for an account while you are logged in.')
+      bottle.redirect('/')
 
   else:
     return templates['nosignup.html']()
