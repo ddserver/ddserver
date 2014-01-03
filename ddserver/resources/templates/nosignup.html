@@ -1,26 +1,25 @@
 {% extends "base.html" %}
 
 {% block content %}
-
-    
   <div class="row">
-    <div class="span12"><h1>Welcome to ddserver</h1></div>
+    <div class="col-md-12"><h1>Welcome to ddserver</h1></div>
   </div>
 
-  <div class="row-fluid">
-    
-    <div class="box">
-      <div class="span12"><h3>Registration is disabled</h3>
-        <p>
-          Sorry, registration to this service is currently disabled.
-        </p>
-        <p>
-          If you have any questions, you may contact the system administrator at
-        </p>
-        <p>
-          {{config.admin.name}} &lt;{{config.admin.email}}&gt;
-        </p>
-      </div>
+  <div class="row">
+    <div class="col-md-12">
+      <p>
+        <strong>ddserver</strong> allows you to add hostnames whose IP address
+        can be updated dynamically using the <a href="http://www.noip.com/integrate">dyndns2 protocol</a>.
+      </p>
+      <p>
+        Sorry, registration to this service is currently disabled.
+      </p>
+      <p>
+        If you have any questions, you may contact the system administrator at
+      </p>
+      <p>
+        <a href="mailto:{{config.contact.email}}">{{config.contact.name}} &lt;{{config.contact.email}}&gt;</a>
+      </p>
     </div>
   </div>
   
