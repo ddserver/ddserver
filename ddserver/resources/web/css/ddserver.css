@@ -25,13 +25,13 @@ h1 {
 }
 
 h3 {
-  font-size: 20px;
+  font-size: 18px;
   padding-top: 0px;
   margin-top: 0px;
 }
 
 h3 .glyphicon {
-  font-size: 16px;
+  font-size: 14px;
 }
 
 
@@ -54,12 +54,8 @@ label span {
   color: #999;
 }
 
-p.j {
+.text-justify {
   text-align: justify;
-}
-
-p.c {
-  text-align: center;
 }
 
 span.origin {
