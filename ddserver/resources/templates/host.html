@@ -34,7 +34,7 @@
           </div>
         </div>
       </div>
-      
+
       <h3><i class="icon-tag"></i> Update IP address</h3>
       <div class="box">
         <form role="form" action="/user/host/updateAddress" method="post">
@@ -57,7 +57,7 @@
           </div>
         </form>
       </div>
-      
+
       <h3><i class="icon-tag"></i> Update host password</h3>
       <p>
         Set a new password for updating this hostname
@@ -81,7 +81,7 @@
                 
                 $('#hostPassword').get(0).type = 'text';
                 $('#hostPassword').val(password);
-                
+
                 $('#hostPassword2').get(0).type = 'text';
                 $('#hostPassword2').prop('readonly', true);
                 $('#hostPassword2').val(password);
@@ -109,7 +109,7 @@
         </form>
       </div>
     </div>
-    
+
     <div class="col-md-7">
       <h3><i class="icon-tag"></i> Configuration examples</h3>
       <p>
@@ -117,7 +117,7 @@
         Please select the type of device you want to configure to send updates
         of your IP address.
       </p>
-      
+
       <div class="panel-group" id="accordion">
         <!-- DD-WRT -->
         <div class="panel panel-default">
@@ -132,7 +132,7 @@
             <div class="panel-body">
               Using the DD-WRT Web-UI, navigate to
               <pre>Settings &rarr; DDNS</pre>
-              
+
               Use these settings:
               <table class="table">
                 <tr>
@@ -330,4 +330,5 @@ password=<em>YourHostnamePassword</em> \
 
     </div>
   </div>
+
 {% endblock %}

@@ -1,13 +1,12 @@
 {% extends "base.html" %}
 
 {% block content %}
-
   {% if config.captcha.enabled %}
   <script type="text/javascript">
     var RecaptchaOptions = { theme : 'custom', custom_theme_widget: 'recaptcha_widget' };
   </script>
   {% endif %}
-    
+
   <div class="row">
     <div class="col-md-12"><h1>Signup for an account</h1></div>
   </div>
@@ -95,5 +94,5 @@
       </div>
     </div>
   </div>
-  
+
 {% endblock %}

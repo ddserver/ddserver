@@ -4,13 +4,13 @@
   <div class="row">
     <div class="col-md-12"><h1>Manage zones</h1></div>
   </div>
-  
+
   <ul class="nav nav-tabs">
     <li><a href="/admin/suffixes/add">Add zone</a></li>
     <li class="active"><a href="/admin/suffixes/list">Your zones</a></li>
   </ul>
   <br>
-  
+
   <div class="row">
     <div class="col-md-12">
       {% if suffixes %}
@@ -20,7 +20,7 @@
           <th style="width:150px">Usage</th>
           <th style="width:100px">Actions</th>
         </tr>
-        
+
         {% for suffix in suffixes %}
         <tr>
           <td>{{suffix.name}}</td>
@@ -64,18 +64,18 @@
           </td>
         </tr>
         {% endfor %}
-        
+
       </table>
-      
+
       {% else %}
-      
+
       <p class="text-danger text-center">
         No zones defined so far.
       </p>
-      
+
       {% endif %}
-      
+
     </div>
   </div>
-  
+
 {% endblock %}

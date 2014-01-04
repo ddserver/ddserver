@@ -35,8 +35,8 @@
       <p>
         <a href="mailto:{{config.contact.email}}">{{config.contact.name}} &lt;{{config.contact.email}}&gt;</a>
       </p>
-    </div>    
-      
+    </div>
+
     <div class="col-md-4">
       <div class="box">
         <form role="form" action="/lostpass" method="post">
@@ -47,7 +47,7 @@
               <input class="form-control" type="text" id="inputUsername" placeholder="Username" name="username" required="required">
             </div>
           </div>
-  
+
           {% if config.captcha.enabled %}
           <div class="form-group">
             <label for="recaptcha_response_field">Human check</label>
@@ -72,7 +72,7 @@
             </div>
           </div>
           {% endif %}
-  
+
           <div class="form-group">
             <button type="submit" class="btn btn-success btn-primary">Send</button>
             <a class="btn btn-default" href="/">Go back</a>
@@ -81,5 +81,5 @@
       </div>
     </div>  
   </div>
-  
+
 {% endblock %}
