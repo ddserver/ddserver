@@ -40,7 +40,7 @@
         <form role="form" action="/user/host/updateAddress" method="post">
           <input type="hidden" name="host_id" value="{{host.id}}">
           <div class="form-group">
-            <label for="inputAddress">Set new IP-Address <span><i class="glyphicon glyphicon-home" id="curIPbutton" title="Use your current IP address ({{current_ip}})" rel="tooltip"></i></span></label>
+            <label for="inputAddress">Set new IP-Address <span><i class="glyphicon glyphicon-home tip" id="curIPbutton" title="Use your current IP address ({{current_ip}})"></i></span></label>
             <div class="input-group">
               <span class="input-group-addon"><i class="glyphicon glyphicon-th-large"></i></span>
               <input class="form-control" type="text" id="inputAddress" name="address" value="" required="required">
@@ -66,7 +66,7 @@
         <form role="form" action="/user/host/updatePassword" method="post">
           <input type="hidden" name="host_id" value="{{host.id}}">
           <div class="form-group">
-            <label for="hostPassword">Password <span><i class="glyphicon glyphicon-gift" id="generatePasswordButton" title="Generate a random password" rel="tooltip"></i></span></label>
+            <label for="hostPassword">Password <span><i class="glyphicon glyphicon-gift tip" id="generatePasswordButton" title="Generate a random password"></i></span></label>
             <div class="input-group">
               <span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
               <input class="form-control" type="password" id="hostPassword" placeholder="Password" name="password" required="required">

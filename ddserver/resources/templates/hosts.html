@@ -26,7 +26,7 @@
           {% for host in hosts %}
           <tr>
             <td>
-              <a href="/user/host/{{host.id}}" title="Display details and configuration examples" rel="tooltip">
+              <a href="/user/host/{{host.id}}" title="Display details and configuration examples" class="tip">
                 {{host.hostname}}<span class="origin">.{{host.suffix}}</span>
               </a>
             </td>
@@ -42,9 +42,9 @@
             <td>{{host.updated}}</td>
             
             <td>
-              <a class="btn btn-default" href="/user/host/{{host.id}}" data-toggle="tooltip" title="Display details and configuration examples" rel="tooltip">Details</a>
+              <a class="btn btn-default tip" href="/user/host/{{host.id}}" title="Display details and configuration examples">Details</a>
   
-              <a href="#modal{{host.id}}" class="btn btn-danger" data-toggle="modal" title="Delete this hostname" rel="tooltip">Delete</a>
+              <a href="#modal{{host.id}}" class="btn btn-danger tip" data-toggle="modal" title="Delete this hostname">Delete</a>
               <div class="modal fade" id="modal{{host.id}}">
                 <div class="modal-dialog">
                   <div class="modal-content">

@@ -33,19 +33,19 @@
               {% if user.admin == 0 %}
               <form action="/admin/users/mkadmin" method="post">
                 <input type="hidden" name="user_id" value="{{user.id}}">
-                <input type="submit" class="btn btn-default" value="&nbsp;User&nbsp;" style="width: 90px;" title="Klick to add Admin privileges" rel="tooltip">
+                <input type="submit" class="btn btn-default tip" value="&nbsp;User&nbsp;" style="width: 90px;" title="Klick to add Admin privileges">
               </form>
               {% else %}
               <form action="/admin/users/rmadmin" method="post">
                 <input type="hidden" name="user_id" value="{{user.id}}">
-                <input type="submit" class="btn btn-default active" value="Admin" style="width: 90px;" title="Klick to remove Admin privileges" rel="tooltip">
+                <input type="submit" class="btn btn-default active tip" value="Admin" style="width: 90px;" title="Klick to remove Admin privileges">
               </form>
               {% endif %}
             {% else %}
               <form action="/admin/users/activate" method="post">
                 <input type="hidden" name="username" value="{{user.username}}">
                 {% if user.authcode == None %}
-                <input type="submit" class="btn btn-success" value="Activate" style="width: 90px;" title="Klick to send activation email" rel="tooltip">
+                <input type="submit" class="btn btn-success tip" value="Activate" style="width: 90px;" title="Klick to send activation email">
                 {% else %}
                 <input type="submit" class="btn btn-success" value="Pending.." style="width: 90px;" disabled="disabled">
                 {% endif %}
@@ -53,7 +53,7 @@
             {% endif %}
             </td>
             <td style="width: 90px; border-left: 0px">
-              <a href="#modal{{user.id}}" data-toggle="modal" class="btn btn-danger" title="Delete this user" rel="tooltip">Delete</a>
+              <a href="#modal{{user.id}}" data-toggle="modal" class="btn btn-danger tip" title="Delete this user">Delete</a>
               <div class="modal fade" id="modal{{user.id}}">
                 <div class="modal-dialog">
                   <div class="modal-content">
