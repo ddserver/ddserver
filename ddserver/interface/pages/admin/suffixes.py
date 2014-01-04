@@ -30,14 +30,14 @@ from ddserver.interface.validation import validate
 
 
 
-@route('/admin/suffixes', method = 'GET')
+@route('/admin/suffixes/list', method = 'GET')
 @authorized_admin()
 @require(db = 'ddserver.db:Database',
          templates = 'ddserver.interface.template:TemplateManager')
-def get_suffixes(user,
-                 db,
-                 templates):
-  ''' Display a list of suffixes and a form to add new ones. '''
+def get_suffix_list(user,
+                    db,
+                    templates):
+  ''' Display a list of available suffixes (zones) '''
 
   with db.cursor() as cur:
     cur.execute('''
@@ -53,9 +53,24 @@ def get_suffixes(user,
 
 
 
+@route('/admin/suffixes/add', method = 'GET')
+@authorized_admin()
+@require(db = 'ddserver.db:Database',
+         config = 'ddserver.config:Config',
+         templates = 'ddserver.interface.template:TemplateManager')
+def get_suffix_add(user,
+                   db,
+                   config,
+                   templates):
+  '''  Display a form for adding new suffixes (zones) '''
+
+  return templates['addsuffix.html']()
+
+
+
 @route('/admin/suffixes/add', method = 'POST')
 @authorized_admin()
-@validate('/admin/suffixes',
+@validate('/admin/suffixes/add',
           suffix_name = validation.ValidSuffix(min = 1, max = 255))
 @require(db = 'ddserver.db:Database',
          messages = 'ddserver.interface.message:MessageManager')
@@ -74,7 +89,7 @@ def post_suffix_add(user,
 
     if cur.rowcount > 0:
       messages.error('Suffix with same name already exists')
-      bottle.redirect('/admin/suffixes')
+      bottle.redirect('/admin/suffixes/add')
 
     cur.execute('''
       INSERT
@@ -84,13 +99,13 @@ def post_suffix_add(user,
 
   messages.success('Ok, done.')
 
-  bottle.redirect('/admin/suffixes')
+  bottle.redirect('/admin/suffixes/list')
 
 
 
 @route('/admin/suffixes/delete', method = 'POST')
 @authorized_admin()
-@validate('/admin/suffixes',
+@validate('/admin/suffixes/list',
           suffix_id = validation.Int(not_empty = True))
 @require(db = 'ddserver.db:Database',
          messages = 'ddserver.interface.message:MessageManager')
@@ -109,7 +124,7 @@ def post_suffix_delete(user,
 
   messages.success('Ok, done.')
 
-  bottle.redirect('/admin/suffixes')
+  bottle.redirect('/admin/suffixes/list')
 
 
 @route('/admin/suffix/<suffix_id>', method = 'GET')
@@ -150,7 +165,7 @@ def get_suffix_hostnames(user,
 
 @route('/admin/suffix/deleteHost', method = 'POST')
 @authorized_admin()
-@validate('/admin/suffixes',
+@validate('/admin/suffixes/list',
           host_id = validation.Int(not_empty = True))
 @require(db = 'ddserver.db:Database',
          messages = 'ddserver.interface.message:MessageManager')
@@ -169,4 +184,4 @@ def post_hosts_delete(user,
 
   messages.success('Ok, done.')
 
-  bottle.redirect('/admin/suffixes')
+  bottle.redirect('/admin/suffixes/list')

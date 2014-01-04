@@ -4,13 +4,13 @@
   <div class="row">
     <div class="col-md-12"><h1>Manage hostnames</h1></div>
   </div>
-  
+
   <ul class="nav nav-tabs">
     <li class="active"><a href="/user/hosts/add">Add hostname</a></li>
     <li><a href="/user/hosts/list">Your hostnames</a></li>
   </ul>
   <br>
-      
+
   <div class="row">
     {% if suffixes %}
     <div class="col-md-8">
@@ -19,21 +19,21 @@
         {{config.dns.max_hosts}} hostnames with a maximum length of 
         63 characters each. Only alphanumeric characters are allowed.
       </p>
-      
+
       {% if suffixes|count > 1 %}
       <p>
         From the dropdown menu, you can choose from a list of available 
         suffixes for your DNS name. 
       </p>
       {% endif %}
-      
+
       <p>
         Each hostname you add gets its individual password for updating.
         The minimum password length is {{config.auth.password_min_chars}} 
         characters. If you want to update multiple hostnames at once, you
         have to use the same password for them.
       </p>
-      
+
       <p>
         If you specify an initial IP address, your hostname will instantly
         be available. If you leave the IP address field blank, you have to
@@ -46,7 +46,7 @@
         tab and click the <em>Details</em> button.
       </p>
     </div>
-        
+
     <div class="col-md-4">
       <div class="box">
         <form role="form" action="/user/hosts/add" method="post">
@@ -57,7 +57,7 @@
               <input class="form-control" type="text" id="inputHostname" placeholder="Hostname" name="hostname" required="required">
             </div>
           </div>
-  
+
           {% if suffixes|count > 1 %}
           <div class="form-group">
             <label for="inputSuffix">Suffix</label>
@@ -73,7 +73,7 @@
           {% else %}
           <input type="hidden" name="suffix" value="{{suffixes[0].id}}">
           {% endif %}
-            
+
           <div class="form-group">
             <label for="hostPassword">Password <span><i class="glyphicon glyphicon-gift tip" id="generatePasswordButton" title="Generate a random password"></i></span></label>
             <div class="input-group">
@@ -104,7 +104,7 @@
               <input class="form-control" type="password" id="hostPassword2" placeholder="Retype" name="password_confirm" required="required">
             </div>
           </div>
-          
+
           <div class="form-group">
             <label for="inputAddress">Initial Address <span>(optional) <i class="glyphicon glyphicon-home tip" id="curIPbutton" title="Use your current IP address ({{current_ip}})"></i></span></label>
             <div class="input-group">
@@ -117,7 +117,7 @@
               });
             </script>
           </div>
-          
+
           <div class="form-group">
             <button type="submit" class="btn btn-success btn-primary">Add hostname</button>
             <button type="reset" class="btn btn-default" id="resetFormButton">Cancel</button>
