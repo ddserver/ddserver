@@ -99,7 +99,15 @@ td.noresults {
   border-right-color: #333333;
 }
 
-
+.alert-error {
+  background-image: -webkit-linear-gradient(top,#f2dede 0,#e7c3c3 100%);
+  background-image: linear-gradient(to bottom,#f2dede 0,#e7c3c3 100%);
+  background-repeat: repeat-x;
+  border-color: #dca7a7;
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#fff2dede',endColorstr='#ffe7c3c3',GradientType=0);
+  color: #a94442;
+  background-color: #f2dede;
+}
 
 /*
  * recaptcha
