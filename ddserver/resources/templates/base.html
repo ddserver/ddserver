@@ -37,17 +37,17 @@
 
       <div class="collapse navbar-collapse navbar-inverse " id="mainmenu">
         <ul class="nav navbar-nav pull-right">
-          <li><a href="/" class="tip" data-placement="bottom" title="Start"><i class="glyphicon glyphicon-home"></i> Start</a></li>
+          <li><a href="/"><i class="glyphicon glyphicon-home"></i> Start</a></li>
           {% if user %}
-          <li><a href="/user/hosts/add" data-placement="bottom" class="tip" title="Add or modify hostnames"><i class="glyphicon glyphicon-th-large"></i> Hostnames</a></li>
-          <li><a href="/user/account" data-placement="bottom" class="tip" title="Modify your account"><i class="glyphicon glyphicon-user"></i> Account</a></li>
+          <li><a href="/user/hosts/add"><i class="glyphicon glyphicon-th-large"></i> Hostnames</a></li>
+          <li><a href="/user/account"><i class="glyphicon glyphicon-user"></i> Account</a></li>
             {% if user.admin %}
             <li class="divider"></li>
-            <li><a href="/admin/users/all" data-placement="bottom" class="tip" title="Manage users"><i class="glyphicon glyphicon-th-large"></i> Users</a></li>
-            <li><a href="/admin/suffixes/list" data-placement="bottom" class="tip" title="Add or modify zones"><i class="glyphicon glyphicon-th-large"></i> Zones</a></li>
+            <li><a href="/admin/users/all"><i class="glyphicon glyphicon-th-large"></i> Users</a></li>
+            <li><a href="/admin/suffixes/list"><i class="glyphicon glyphicon-th-large"></i> Zones</a></li>
             {% endif %}
           <li class="divider"></li>
-          <li><a href="/logout" class="tip" data-placement="bottom" title="Logout"><i class="glyphicon glyphicon-off"></i> Logout</a></li>
+          <li><a href="/logout"><i class="glyphicon glyphicon-off"></i> Logout</a></li>
           {% endif %}
         </ul>
       </div>
