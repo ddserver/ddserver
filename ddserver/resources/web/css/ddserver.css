@@ -94,7 +94,7 @@ td.noresults {
   padding: 12px;
 }
 
-.navbar-inverse .divider-vertical {
+.divider {
   border-left-color: #111111;
   border-right-color: #333333;
 }
@@ -142,7 +142,7 @@ td.noresults {
     color: #FF0000;
     font-family: monospace;
     font-weight: bold;
-    font-size: 20px;
+    font-size: 18px;
     border-radius: 5px 5px 5px 5px;
     box-shadow: 0 0 15px 5px #FF2222;
     text-shadow: 0 0 5px #FF2222;

@@ -35,19 +35,19 @@
         <a class="navbar-brand" href="#">ddserver<span class="beta">BETA</span></a>
       </div>
 
-      <div class="collapse navbar-collapse" id="mainmenu">
+      <div class="collapse navbar-collapse navbar-inverse " id="mainmenu">
         <ul class="nav navbar-nav pull-right">
-          <li><a href="/" title="Start"><i class="glyphicon glyphicon-home"></i> Start</a></li>
+          <li><a href="/" class="tip" data-placement="bottom" title="Start"><i class="glyphicon glyphicon-home"></i> Start</a></li>
           {% if user %}
-          <li><a href="/user/hosts/add" title="Manage Hostnames"><i class="glyphicon glyphicon-th-large"></i> Hostnames</a></li>
-          <li><a href="/user/account" title="Manage Account"><i class="glyphicon glyphicon-user"></i> Account</a></li>
+          <li><a href="/user/hosts/add" data-placement="bottom" class="tip" title="Add or modify hostnames"><i class="glyphicon glyphicon-th-large"></i> Hostnames</a></li>
+          <li><a href="/user/account" data-placement="bottom" class="tip" title="Modify your account"><i class="glyphicon glyphicon-user"></i> Account</a></li>
             {% if user.admin %}
             <li class="divider"></li>
-            <li><a href="/admin/users/all" title="Manage Users"><i class="glyphicon glyphicon-th-large"></i> Users</a></li>
-            <li><a href="/admin/suffixes/list" title="Manage Suffixes"><i class="glyphicon glyphicon-th-large"></i> Suffixes</a></li>
+            <li><a href="/admin/users/all" data-placement="bottom" class="tip" title="Manage users"><i class="glyphicon glyphicon-th-large"></i> Users</a></li>
+            <li><a href="/admin/suffixes/list" data-placement="bottom" class="tip" title="Add or modify zones"><i class="glyphicon glyphicon-th-large"></i> Zones</a></li>
             {% endif %}
           <li class="divider"></li>
-          <li><a href="/logout" title="Logout"><i class="glyphicon glyphicon-off"></i> Logout</a></li>
+          <li><a href="/logout" class="tip" data-placement="bottom" title="Logout"><i class="glyphicon glyphicon-off"></i> Logout</a></li>
           {% endif %}
         </ul>
       </div>
