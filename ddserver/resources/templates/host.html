@@ -4,14 +4,14 @@
   <div class="row">
     <div class="col-md-12"><h1>Manage hostnames</h1></div>
   </div>
-  
+
   <ul class="nav nav-tabs">
     <li><a href="/user/hosts/add">Add hostname</a></li>
     <li><a href="/user/hosts/list">Your hostnames</a></li>
     <li class="active"><a href="/user/host/{{host.id}}">Hostname details</a></li>
   </ul>
   <br>
-  
+
   <div class="row">
     <div class="col-md-5">
       <h3>Hostname information</h3>
@@ -149,7 +149,7 @@
                 </tr>
                 <tr>
                   <td>Password</td>
-                  <td><i>Your password</i></td>
+                  <td><em>Your password</em></td>
                 </tr>
                 <tr>
                   <td>Hostname</td>
@@ -173,40 +173,44 @@
             <div class="panel-body">
               <p>
                 With OpenWRT 12.09 you can use the LuCI Web-UI or configure dynamic DNS using
-                the command line to edit <i>/etc/config/ddns</i>.
+                the command line to edit <em>/etc/config/ddns</em>.
               </p>
               <h4>Using the Web-UI</h4>
               <p>
                 To use DDNS from inside the LuCI Web-UI, you have to install
-                the <i>luci-app-ddns</i> package. This will automatically
+                the <em>luci-app-ddns</em> package. This will automatically
                 install the package ddns-scripts, which contains the scripts
                 that actually update the dynamic DNS name.
               </p>
               <p>
-                After <i>luci-app-ddns</i> has been installed, you will find
+                After <em>luci-app-ddns</em> has been installed, you will find
                 the DDNS configuration by navigating to
-                <pre>Services &rarr; Dynamic DNS</pre>
+              </p>
+              <pre>Services &rarr; Dynamic DNS</pre>
 
+              <p>
                 Use the following settings, to update your DDNS hostname:
-                <pre>
+              </p>
+              <pre>
   TODO
   (If you are using OpenWRT please send us your experience.)
-                </pre>
-              </p>
+              </pre>
 
               <h4>Using the CLI</h4>
               <p>
-                To use <i>ddns-scripts</i> directly, first install the
+                To use <em>ddns-scripts</em> directly, first install the
                 needed packages:
-                <pre>opkg update<br>opkg install ddns-scripts</pre>
+              </p>
+              <pre>opkg update<br>opkg install ddns-scripts</pre>
 
-                Now edit the configuration file <i>/etc/config/ddns</i> and
+              <p>
+                Now edit the configuration file <em>/etc/config/ddns</em> and
                 add the following:
-                <pre>
+              </p>
+              <pre>
   TODO
   (If you are using OpenWRT please send us your experience.)
-                </pre>
-              </p>
+              </pre>
             </div>
           </div>
         </div>
@@ -233,7 +237,7 @@
                 </tr>
                 <tr>
                   <td>URL</td>
-                  <td>{{config.wsgi.protocol}}{{session.username}}:<i>YourHostnamePassword</i>@{{config.wsgi.basename}}/nic/update?hostname={{host.hostname}}.{{host.suffix}}&amp;myip=@IP</td>
+                  <td>{{config.wsgi.protocol}}{{session.username}}:<em>YourHostnamePassword</em>@{{config.wsgi.basename}}/nic/update?hostname={{host.hostname}}.{{host.suffix}}&amp;myip=@IP</td>
                 </tr>
                 <tr>
                   <td>Username</td>
@@ -241,7 +245,7 @@
                 </tr>
                 <tr>
                   <td>Password</td>
-                  <td><i>YourHostnamePassword</i></td>
+                  <td><em>YourHostnamePassword</em></td>
                 </tr>
               </table>
             </div>
@@ -282,7 +286,7 @@
                 </tr>
                 <tr>
                   <td>Kennwort</td>
-                  <td><i>Your hostnames password</i></td>
+                  <td><em>Your hostnames password</em></td>
                 </tr>
               </table>
             </div>
@@ -310,13 +314,13 @@ syslog=yes
 mail=root
 mail-failure=root
 ssl=yes
-use=if, if=<i>YourExternalInterface</i>
+use=if, if=<em>YourExternalInterface</em>
 
 # == Update server
 protocol=noip, \
 server={{config.wsgi.basename}}, \
 login={{session.username}}, \
-password=<i>YourHostnamePassword</i> \
+password=<em>YourHostnamePassword</em> \
 {{host.hostname}}.{{host.suffix}}
                 </pre>
             </div>
