@@ -1,0 +1,8 @@
+0.1.2
+  - BUG: Fixed an issue, which led database connection errors
+
+0.1.1
+  - BUG: Fixed an issue with non-admin users not being able to add hostnames
+
+0.1.0
+  - Initial stable releaseof ddserver
