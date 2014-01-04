@@ -1,3 +1,6 @@
+0.1.3
+  - BUG: fix critical bug which allowed the use of any character in hostnames
+
 0.1.2
   - BUG: Fixed an issue, which led database connection errors
 
