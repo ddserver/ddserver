@@ -55,8 +55,8 @@ setuptools.setup(
     package_data = {
         'ddserver.resources': [
             'email/*.mail',
-            'web/css/*.html',
-            'web/img/*.png',
+            'web/css/*.css',
+            'web/fonts/*',
             'web/js/*.js',
             'templates/*.html',
         ],
@@ -67,14 +67,21 @@ setuptools.setup(
         ('/etc/ddserver', ['ddserver/resources/doc/ddserver.conf.example']),
         ('/etc/init.d', ['ddserver/resources/doc/debian.init.d/ddserver']),
         ('/usr/share/ddserver/static/css', ['ddserver/resources/web/css/bootstrap.min.css',
-                                            'ddserver/resources/web/css/bootstrap-responsive.min.css',
+                                            'ddserver/resources/web/css/bootstrap-theme.min.css',
                                             'ddserver/resources/web/css/ddserver.css']),
-        ('/usr/share/ddserver/static/img', ['ddserver/resources/web/img/glyphicons-halflings.png',
-                                            'ddserver/resources/web/img/glyphicons-halflings-white.png']),
+        ('/usr/share/ddserver/static/fonts', ['ddserver/resources/web/fonts/glyphicons-halflings-regular.eot',
+                                              'ddserver/resources/web/fonts/glyphicons-halflings-regular.svg',
+                                              'ddserver/resources/web/fonts/glyphicons-halflings-regular.ttf',
+                                              'ddserver/resources/web/fonts/glyphicons-halflings-regular.woff'
+                                              ]),
         ('/usr/share/ddserver/static/js', ['ddserver/resources/web/js/bootstrap.min.js',
                                            'ddserver/resources/web/js/jquery.min.js']),
         ('/usr/share/doc/ddserver', ['ddserver/resources/doc/schema.sql',
-                                     'README', 'VERSION', 'LICENSE'])
+                                     'ddserver/resources/doc/ddserver.conf.example',
+                                     'ddserver/resources/doc/ddclient.conf.example',
+                                     'README', 'VERSION', 'LICENSE', 'CHANGES']),
+        ('/usr/share/doc/ddserver/centos.init.d', ['ddserver/resources/doc/centos.init.d/ddserver']),
+        ('/usr/share/doc/ddserver/debian.init.d', ['ddserver/resources/doc/debian.init.d/ddserver'])
     ],
 
     entry_points = {
