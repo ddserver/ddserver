@@ -1,331 +1,334 @@
 {% extends "base.html" %}
 
 {% block content %}
-
-  <div class="row-fluid">
-    <div class="span12"><h1>Hostname: {{host.hostname}}.{{host.suffix}}</h1></div>
+  <div class="row">
+    <div class="col-md-12"><h1>Manage hostnames</h1></div>
   </div>
-  
-  <div class="row-fluid">
-    <div class="span6">
-      <div class="box">
-        <h3><i class="icon-tag"></i> Update host information</h3>
-        
-        <form class="form-horizontal">
-          <div class="control-group">
-            <label class="control-label" for="inputHostname">Hostname</label>
-            <div class="controls">
-              <div class="input-prepend">
-                <span class="add-on"><i class="icon-th-large"></i></span>
-                <input type="text" id="inputHostname" name="hostname" value="{{host.hostname}}.{{host.suffix}}" readonly="readonly">
-              </div>
-            </div>
-          </div>
-          <div class="control-group">
-            <label class="control-label" for="inputCurAddr">Current IP-Address</label>
-            <div class="controls">
-              <div class="input-prepend">
-                <span class="add-on"><i class="icon-th-large"></i></span>
-                <input type="text" id="inputCurAddr" name="curAddress" value="{{host.address}}" readonly="readonly">
-              </div>
-            </div>
-          </div>
-        </form>
-        <form class="form-horizontal" action="/user/host/updateAddress" method="post">
-          <input type="hidden" name="host_id" value="{{host.id}}">
-          <div class="control-group">
-            <label class="control-label" for="inputAddress">Set new IP-Address</label>
-            <div class="controls">
-              <div class="input-prepend">
-                <span class="add-on"><i class="icon-th-large"></i></span>
-                <input type="text" id="inputAddress" name="address" value="" required="required">
-                <button class="btn" type="button" title="Use your current IP address ({{current_ip}})" id="curIPbutton">
-                  <i class="icon-home"></i>
-                </button>
-                <script type="text/javascript">
-                  $('#curIPbutton').click(function() {
-                    $('#inputAddress').val("{{current_ip}}")
-                  });
-                </script>
-              </div>
-            </div>
-          </div>
-          <div class="control-group">
-            <div class="controls">
-              <button type="submit" class="btn btn-success btn-primary">Update address</button>
-              <button type="reset" class="btn">Cancel</button>
-            </div>
-          </div>
-        </form>
-      </div>
-      
-      <div class="box">
-        <h3><i class="icon-tag"></i> Update host password</h3>
-        <p>
-          Set a new password for updating this hostname
-        </p>
-        <form class="form-horizontal" action="/user/host/updatePassword" method="post">
-          <input type="hidden" name="host_id" value="{{host.id}}">
-          <div class="control-group">
-            <label class="control-label" for="hostPassword">Password</label>
-            <div class="controls">
-              <div class="input-prepend">
-                <span class="add-on"><i class="icon-lock"></i></span>
-                <input type="password" id="hostPassword" placeholder="Password" name="password" required="required">
-                <button class="btn" type="button" title="Generate a random password" id="generatePasswordButton">
-                      <i class="icon-gift"></i>
-                    </button>
-                    <script type="text/javascript">
-                      $('#generatePasswordButton').click(function() {
-                        var password = '';
-                        var possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 
-                        for( var i=0; i < 12; i++ )
-                          password += possible.charAt(Math.floor(Math.random() * possible.length));
-                        
-                        $('#hostPassword').get(0).type = 'text';
-                        $('#hostPassword').val(password);
-                        
-                        $('#hostPassword2').get(0).type = 'text';
-                        $('#hostPassword2').prop('readonly', true);
-                        $('#hostPassword2').val(password);
-                      });
-                    </script>
-              </div>
-            </div>
-          </div>
-          <div class="control-group">
-            <label class="control-label" for="hostPassword2">Retype</label>
-            <div class="controls">
-              <div class="input-prepend">
-                <span class="add-on"><i class="icon-lock"></i></span>
-                <input type="password" id="hostPassword2" placeholder="Retype" name="password_confirm" required="required">
-              </div>
-            </div>
-          </div>
-          <div class="control-group">
-            <div class="controls">
-              <button type="submit" class="btn btn-success btn-primary">Update password</button>
-              <button type="reset" class="btn" id="resetFormButton">Cancel</button>
-              <script type="text/javascript">
-                $('#resetFormButton').click(function() {
-                  $('#hostPassword').get(0).type = 'password';
-                  $('#hostPassword2').get(0).type = 'password';
-                  $('#hostPassword2').prop('readonly', false);
-                });
-              </script>
-            </div>
-          </div>
-        </form>
-      </div>
-    </div>
-    
-    <div class="span6">
+  <ul class="nav nav-tabs">
+    <li><a href="/user/hosts/add">Add hostname</a></li>
+    <li><a href="/user/hosts/list">Your hostnames</a></li>
+    <li class="active"><a href="/user/host/{{host.id}}">Hostname details</a></li>
+  </ul>
+  <br>
+
+  <div class="row">
+    <div class="col-md-5">
+      <h3>Hostname information</h3>
+      <p>
+        This is the information we currently have about your hostname.
+      </p>
       <div class="box">
-      <h3><i class="icon-tag"></i> Configuration examples</h3>
-        <div class="row-fluid">
-          
-          <div class="accordion" id="accordion2">
-            <div class="accordion-group">
-              <div class="accordion-heading">
-                <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapse1">
-                  DD-WRT
-                </a>
-              </div>
-              <div id="collapse1" class="accordion-body collapse">
-              
-                <!-- DD-WRT -->
-                <div class="accordion-inner">
-                  Using the DD-WRT Web-UI, navigate to
-                  <pre>Settings &rarr; DDNS</pre>
-                  
-                  Use these settings:
-                  <table class="table">
-                    <tr>
-                      <td>DDNS Service</td>
-                      <td>Custom</td>
-                    </tr>
-                    <tr>
-                      <td>DYNDNS Server</td>
-                      <td>{{config.wsgi.protocol}}{{config.wsgi.basename}}</td>
-                    </tr>
-                    <tr>
-                      <td>Username</td>
-                      <td>{{session.username}}</td>
-                    </tr>
-                    <tr>
-                      <td>Password</td>
-                      <td><i>Your password</i></td>
-                    </tr>
-                    <tr>
-                      <td>Hostname</td>
-                      <td>{{host.hostname}}.{{host.suffix}}</td>
-                    </tr>
-                  </table> 
-                </div>
-              </div>
-            </div>
-            
-            <!-- OpenWRT -->
-            <div class="accordion-group">
-              <div class="accordion-heading">
-                <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapse2">
-                  OpenWRT
-                </a>
-              </div>
-              <div id="collapse2" class="accordion-body collapse">
-                <div class="accordion-inner">
-                  <p>
-                    With OpenWRT 12.09 you can use the LuCI Web-UI or configure dynamic DNS using
-                    the command line to edit <i>/etc/config/ddns</i>.
-                  </p>
-                  <h4>Using the Web-UI</h4>
-                  <p>
-                    To use DDNS from inside the LuCI Web-UI, you have to install 
-                    the <i>luci-app-ddns</i> package. This will automatically 
-                    install the package ddns-scripts, which contains the scripts
-                    that actually update the dynamic DNS name.
-                  </p>
-                    After <i>luci-app-ddns</i> has been installed, you will find
-                    the DDNS configuration by navigating to                
-                    <pre>Services &rarr; Dynamic DNS</pre>
-                    
-                    Use the following settings, to update your DDNS hostname:
-                    <pre>
-  TODO 
-  (If you are using OpenWRT please send us your experience.)
-                    </pre>  
-                  </p>
-                  
-                  <h4>Using the CLI</h4>
-                  <p>
-                    To use <i>ddns-scripts</i> directly, first install the 
-                    needed packages:
-                    <pre>opkg update<br>opkg install ddns-scripts</pre>
-                    
-                    Now edit the configuration file <i>/etc/config/ddns</i> and
-                    add the following:
-                    <pre>
-  TODO
-  (If you are using OpenWRT please send us your experience.)
-                    </pre>
-                  </p>
-                  
-                  
-                </div>
-              </div>
-            </div>
-            
-            <!-- Tomato -->
-            <div class="accordion-group">
-              <div class="accordion-heading">
-                <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapse3">
-                  Tomato
-                </a>
-              </div>
-              <div id="collapse3" class="accordion-body collapse">
-                <div class="accordion-inner">
-                  Using the Tomato Web-UI, navigate to
-                  <pre>Basic &rarr; DDNS</pre>
-                  
-                  Use these settings:
-                  <table class="table">
-                    <tr>
-                      <td>Service</td>
-                      <td>Custom URL</td>
-                    </tr>
-                    <tr>
-                      <td>URL</td>
-                      <td>{{config.wsgi.protocol}}{{session.username}}:<i>YourHostnamePassword</i>@{{config.wsgi.basename}}/nic/update?hostname={{host.hostname}}.{{host.suffix}}&myip=@IP</td>
-                    </tr>
-                    <tr>
-                      <td>Username</td>
-                      <td>{{session.username}}</td>
-                    </tr>
-                    <tr>
-                      <td>Password</td>
-                      <td><i>YourHostnamePassword</i></td>
-                    </tr>
-                  </table> 
-                </div>
-              </div>
-            </div>
-            
-            <!-- Fritz!Box -->
-            <div class="accordion-group">
-              <div class="accordion-heading">
-                <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapse4">
-                  Fritz!Box
-                </a>
-              </div>
-              <div id="collapse4" class="accordion-body collapse">
-                <div class="accordion-inner">
-                  If you are from germany, using a fritz.box, navigating to:
-                  <pre>Internet &rarr; Freigaben &rarr; Dynamic DNS</pre>
-                  
-                  Please use the following settings to update your dynamic hostnames:
-                  <table class="table">
-                    <tr>
-                      <td>Dynamic DNS-Anbieter</td>
-                      <td>Benutzerdefiniert</td>
-                    </tr>
-                    <tr>
-                      <td>Update-URL</td>
-                      <td>{{config.wsgi.protocol}}{{config.wsgi.basename}}/nic/update?hostname=&lt;domain&gt;&amp;myip=&lt;ipaddr&gt;</td>
-                    </tr>
-                    <tr>
-                      <td>Domainname</td>
-                      <td>{{host.hostname}}.{{host.suffix}}</td>
-                    </tr>
-                    <tr>
-                      <td>Benutzername</td>
-                      <td>{{session.username}}</td>
-                    </tr>
-                    <tr>
-                      <td>Kennwort</td>
-                      <td><i>Your hostnames password</i></td>
-                    </tr>
-                  </table> 
-                </div>
-              </div>
-            </div>
-            
-            <!-- ddclient -->
-            <div class="accordion-group">
-              <div class="accordion-heading">
-                <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapse5">
-                  ddclient
-                </a>
-              </div>
-              <div id="collapse5" class="accordion-body collapse">
-                <div class="accordion-inner">
-                  <p>
-                    This is an example configuration for ddclient:
-                  </p>
-                  <pre>
-  # == General options
-  daemon=300
-  syslog=yes
-  mail=root
-  mail-failure=root
-  ssl=yes
-  use=if, if=<i>YourExternalInterface</i>
-  
-  # == Update server
-  protocol=noip, \
-  server={{config.wsgi.basename}}, \
-  login={{session.username}}, \
-  password=<i>YourHostnamePassword</i> \
-  {{host.hostname}}.{{host.suffix}}
-                  </pre>
-                </div>
-              </div>
-            </div>
+        <div class="form-group">
+          <label for="inputHostname">Hostname</label>
+          <div class="input-group">
+            <span class="input-group-addon"><i class="glyphicon glyphicon-th-large"></i></span>
+            <input class="form-control" type="text" id="inputHostname" name="hostname" value="{{host.hostname}}.{{host.suffix}}" readonly="readonly">
           </div>
-          
+        </div>
+        <div class="form-group">
+          <label for="inputCurAddr">Current IP-Address</label>
+          <div class="input-group">
+            <span class="input-group-addon"><i class="glyphicon glyphicon-th-large"></i></span>
+            <input class="form-control" type="text" id="inputCurAddr" name="curAddress" value="{{host.address}}" readonly="readonly">
+          </div>
         </div>
       </div>
+
+      <h3><i class="icon-tag"></i> Update IP address</h3>
+      <div class="box">
+        <form role="form" action="/user/host/updateAddress" method="post">
+          <input type="hidden" name="host_id" value="{{host.id}}">
+          <div class="form-group">
+            <label for="inputAddress">Set new IP-Address <span><i class="glyphicon glyphicon-home tip" id="curIPbutton" title="Use your current IP address ({{current_ip}})"></i></span></label>
+            <div class="input-group">
+              <span class="input-group-addon"><i class="glyphicon glyphicon-th-large"></i></span>
+              <input class="form-control" type="text" id="inputAddress" name="address" value="" required="required">
+            </div>
+            <script type="text/javascript">
+              $('#curIPbutton').click(function() {
+                $('#inputAddress').val("{{current_ip}}")
+              });
+            </script>
+          </div>
+          <div class="form-group">
+            <button type="submit" class="btn btn-success btn-primary">Update address</button>
+            <button type="reset" class="btn btn-default">Cancel</button>
+          </div>
+        </form>
+      </div>
+
+      <h3><i class="icon-tag"></i> Update host password</h3>
+      <p>
+        Set a new password for updating this hostname
+      </p>
+      <div class="box">
+        <form role="form" action="/user/host/updatePassword" method="post">
+          <input type="hidden" name="host_id" value="{{host.id}}">
+          <div class="form-group">
+            <label for="hostPassword">Password <span><i class="glyphicon glyphicon-gift tip" id="generatePasswordButton" title="Generate a random password"></i></span></label>
+            <div class="input-group">
+              <span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
+              <input class="form-control" type="password" id="hostPassword" placeholder="Password" name="password" required="required">
+            </div>
+            <script type="text/javascript">
+              $('#generatePasswordButton').click(function() {
+                var password = '';
+                var possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+
+                for( var i=0; i < 12; i++ )
+                  password += possible.charAt(Math.floor(Math.random() * possible.length));
+                
+                $('#hostPassword').get(0).type = 'text';
+                $('#hostPassword').val(password);
+
+                $('#hostPassword2').get(0).type = 'text';
+                $('#hostPassword2').prop('readonly', true);
+                $('#hostPassword2').val(password);
+              });
+            </script>
+          </div>
+          <div class="form-group">
+            <label for="hostPassword2">Retype</label>
+            <div class="input-group">
+              <span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
+              <input class="form-control" type="password" id="hostPassword2" placeholder="Retype" name="password_confirm" required="required">
+            </div>
+          </div>
+          <div class="form-group">
+            <button type="submit" class="btn btn-success btn-primary">Update password</button>
+            <button type="reset" class="btn btn-default" id="resetFormButton">Cancel</button>
+          </div>
+          <script type="text/javascript">
+            $('#resetFormButton').click(function() {
+              $('#hostPassword').get(0).type = 'password';
+              $('#hostPassword2').get(0).type = 'password';
+              $('#hostPassword2').prop('readonly', false);
+            });
+          </script>
+        </form>
+      </div>
     </div>
-    
+
+    <div class="col-md-7">
+      <h3><i class="icon-tag"></i> Configuration examples</h3>
+      <p>
+        We have full-functional configuration examples for many common devices.
+        Please select the type of device you want to configure to send updates
+        of your IP address.
+      </p>
+
+      <div class="panel-group" id="accordion">
+        <!-- DD-WRT -->
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h4 class="panel-title">
+              <a data-toggle="collapse" data-parent="#accordion" href="#collapse1">
+                DD-WRT
+              </a>
+            </h4>
+          </div>
+          <div id="collapse1" class="panel-collapse collapse">
+            <div class="panel-body">
+              Using the DD-WRT Web-UI, navigate to
+              <pre>Settings &rarr; DDNS</pre>
+
+              Use these settings:
+              <table class="table">
+                <tr>
+                  <td>DDNS Service</td>
+                  <td>Custom</td>
+                </tr>
+                <tr>
+                  <td>DYNDNS Server</td>
+                  <td>{{config.wsgi.protocol}}{{config.wsgi.basename}}</td>
+                </tr>
+                <tr>
+                  <td>Username</td>
+                  <td>{{session.username}}</td>
+                </tr>
+                <tr>
+                  <td>Password</td>
+                  <td><em>Your password</em></td>
+                </tr>
+                <tr>
+                  <td>Hostname</td>
+                  <td>{{host.hostname}}.{{host.suffix}}</td>
+                </tr>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- OpenWRT -->
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h4 class="panel-title">
+              <a data-toggle="collapse" data-parent="#accordion" href="#collapse2">
+                OpenWRT
+              </a>
+            </h4>
+          </div>
+          <div id="collapse2" class="panel-collapse collapse">
+            <div class="panel-body">
+              <p>
+                With OpenWRT 12.09 you can use the LuCI Web-UI or configure dynamic DNS using
+                the command line to edit <em>/etc/config/ddns</em>.
+              </p>
+              <h4>Using the Web-UI</h4>
+              <p>
+                To use DDNS from inside the LuCI Web-UI, you have to install
+                the <em>luci-app-ddns</em> package. This will automatically
+                install the package ddns-scripts, which contains the scripts
+                that actually update the dynamic DNS name.
+              </p>
+              <p>
+                After <em>luci-app-ddns</em> has been installed, you will find
+                the DDNS configuration by navigating to
+              </p>
+              <pre>Services &rarr; Dynamic DNS</pre>
+
+              <p>
+                Use the following settings, to update your DDNS hostname:
+              </p>
+              <pre>
+  TODO
+  (If you are using OpenWRT please send us your experience.)
+              </pre>
+
+              <h4>Using the CLI</h4>
+              <p>
+                To use <em>ddns-scripts</em> directly, first install the
+                needed packages:
+              </p>
+              <pre>opkg update<br>opkg install ddns-scripts</pre>
+
+              <p>
+                Now edit the configuration file <em>/etc/config/ddns</em> and
+                add the following:
+              </p>
+              <pre>
+  TODO
+  (If you are using OpenWRT please send us your experience.)
+              </pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tomato -->
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h4 class="panel-title">
+              <a data-toggle="collapse" data-parent="#accordion" href="#collapse3">
+                Tomato
+              </a>
+            </h4>
+          </div>
+          <div id="collapse3" class="panel-collapse collapse">
+            <div class="panel-body">
+              Using the Tomato Web-UI, navigate to
+              <pre>Basic &rarr; DDNS</pre>
+
+              Use these settings:
+              <table class="table">
+                <tr>
+                  <td>Service</td>
+                  <td>Custom URL</td>
+                </tr>
+                <tr>
+                  <td>URL</td>
+                  <td>{{config.wsgi.protocol}}{{session.username}}:<em>YourHostnamePassword</em>@{{config.wsgi.basename}}/nic/update?hostname={{host.hostname}}.{{host.suffix}}&amp;myip=@IP</td>
+                </tr>
+                <tr>
+                  <td>Username</td>
+                  <td>{{session.username}}</td>
+                </tr>
+                <tr>
+                  <td>Password</td>
+                  <td><em>YourHostnamePassword</em></td>
+                </tr>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Fritz!Box -->
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h4 class="panel-title">
+              <a data-toggle="collapse" data-parent="#accordion" href="#collapse4">
+                Fritz!Box
+              </a>
+            </h4>
+          </div>
+          <div id="collapse4" class="panel-collapse collapse">
+            <div class="panel-body">
+              If you are from germany, using a fritz.box, navigating to:
+              <pre>Internet &rarr; Freigaben &rarr; Dynamic DNS</pre>
+
+              Please use the following settings to update your dynamic hostnames:
+              <table class="table">
+                <tr>
+                  <td>Dynamic DNS-Anbieter</td>
+                  <td>Benutzerdefiniert</td>
+                </tr>
+                <tr>
+                  <td>Update-URL</td>
+                  <td>{{config.wsgi.protocol}}{{config.wsgi.basename}}/nic/update?hostname=&lt;domain&gt;&amp;myip=&lt;ipaddr&gt;</td>
+                </tr>
+                <tr>
+                  <td>Domainname</td>
+                  <td>{{host.hostname}}.{{host.suffix}}</td>
+                </tr>
+                <tr>
+                  <td>Benutzername</td>
+                  <td>{{session.username}}</td>
+                </tr>
+                <tr>
+                  <td>Kennwort</td>
+                  <td><em>Your hostnames password</em></td>
+                </tr>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ddclient -->
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h4 class="panel-title">
+              <a data-toggle="collapse" data-parent="#accordion" href="#collapse5">
+                ddclient
+              </a>
+            </h4>
+          </div>
+          <div id="collapse5" class="panel-collapse collapse">
+            <div class="panel-body">
+              <p>
+                This is an example configuration for ddclient:
+              </p>
+              <pre>
+# == General options
+daemon=300
+syslog=yes
+mail=root
+mail-failure=root
+ssl=yes
+use=if, if=<em>YourExternalInterface</em>
+
+# == Update server
+protocol=noip, \
+server={{config.wsgi.basename}}, \
+login={{session.username}}, \
+password=<em>YourHostnamePassword</em> \
+{{host.hostname}}.{{host.suffix}}
+                </pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
   </div>
+
 {% endblock %}

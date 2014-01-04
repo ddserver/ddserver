@@ -3,82 +3,73 @@
 {% block content %}
 
   <div class="row">
-    <div class="span12"><h1>Password recovery</h1></div>
+    <div class="col-md-12"><h1>Password recovery</h1></div>
   </div>
 
-  <div class="row-fluid">
-    <div class="box">
-      <div class="span12"><h3>Set a new password</h3></div>
-    
-      <div class="row-fluid">
-        <div class="span6">
-          <p>
-            Please use secure passwords, consisting of upper- and lowercase
-            characters, as well as numbers or special characters. The minimum
-            password length is {{passwd_min_chars}} characters.
-          </p>
-        </div>
-      
-        <div class="span6">
-          <form class="form-horizontal"
-                action="/lostpass/setnew?username={{username}}&authcode={{authcode}}"
-                method="post">
-            <div class="control-group">
-              <label class="control-label" for="inputPassword1">New Password</label>
-              <div class="controls">
-                <div class="input-prepend">
-                  <span class="add-on"><i class="icon-lock"></i></span>
-                  <input type="password" id="inputPassword1" placeholder="Password" name="password">
-                </div>
-              </div>
+  <div class="row">
+    <div class="col-md-8">
+      <p>
+        Hi {{username}},
+      </p>
+      <p>
+        welcome to <strong>ddserver</strong>, a service that allows you to add
+        hostnames whose IP address can be updated dynamically using the
+        <a href="http://www.noip.com/integrate">dyndns2 protocol</a>.
+      </p>
+      <p>
+        You requested a password reset for your ddserver account. To finish the
+        password reset process, you need to set a new password using the form
+        on the right. Please use secure passwords, consisting of upper- and lowercase
+        characters, as well as numbers or special characters. The minimum
+        password length is {{passwd_min_chars}} characters.
+      </p>
+      <p>
+        If you did not request a password reset for your ddserver account, 
+        you may cancel the password reset process by clicking the button
+        on the right. 
+      </p>
+      <p>
+        If you have any trouble with the password recovery process, please contact us.
+      </p>
+      <p>
+        <a href="mailto:{{config.contact.email}}">{{config.contact.name}} &lt;{{config.contact.email}}&gt;</a>
+      </p>
+    </div>
+
+    <div class="col-md-4">
+      <div class="box">
+        <h3><i class="glyphicon glyphicon-tag"></i> Set a new password</h3>
+        <form role="form" action="/lostpass/setnew?username={{username}}&amp;authcode={{authcode}}" method="post">
+          <div class="form-group">
+            <label for="inputPassword1">New Password</label>
+            <div class="input-group">
+              <span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
+              <input class="form-control" type="password" id="inputPassword1" placeholder="Password" name="password">
             </div>
-            <div class="control-group">
-              <label class="control-label" for="inputPassword2">Retype</label>
-              <div class="controls">
-                <div class="input-prepend">
-                  <span class="add-on"><i class="icon-lock"></i></span>
-                  <input type="password" id="inputPassword2" placeholder="Retype" name="password_confirm">
-                </div>
-              </div>
+          </div>
+          <div class="form-group">
+            <label for="inputPassword2">Retype</label>
+            <div class="input-group">
+              <span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
+              <input class="form-control" type="password" id="inputPassword2" placeholder="Retype" name="password_confirm">
             </div>
-            <div class="control-group">
-              <div class="controls">
-                <button type="submit" class="btn btn-success btn-primary">Set new password</button>
-                <a class="btn" href="/">Go back</a>
-              </div>
-            </div>
-          </form>
-        </div>
+          </div>
+          <div class="form-group">
+            <button type="submit" class="btn btn-success btn-primary">Set new password</button>
+            <a class="btn btn-default" href="/">Go back</a>
+          </div>
+        </form>
+      </div>
+
+      <div class="box">
+        <h3><i class="glyphicon glyphicon-tag"></i> Cancel password reset</h3>
+        <form role="form" action="/lostpass/cancel?username={{username}}&amp;authcode={{authcode}}" method="post">
+          <div class="form-group">
+            <button type="submit" class="btn btn-danger btn-primary">Cancel Password Reset</button>
+          </div>
+        </form>
       </div>
     </div>
   </div>
-  
-  <div class="row-fluid">
-    <div class="box">
-      <div class="span12"><h3>Cancel password reset</h3></div>
-  
-      <div class="row-fluid">
-        <div class="span6">
-          <p>
-            If you did not request a password reset for your ddserver account, 
-            you may cancel the password reset process by clicking the button
-            on the right. 
-          </p>
-        </div>
-    
-        <div class="span6">
-          <form class="form-horizontal"
-                action="/lostpass/cancel?username={{username}}&authcode={{authcode}}"
-                method="post">
-            <div class="control-group">
-              <div class="controls">
-                <button type="submit" class="btn btn-danger btn-primary">Cancel Password Reset</button>
-              </div>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
-  </div>
-  
+
 {% endblock %}
