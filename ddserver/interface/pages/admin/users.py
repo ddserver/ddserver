@@ -129,7 +129,7 @@ def post_users_activate(user,
   ''' Activate a users account. '''
 
   users.generate_authcode(data.username)
-  user = users[data.user_name]
+  user = users[data.username]
 
   emails.to_user('signup_activate.mail',
                  user = user)
