@@ -15,9 +15,6 @@
   <div class="row">
     <div class="col-md-5">
       <h3>Hostname information</h3>
-      <p>
-        This is the information we currently have about your hostname.
-      </p>
       <div class="box">
         <div class="form-group">
           <label for="inputHostname">Hostname</label>
@@ -35,7 +32,10 @@
         </div>
       </div>
 
-      <h3><i class="icon-tag"></i> Update IP address</h3>
+      <h3>Update IP address</h3>
+      <p>
+        Manually set a new IP address for the hostname
+      </p>
       <div class="box">
         <form role="form" action="/user/host/updateAddress" method="post">
           <input type="hidden" name="host_id" value="{{host.id}}">
@@ -111,14 +111,35 @@
     </div>
 
     <div class="col-md-7">
-      <h3><i class="icon-tag"></i> Configuration examples</h3>
-      <p>
-        We have full-functional configuration examples for many common devices.
-        Please select the type of device you want to configure to send updates
-        of your IP address.
-      </p>
+      <h3>Configuration examples</h3>
 
       <div class="panel-group" id="accordion">
+        <!-- General instructions -->
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h4 class="panel-title">
+              <a data-toggle="collapse" data-parent="#accordion" href="#collapse0">
+                General instructions
+              </a>
+            </h4>
+          </div>
+          <div id="collapse0" class="panel-collapse collapse in">
+            <div class="panel-body">
+              <p>
+                To update your hostname, you have to configure dynamic DNS updates
+                on your homerouter or one of your computer systems at home.
+              </p>
+              <p>
+                Whatever method you want to use to update your hostname, your client
+                has to access the following URL in order to trigger an update:
+              </p>
+              <pre>
+{{config.wsgi.protocol}}{{session.username}}:<abbr class="tip" title="The password you specified for updating the hostname (not the password you use to login into this WebUI)">YourHostPassword</abbr>@{{config.wsgi.basename}}/nic/update?hostname={{host.hostname}}.{{host.suffix}}&amp;myip=<abbr class="tip" title="The IP address you want to set">IP-Address</abbr>
+              </pre>
+            </div>
+          </div>
+        </div>
+
         <!-- DD-WRT -->
         <div class="panel panel-default">
           <div class="panel-heading">
@@ -130,32 +151,15 @@
           </div>
           <div id="collapse1" class="panel-collapse collapse">
             <div class="panel-body">
-              Using the DD-WRT Web-UI, navigate to
-              <pre>Settings &rarr; DDNS</pre>
-
-              Use these settings:
-              <table class="table">
-                <tr>
-                  <td>DDNS Service</td>
-                  <td>Custom</td>
-                </tr>
-                <tr>
-                  <td>DYNDNS Server</td>
-                  <td>{{config.wsgi.protocol}}{{config.wsgi.basename}}</td>
-                </tr>
-                <tr>
-                  <td>Username</td>
-                  <td>{{session.username}}</td>
-                </tr>
-                <tr>
-                  <td>Password</td>
-                  <td><em>Your password</em></td>
-                </tr>
-                <tr>
-                  <td>Hostname</td>
-                  <td>{{host.hostname}}.{{host.suffix}}</td>
-                </tr>
-              </table>
+              <p>
+                Sorry, it looks like DD-WRT routers are not able to send updates
+                correctly. There is a configuration example in the
+                <a href="http://www.dd-wrt.com/wiki/index.php/DDNS_-_How_to_setup_Custom_DDNS_settings_using_embedded_inadyn_-_HOWTO#Custom_.28URL_Updates.29">DD-WRT Wiki</a>,
+                but it does not seem to work correctly.
+              </p>
+              <p>
+                If you manage to use a custom update service with DD-WRT, please let us know!
+              </p>
             </div>
           </div>
         </div>
@@ -172,9 +176,10 @@
           <div id="collapse2" class="panel-collapse collapse">
             <div class="panel-body">
               <p>
-                With OpenWRT 12.09 you can use the LuCI Web-UI or configure dynamic DNS using
-                the command line to edit <em>/etc/config/ddns</em>.
+                With OpenWRT you can use the LuCI Web-UI or configure dynamic DNS using
+                the command line. The following instructions were tested with OpenWRT 12.09.
               </p>
+
               <h4>Using the Web-UI</h4>
               <p>
                 To use DDNS from inside the LuCI Web-UI, you have to install
@@ -184,17 +189,43 @@
               </p>
               <p>
                 After <em>luci-app-ddns</em> has been installed, you will find
-                the DDNS configuration by navigating to
+                the DDNS configuration by navigating to:
               </p>
               <pre>Services &rarr; Dynamic DNS</pre>
 
               <p>
-                Use the following settings, to update your DDNS hostname:
+                At the form presented, use the following settings:
               </p>
-              <pre>
-  TODO
-  (If you are using OpenWRT please send us your experience.)
-              </pre>
+              <table class="table">
+                <tr>
+                  <td>Service</td>
+                  <td>-- custom --</td>
+                </tr>
+                <tr>
+                  <td>Custom update-URL</td>
+                  <td>{{config.wsgi.protocol}}[USERNAME]:[PASSWORD]@{{config.wsgi.basename}}/nic/update?hostname=[DOMAIN]&amp;myip=[IP]</td>
+                </tr>
+                <tr>
+                  <td>Hostname</td>
+                  <td>{{host.hostname}}.{{host.suffix}}</td>
+                </tr>
+                <tr>
+                  <td>Username</td>
+                  <td>{{session.username}}</td>
+                </tr>
+                <tr>
+                  <td>Password</td>
+                  <td><abbr class="tip" title="The password you specified for updating the hostname (not the password you use to login into this WebUI)">YourHostPassword</abbr></td>
+                </tr>
+                <tr>
+                  <td>Source of IP address</td>
+                  <td>URL</td>
+                </tr>
+                <tr>
+                  <td>URL</td>
+                  <td>{{config.wsgi.protocol}}{{config.wsgi.basename}}/nic/ip</td>
+                </tr>
+              </table>
 
               <h4>Using the CLI</h4>
               <p>
@@ -208,9 +239,38 @@
                 add the following:
               </p>
               <pre>
-  TODO
-  (If you are using OpenWRT please send us your experience.)
-              </pre>
+config service 'myddns'
+        option enabled '1'
+        option interface 'wan'
+        option update_url 'http://[USERNAME]:[PASSWORD]@10.0.0.10:8082/nic/update?hostname=[DOMAIN]&amo;myip=[IP]'
+        option domain '{{host.hostname}}.{{host.suffix}}'
+        option username '{{session.username}}'
+        option password '<abbr class="tip" title="The password you specified for updating the hostname (not the password you use to login into this WebUI)">YourHostPassword</abbr>'
+        option ip_source 'web'
+        option ip_url '{{config.wsgi.protocol}}{{config.wsgi.basename}}/nic/ip'
+        option check_unit 'hours'
+        option check_interval '1'
+        option retry_interval '60'
+        option retry_unit 'seconds'
+        option force_interval '24'
+        option force_unit 'hours'{% if config.wsgi.protocol %}
+        option use_https 1
+        option cacert /etc/ssl/certs{% endif %}</pre>
+
+              {% if config.wsgi.protocol == 'https://' %}
+              <h4>Notes on using SSL (https://)</h4>
+              <p>
+                In order for ddns-scripts to perform DNS updates over https (SSL),
+                you will need to install the curl package, and add the appropriate
+                root certificate for your ddns provider.
+              </p>
+              <p>
+                Install curl:
+              </p>
+              <pre>opkg update<br>opkg install curl</pre>
+              <p>Install CA certificates</p>
+              <pre>mkdir -p /etc/ssl/certs/<br>wget -P /etc/ssl/certs/ http://curl.haxx.se/ca/cacert.pem</pre>
+              {% endif %}
             </div>
           </div>
         </div>
@@ -226,10 +286,19 @@
           </div>
           <div id="collapse3" class="panel-collapse collapse">
             <div class="panel-body">
-              Using the Tomato Web-UI, navigate to
+              <p>
+                Routers running Tomato firmware allow the configuration of
+                dynamic DNS updates using the Web-UI. The following instructions
+                were tested with Tomato version 1.28.
+              </p>
+              <p>
+                Start by navigating to:
+              </p>
               <pre>Basic &rarr; DDNS</pre>
 
-              Use these settings:
+              <p>
+                At the form presented, use the following settings:
+              </p>
               <table class="table">
                 <tr>
                   <td>Service</td>
@@ -237,15 +306,7 @@
                 </tr>
                 <tr>
                   <td>URL</td>
-                  <td>{{config.wsgi.protocol}}{{session.username}}:<em>YourHostnamePassword</em>@{{config.wsgi.basename}}/nic/update?hostname={{host.hostname}}.{{host.suffix}}&amp;myip=@IP</td>
-                </tr>
-                <tr>
-                  <td>Username</td>
-                  <td>{{session.username}}</td>
-                </tr>
-                <tr>
-                  <td>Password</td>
-                  <td><em>YourHostnamePassword</em></td>
+                  <td>{{config.wsgi.protocol}}{{session.username}}:<abbr class="tip" title="The password you specified for updating the hostname (not the password you use to login into this WebUI)">YourHostPassword</abbr>@{{config.wsgi.basename}}/nic/update?hostname={{host.hostname}}.{{host.suffix}}&amp;myip=@IP</td>
                 </tr>
               </table>
             </div>
@@ -263,10 +324,19 @@
           </div>
           <div id="collapse4" class="panel-collapse collapse">
             <div class="panel-body">
-              If you are from germany, using a fritz.box, navigating to:
+              <p>
+                If you are using a FRITZ!Box, you can configure dynamic DNS updates
+                using the Web-UI. The following instructions were tested with
+                FRITZ!Box 7390 and 7490, both running FRITZ!OS 06.01.
+              </p>
+              <p>
+                Start by navigating to:
+              </p>
               <pre>Internet &rarr; Freigaben &rarr; Dynamic DNS</pre>
 
-              Please use the following settings to update your dynamic hostnames:
+              <p>
+                At the form presented, use the following settings:
+              </p>
               <table class="table">
                 <tr>
                   <td>Dynamic DNS-Anbieter</td>
@@ -286,7 +356,7 @@
                 </tr>
                 <tr>
                   <td>Kennwort</td>
-                  <td><em>Your hostnames password</em></td>
+                  <td><abbr class="tip" title="The password you specified for updating the hostname (not the password you use to login into this WebUI)">YourHostPassword</abbr></td>
                 </tr>
               </table>
             </div>
@@ -305,6 +375,11 @@
           <div id="collapse5" class="panel-collapse collapse">
             <div class="panel-body">
               <p>
+                DDclient is a small but full featured client used to update dynamic
+                DNS entries requiring only Perl and no additional modules. It runs
+                under most UNIX OSes and has been tested under GNU/Linux and FreeBSD.
+              </p>
+              <p>
                 This is an example configuration for ddclient:
               </p>
               <pre>
@@ -313,14 +388,14 @@ daemon=300
 syslog=yes
 mail=root
 mail-failure=root
-ssl=yes
-use=if, if=<em>YourExternalInterface</em>
+<abbr class="tip" title="Set this to yes, if your update server uses SSL (https://)">ssl=yes</abbr>
+use=web, web={{config.wsgi.protocol}}{{config.wsgi.basename}}/nic/ip
 
 # == Update server
 protocol=noip, \
 server={{config.wsgi.basename}}, \
 login={{session.username}}, \
-password=<em>YourHostnamePassword</em> \
+password=<abbr class="tip" title="The password you specified for updating the hostname (not the password you use to login into this WebUI)">YourHostnamePassword</abbr> \
 {{host.hostname}}.{{host.suffix}}
                 </pre>
             </div>
