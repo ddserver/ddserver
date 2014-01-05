@@ -20,6 +20,8 @@ along with ddserver. If not, see <http://www.gnu.org/licenses/>.
 import functools
 import bottle
 
+import formencode
+
 from passlib.apps import custom_app_context as pwd
 
 from ddserver.utils.deps import require
@@ -70,8 +72,9 @@ resp_911 = functools.partial(Response, '911', None)
 def update(logger, db, username, password, hostnames, address):
   ''' Update the records.
 
-      The very first step is to check username and password. If they do not
-      match, a bad credentials answer is returned.
+      The very first step is to check username and password. If they are not
+      provided or the username does not exist, a bad credentials answer is
+      returned.
 
       If the credentials are checked, for each given hostname, the address is
       stored in the database.
@@ -139,6 +142,17 @@ def update(logger, db, username, password, hostnames, address):
       logger.debug('Address has not changed: %s', address)
 
       responses.append(resp_nochg(value = address))
+      continue
+
+    # validate the ip address
+    try:
+      validator = formencode.validators.IPAddress()
+      validator.to_python(address)
+
+    except formencode.Invalid:
+      logger.debug('Invalid IP address in update request: %s', address)
+
+      responses.append(resp_abuse())
       continue
 
     # Update the host entry
