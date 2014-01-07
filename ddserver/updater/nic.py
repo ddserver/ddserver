@@ -80,15 +80,6 @@ def update(logger, db, username, password, hostnames, address):
       stored in the database.
   '''
 
-  # Validate the IP address
-  try:
-    validator = formencode.validators.IPAddress()
-    validator.to_python(address)
-
-  except formencode.Invalid:
-    logger.warning('Invalid IP address in update request: %s', address)
-    return resp_abuse()
-
   # Check if we get some credentials
   if not username or not password:
     logger.warning('Missing credentials')
@@ -110,6 +101,15 @@ def update(logger, db, username, password, hostnames, address):
     return resp_badauth()
 
   logger.debug('Found user in DB: %s', user)
+
+  # Validate the IP address
+  try:
+    validator = formencode.validators.IPAddress()
+    validator.to_python(address)
+
+  except formencode.Invalid:
+    logger.warning('Invalid IP address in update request: %s', address)
+    return resp_abuse()
 
   # The specification allows to give multiple hosts separated by comma
   responses = []
@@ -163,7 +163,7 @@ def update(logger, db, username, password, hostnames, address):
       ''', {'id': host['id'],
             'address': address})
 
-    logger.debug('Host entry updated: %s = %s', hostname, address)
+    logger.info('Host entry updated: %s = %s', hostname, address)
 
     responses.append(resp_good(value = address))
 
@@ -187,36 +187,42 @@ def get_update(logger):
 
   # Extract the hostnames separated by comma, the new IP address and the offline
   # flag from the query
-  hostnames = bottle.request.query.get('hostname', None).split(',')
-  address = bottle.request.query.get('myip', None)
-  offline = bottle.request.query.get('offline', 'NO') == 'YES'
+  hostnames = bottle.request.query.get('hostname', None)
+  if hostnames:
+    hostnames = hostnames.split(',')
+    address = bottle.request.query.get('myip', None)
+    offline = bottle.request.query.get('offline', 'NO') == 'YES'
 
-  # Fetch the the credentials from HTTP header
-  if bottle.request.auth:
-    username, password = bottle.request.auth
+    # Fetch the the credentials from HTTP header
+    if bottle.request.auth:
+      username, password = bottle.request.auth
+
+    else:
+      username, password = None, None
+
+    # Clear the address if the offline flag is set
+    if offline:
+      address = None
+
+    logger.debug('Update request for %s as %s', hostnames, address)
+
+    # Call the update function
+    try:
+      responses = update(username = username,
+                         password = password,
+                         hostnames = hostnames,
+                         address = address)
+
+    except:
+      responses = resp_911()
+
+    # Blow up responses if we got a single response
+    if isinstance(responses, Response):
+      responses = [responses] * len(hostnames)
 
   else:
-    username, password = None, None
-
-  # Clear the address if the offline flag is set
-  if offline:
-    address = None
-
-  logger.debug('Update request for %s as %s', hostnames, address)
-
-  # Call the update function
-  try:
-    responses = update(username = username,
-                       password = password,
-                       hostnames = hostnames,
-                       address = address)
-
-  except:
-    responses = resp_911()
-
-  # Blow up responses if we got a single response
-  if isinstance(responses, Response):
-    responses = [responses] * len(hostnames)
+    responses = resp_abuse()
+    responses = [responses]
 
   logger.debug('Update responses: %s', responses)
 
