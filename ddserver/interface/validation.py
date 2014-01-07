@@ -99,7 +99,7 @@ class ValidHostname(FancyValidator):
     'invalid_start': 'Hostnames must start with an aplhanumeric character'
   }
 
-  letter_regex = re.compile(r'[a-z0-9\-]+')
+  letter_regex = re.compile(r'^[a-z0-9\-]+$')
 
   def validate_python(self,
                       value,
@@ -116,8 +116,7 @@ class ValidHostname(FancyValidator):
                                value,
                                state)
 
-    non_letters = self.letter_regex.sub('', value)
-    if len(non_letters) != 0:
+    if not self.letter_regex.match(value):
       raise formencode.Invalid(self.message('non_letter',
                                             value),
                                value,
@@ -174,11 +173,11 @@ class ValidUsername(FancyValidator):
 
   messages = {
     'too_short': 'Username can not be empty',
-    'too_long': 'Username can not exceed 30 characters.',
+    'too_long': 'Username can not exceed 255 characters.',
     'non_letter': 'Username can only consist of a-z, 0-9, -, .',
   }
 
-  letter_regex = re.compile(r'[A-Za-z0-9\-\.]+')
+  letter_regex = re.compile(r'^[A-Za-z0-9\-\.]+$')
 
   def validate_python(self, value, state):
     if len(value) < 1:

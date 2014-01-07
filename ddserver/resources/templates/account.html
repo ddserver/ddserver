@@ -44,21 +44,21 @@
           <div class="form-group">
             <label for="inputUsername">Username</label>
             <div class="input-group">
-              <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
+              <span class="input-group-addon"><i class="fa fa-user"></i></span>
               <input class="form-control" type="text" id="inputUsername" placeholder="Username" readonly="readonly" value="{{data.username}}">
             </div>
           </div>
           <div class="form-group">
             <label for="inputCreated">Account Created</label>
             <div class="input-group">
-              <span class="input-group-addon"><i class="glyphicon glyphicon-time"></i></span>
+              <span class="input-group-addon"><i class="fa fa-clock-o"></i></span>
               <input class="form-control" type="text" id="inputCreated" placeholder="Account Created" readonly="readonly" value="{{data.created}}">
             </div>
           </div>
           <div class="form-group">
             <label for="inputEmail">E-Mail Address</label>
             <div class="input-group">
-              <span class="input-group-addon"><i class="glyphicon glyphicon-envelope"></i></span>
+              <span class="input-group-addon"><i class="fa fa-envelope"></i></span>
               <input class="form-control" type="email" id="inputEmail" placeholder="E-Mail" value="{{data.email}}" required="required" name="email">
             </div>
           </div>
@@ -72,24 +72,40 @@
 
     <div class="col-md-4">
       <div class="box">
-        <form role="form" action="/user/account/password" method="post">
+        <form role="form" action="/user/account/password" method="post" id="pwdcontainer">
           <div class="form-group">
             <label for="inputPassword1">Password</label>
             <div class="input-group">
-              <span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
+              <span class="input-group-addon"><i class="fa fa-lock"></i></span>
               <input class="form-control" type="password" id="inputPassword1" placeholder="Password" name="password" required="required">
             </div>
           </div>
           <div class="form-group">
             <label for="inputPassword2">Retype</label>
             <div class="input-group">
-              <span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
+              <span class="input-group-addon"><i class="fa fa-lock"></i></span>
               <input class="form-control" type="password" id="inputPassword2" placeholder="Retype" name="password_confirm" required="required">
             </div>
           </div>
           <div class="form-group">
+            <label for="inputPassword2">Password strength</label>
+            <span class="pwstrength_viewport_progress"></span>
+          </div>
+          <script type="text/javascript">
+            jQuery(document).ready(function () {
+                "use strict";
+                $('#inputPassword1').pwstrength(pwdstrength_options);
+            });
+          </script>
+          <div class="form-group">
             <button type="submit" class="btn btn-primary">Update password</button>
-            <button type="reset" class="btn btn-default">Cancel</button>
+            <button type="reset" class="btn btn-default" id="resetFormButton">Cancel</button>
+            <script type="text/javascript">
+              $('#resetFormButton').click(function() {
+                $('#inputPassword1').val('');
+                $('#inputPassword1').trigger('keyup');
+              });
+            </script>
           </div>
         </form>
       </div>
@@ -111,7 +127,7 @@
           <h4 class="modal-title">Delete your account</h4>
         </div>
         <div class="modal-body">
-          <span class="glyphicon glyphicon-trash pull-left" style="font-size: 60px; margin: 20px 20px 0 0;"></span>
+          <span class="fa fa-trash-o pull-left" style="font-size: 60px; margin: 20px 20px 0 0;"></span>
           <p>
             If you really want to delete your account, please confirm by clicking the
             <em>Delete my account</em> button.

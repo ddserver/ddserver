@@ -21,7 +21,7 @@
         password reset process, you need to set a new password using the form
         on the right. Please use secure passwords, consisting of upper- and lowercase
         characters, as well as numbers or special characters. The minimum
-        password length is {{passwd_min_chars}} characters.
+        password length is {{config.auth.password_min_chars}} characters.
       </p>
       <p>
         If you did not request a password reset for your ddserver account, 
@@ -38,22 +38,32 @@
 
     <div class="col-md-4">
       <div class="box">
-        <h3><i class="glyphicon glyphicon-tag"></i> Set a new password</h3>
-        <form role="form" action="/lostpass/setnew?username={{username}}&amp;authcode={{authcode}}" method="post">
+        <h3>Set a new password</h3>
+        <form role="form" action="/lostpass/setnew?username={{username}}&amp;authcode={{authcode}}" method="post" id="pwdcontainer">
           <div class="form-group">
             <label for="inputPassword1">New Password</label>
             <div class="input-group">
-              <span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
+              <span class="input-group-addon"><i class="fa fa-lock"></i></span>
               <input class="form-control" type="password" id="inputPassword1" placeholder="Password" name="password">
             </div>
           </div>
           <div class="form-group">
             <label for="inputPassword2">Retype</label>
             <div class="input-group">
-              <span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
+              <span class="input-group-addon"><i class="fa fa-lock"></i></span>
               <input class="form-control" type="password" id="inputPassword2" placeholder="Retype" name="password_confirm">
             </div>
           </div>
+          <div class="form-group">
+            <label for="inputPassword2">Password strength</label>
+            <span class="pwstrength_viewport_progress"></span>
+          </div>
+          <script type="text/javascript">
+            jQuery(document).ready(function () {
+                "use strict";
+                $('#inputPassword1').pwstrength(pwdstrength_options);
+            });
+          </script>
           <div class="form-group">
             <button type="submit" class="btn btn-success btn-primary">Set new password</button>
             <a class="btn btn-default" href="/">Go back</a>
@@ -62,7 +72,7 @@
       </div>
 
       <div class="box">
-        <h3><i class="glyphicon glyphicon-tag"></i> Cancel password reset</h3>
+        <h3>Cancel password reset</h3>
         <form role="form" action="/lostpass/cancel?username={{username}}&amp;authcode={{authcode}}" method="post">
           <div class="form-group">
             <button type="submit" class="btn btn-danger btn-primary">Cancel Password Reset</button>
