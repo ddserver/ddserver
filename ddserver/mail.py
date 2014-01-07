@@ -61,11 +61,15 @@ class EmailManager(object):
                                                                           'email'))
 
 
-  @require(config = 'ddserver.config:Config')
+  @require(config = 'ddserver.config:Config',
+           messages = 'ddserver.interface.message:MessageManager',
+           logger = 'ddserver.utils.logger:Logger')
   def __send(self,
              key,
              rcpt,
              config,
+             messages,
+             logger,
              **kwargs):
     ''' Sends a mail.
 
@@ -78,18 +82,39 @@ class EmailManager(object):
     template = self.__environment.get_template(key)
 
     # Open SMTP connection
-    smtp = smtplib.SMTP(host = config.smtp.host,
-                        port = config.smtp.port)
+    try:
+      smtp = smtplib.SMTP(host = config.smtp.host,
+                          port = config.smtp.port)
 
-    # Send mail
-    smtp.sendmail(config.contact.email,
-                  [rcpt],
-                  template.render(rcpt = rcpt,
-                                  config = config,
-                                  **kwargs))
+    except:
+      messages.error('Failed to to send email. Please contact an administrator at %s' %
+                       config.contact.email)
 
-    # Close SMTP connection
-    smtp.quit()
+      logger.error('Failed to contact the SMTP server at %s:%s (template %s)' %
+                   config.smtp.host,
+                   config.smtp.port,
+                   key)
+
+    else:
+      try:
+        # Send mail
+        smtp.sendmail(config.contact.email,
+                      [rcpt],
+                      template.render(rcpt = rcpt,
+                                      config = config,
+                                      **kwargs))
+
+      except:
+        messages.error('Failed to send email. Please contact an administrator at %s' %
+                       config.contact.email)
+
+        logger.error('Failed to send email to %s (template %s)' %
+                     rcpt,
+                     key)
+
+      finally:
+        # Close SMTP connection
+        smtp.quit()
 
 
   def to_user(self,
