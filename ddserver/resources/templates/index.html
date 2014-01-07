@@ -45,17 +45,17 @@
     {% if not user %}
     <div class="col-md-4">
       <div class="box">
-        <h3><i class="glyphicon glyphicon-tag"></i> Login</h3>
+        <h3>Login</h3>
         <form role="form" action="/login" method="post">
           <div class="form-group">
             <div class="input-group">
-              <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
+              <span class="input-group-addon"><i class="fa fa-user"></i></span>
               <input class="form-control" type="text" id="loginUsername" placeholder="Username" name="username" required="required">
             </div>
           </div>
           <div class="form-group">
             <div class="input-group">
-              <span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
+              <span class="input-group-addon"><i class="fa fa-lock"></i></span>
               <input class="form-control" type="password" id="loginPassword" placeholder="Password" name="password" required="required">
             </div>
           </div>
@@ -68,7 +68,7 @@
 
       {% if config.signup.enabled %}
       <div class="box">
-        <h3><i class="glyphicon glyphicon-tag"></i> Signup</h3>
+        <h3>Signup</h3>
         <p class="text-center">Want to use dynamic DNS? Signup now!</p>
         <p class="text-center"><a class="btn btn-primary" href="/signup">Create an account</a></p>
       </div>

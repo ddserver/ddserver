@@ -13,6 +13,7 @@
 
   <link rel="stylesheet" type="text/css" href="/static/css/bootstrap.min.css">
   <link rel="stylesheet" type="text/css" href="/static/css/bootstrap-theme.min.css">
+  <link rel="stylesheet" type="text/css" href="/static/css/font-awesome.min.css">
   <link rel="stylesheet" type="text/css" href="/static/css/ddserver.css">
 
   <script type="text/javascript">
@@ -37,17 +38,17 @@
 
       <div class="collapse navbar-collapse navbar-inverse " id="mainmenu">
         <ul class="nav navbar-nav pull-right">
-          <li><a href="/"><i class="glyphicon glyphicon-home"></i> Start</a></li>
+          <li><a href="/"><i class="fa fa-home"></i> Start</a></li>
           {% if user %}
-          <li><a href="/user/hosts/add"><i class="glyphicon glyphicon-th-large"></i> Hostnames</a></li>
-          <li><a href="/user/account"><i class="glyphicon glyphicon-user"></i> Account</a></li>
+          <li><a href="/user/hosts/add"><i class="fa fa-desktop"></i> Hostnames</a></li>
+          <li><a href="/user/account"><i class="fa fa-user"></i> Account</a></li>
             {% if user.admin %}
             <li class="divider"></li>
-            <li><a href="/admin/users/all"><i class="glyphicon glyphicon-th-large"></i> Users</a></li>
-            <li><a href="/admin/suffixes/list"><i class="glyphicon glyphicon-th-large"></i> Zones</a></li>
+            <li><a href="/admin/users/all"><i class="fa fa-users"></i> Users</a></li>
+            <li><a href="/admin/suffixes/list"><i class="fa fa-sitemap"></i> Zones</a></li>
             {% endif %}
           <li class="divider"></li>
-          <li><a href="/logout"><i class="glyphicon glyphicon-off"></i> Logout</a></li>
+          <li><a href="/logout"><i class="fa fa-power-off"></i> Logout</a></li>
           {% endif %}
         </ul>
       </div>

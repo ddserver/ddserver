@@ -19,14 +19,14 @@
         <div class="form-group">
           <label for="inputHostname">Hostname</label>
           <div class="input-group">
-            <span class="input-group-addon"><i class="glyphicon glyphicon-th-large"></i></span>
+            <span class="input-group-addon"><i class="fa fa-desktop"></i></span>
             <input class="form-control" type="text" id="inputHostname" name="hostname" value="{{host.hostname}}.{{host.suffix}}" readonly="readonly">
           </div>
         </div>
         <div class="form-group">
           <label for="inputCurAddr">Current IP-Address</label>
           <div class="input-group">
-            <span class="input-group-addon"><i class="glyphicon glyphicon-th-large"></i></span>
+            <span class="input-group-addon"><i class="fa fa-info"></i></span>
             <input class="form-control" type="text" id="inputCurAddr" name="curAddress" value="{{host.address}}" readonly="readonly">
           </div>
         </div>
@@ -40,9 +40,9 @@
         <form role="form" action="/user/host/updateAddress" method="post">
           <input type="hidden" name="host_id" value="{{host.id}}">
           <div class="form-group">
-            <label for="inputAddress">Set new IP-Address <span><i class="glyphicon glyphicon-home tip" id="curIPbutton" title="Use your current IP address ({{current_ip}})"></i></span></label>
+            <label for="inputAddress">Set new IP-Address <span><i class="fa fa-home tip" id="curIPbutton" title="Use your current IP address ({{current_ip}})"></i></span></label>
             <div class="input-group">
-              <span class="input-group-addon"><i class="glyphicon glyphicon-th-large"></i></span>
+              <span class="input-group-addon"><i class="fa fa-info"></i></span>
               <input class="form-control" type="text" id="inputAddress" name="address" value="" required="required">
             </div>
             <script type="text/javascript">
@@ -66,9 +66,9 @@
         <form role="form" action="/user/host/updatePassword" method="post">
           <input type="hidden" name="host_id" value="{{host.id}}">
           <div class="form-group">
-            <label for="hostPassword">Password <span><i class="glyphicon glyphicon-gift tip" id="generatePasswordButton" title="Generate a random password"></i></span></label>
+            <label for="hostPassword">Password <span><i class="fa fa-magic tip" id="generatePasswordButton" title="Generate a random password"></i></span></label>
             <div class="input-group">
-              <span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
+              <span class="input-group-addon"><i class="fa fa-lock"></i></span>
               <input class="form-control" type="password" id="hostPassword" placeholder="Password" name="password" required="required">
             </div>
             <script type="text/javascript">
@@ -91,7 +91,7 @@
           <div class="form-group">
             <label for="hostPassword2">Retype</label>
             <div class="input-group">
-              <span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
+              <span class="input-group-addon"><i class="fa fa-lock"></i></span>
               <input class="form-control" type="password" id="hostPassword2" placeholder="Retype" name="password_confirm" required="required">
             </div>
           </div>
