@@ -72,10 +72,10 @@ setuptools.setup(
                                             'ddserver/resources/web/css/ddserver.css'
                                             ]),
         ('/usr/share/ddserver/static/fonts', ['ddserver/resources/web/fonts/FontAwesome.otf',
-                                              'ddserver/resources/web/fonts/FontAwesome-webfont.eot',
-                                              'ddserver/resources/web/fonts/FontAwesome-webfont.svg',
-                                              'ddserver/resources/web/fonts/FontAwesome-webfont.ttf',
-                                              'ddserver/resources/web/fonts/FontAwesome-webfont.woff'
+                                              'ddserver/resources/web/fonts/fontawesome-webfont.eot',
+                                              'ddserver/resources/web/fonts/fontawesome-webfont.svg',
+                                              'ddserver/resources/web/fonts/fontawesome-webfont.ttf',
+                                              'ddserver/resources/web/fonts/fontawesome-webfont.woff'
                                               ]),
         ('/usr/share/ddserver/static/js', ['ddserver/resources/web/js/bootstrap.min.js',
                                            'ddserver/resources/web/js/Chart.min.js',
