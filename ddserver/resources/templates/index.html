@@ -42,8 +42,9 @@
       </p>
     </div>
 
-    {% if not user %}
     <div class="col-md-4">
+
+    {% if not user %}
       <div class="box">
         <h3>Login</h3>
         <form role="form" action="/login" method="post">
@@ -60,8 +61,8 @@
             </div>
           </div>
           <div class="form-group">
-            <button type="submit" class="btn btn-success btn-primary">Login</button>
-            <a href="/lostpass">Lost your password?</a>
+            <button type="submit" class="btn btn-success btn-primary">Login</button>&nbsp;
+            <span class="small"><a href="/lostpass">Lost your password?</a></span>
           </div>
         </form>
       </div>
@@ -74,8 +75,79 @@
       </div>
       {% endif %}
 
+    {% else %}
+    <div class="box">
+      <p>
+        Your current IP-Address:
+      </p>
+      <p class="text-center"><strong style="font-size: 2.5em;">{{current_ip}}</strong></p>
     </div>
+
+    <div class="box">
+      <div class="row">
+        <div class="col-md-6">
+          <canvas id="hostUsageChart" width="140"></canvas>
+          <p class="text-center">
+            You are using {{hosts.count}} of your {{config.dns.max_hosts}} hostnames
+          </p>
+        </div>
+        <div class="col-md-6">
+          <canvas id="allUsageChart" width="140"></canvas>
+          <p class="text-center">
+            You are using {{ (userhosts.count / hosts.count * 100)|round|int }}% of our total hostnames.
+          </p>
+        </div>
+      </div>
+
+      <script type="text/javascript">
+        var dataUser = [
+          {
+            value: {{userhosts.count}},
+            color:"#cc0000"
+          },
+          {
+            value : {{config.dns.max_hosts - userhosts.count}},
+            color : "#428bca"
+          }
+        ];
+        var dataAll = [
+          {
+            value: {{userhosts.count}},
+            color:"#cc0000"
+          },
+          {
+            value : {{hosts.count - userhosts.count}},
+            color : "#428bca"
+          }
+        ];
+        //Get the context of the canvas element we want to select
+        var ctx = $("#hostUsageChart").get(0).getContext("2d");
+        var pc = new Chart(ctx).Pie(dataUser, {segmentStrokeColor : "#f9f9f9"});
+
+        var ctx = $("#allUsageChart").get(0).getContext("2d");
+        var pc = new Chart(ctx).Pie(dataAll, {segmentStrokeColor : "#f9f9f9"});
+      </script>
+    </div>
+    <div class="box">
+      <table class="table">
+        <tr>
+          <th>Active users</th>
+          <td>{{users.count}}</td>
+        </tr>
+        <tr>
+          <th>Available zones</th>
+          <td>{{zones.count}}</td>
+        </tr>
+        <tr>
+          <th>Active hostnames</th>
+          <td>{{hosts.count}}</td>
+        </tr>
+      </table>
+    </div>
+
     {% endif %}
+
+    </div>
 
   </div>
 
