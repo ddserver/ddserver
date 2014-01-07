@@ -80,6 +80,15 @@ def update(logger, db, username, password, hostnames, address):
       stored in the database.
   '''
 
+  # Validate the IP address
+  try:
+    validator = formencode.validators.IPAddress()
+    validator.to_python(address)
+
+  except formencode.Invalid:
+    logger.warning('Invalid IP address in update request: %s', address)
+    return resp_abuse()
+
   # Check if we get some credentials
   if not username or not password:
     logger.warning('Missing credentials')
@@ -125,7 +134,7 @@ def update(logger, db, username, password, hostnames, address):
 
     # Check if we got a host entry for the queried hostname
     if not host:
-      logger.debug('No such host entry found: %s', hostname)
+      logger.warning('No such host entry found: %s', hostname)
 
       responses.append(resp_nohost())
       continue
@@ -142,17 +151,6 @@ def update(logger, db, username, password, hostnames, address):
       logger.debug('Address has not changed: %s', address)
 
       responses.append(resp_nochg(value = address))
-      continue
-
-    # validate the ip address
-    try:
-      validator = formencode.validators.IPAddress()
-      validator.to_python(address)
-
-    except formencode.Invalid:
-      logger.debug('Invalid IP address in update request: %s', address)
-
-      responses.append(resp_abuse())
       continue
 
     # Update the host entry
