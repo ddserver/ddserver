@@ -127,11 +127,15 @@
             <div class="panel-body">
               <p>
                 To update your hostname, you have to configure dynamic DNS updates
-                on your homerouter or one of your computer systems at home.
+                on your homerouter or any of your computer systems. The update is done
+                by a HTTP-GET request, as specified by the
+                <a href="http://www.noip.com/integrate/request">dyndns2 update protocol</a>.
+                Authentication is performed using
+                <a href="http://www.ietf.org/rfc/rfc2617.txt">HTTP Basic Authentication</a>.
               </p>
               <p>
-                Whatever method you want to use to update your hostname, your client
-                has to access the following URL in order to trigger an update:
+                Your client has to access the following URL in order to trigger an update
+                of your hostname:
               </p>
               <pre>
 {{config.wsgi.protocol}}{{session.username}}:<abbr class="tip" title="The password you specified for updating the hostname (not the password you use to login into this WebUI)">YourHostPassword</abbr>@{{config.wsgi.basename}}/nic/update?hostname={{host.hostname}}.{{host.suffix}}&amp;myip=<abbr class="tip" title="The IP address you want to set">IP-Address</abbr>
@@ -397,10 +401,47 @@ server={{config.wsgi.basename}}, \
 login={{session.username}}, \
 password=<abbr class="tip" title="The password you specified for updating the hostname (not the password you use to login into this WebUI)">YourHostnamePassword</abbr> \
 {{host.hostname}}.{{host.suffix}}
-                </pre>
+              </pre>
             </div>
           </div>
         </div>
+
+        <!-- wget / cron -->
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h4 class="panel-title">
+              <a data-toggle="collapse" data-parent="#accordion" href="#collapse6">
+                wget and cron
+              </a>
+            </h4>
+          </div>
+          <div id="collapse6" class="panel-collapse collapse">
+            <div class="panel-body">
+              <p>
+                On *NIX-based operating systems, the easiest way is to use the wget
+                command in order to perform an update of your hostname.
+              </p>
+              <p>
+                An example usage would be:
+              </p>
+              <pre>wget -q --auth-no-challenge {% if protocol == 'https://' %}--no-check-certificate {% endif %}'{{config.wsgi.protocol}}{{session.username}}:<abbr class="tip" title="The password you specified for updating the hostname (not the password you use to login into this WebUI)">YourHostPassword</abbr>@{{config.wsgi.basename}}/nic/update?hostname={{host.hostname}}.{{host.suffix}}&amp;myip=<abbr class="tip" title="The IP address you want to set">IP-Address</abbr>' -O -</pre>
+              <p>
+                You can automate updates using the cron daemon. Just put the above
+                command into an executable bash script as follows
+              </p>
+              <pre>
+#!/bin/bash
+
+IP=$(wget -q {% if protocol == 'https://' %}--no-check-certificate {% endif %}'{{config.wsgi.protocol}}{{config.wsgi.basename}}/nic/ip' -O -)
+wget -q --auth-no-challenge {% if protocol == 'https://' %}--no-check-certificate {% endif %}"{{config.wsgi.protocol}}{{session.username}}:<abbr class="tip" title="The password you specified for updating the hostname (not the password you use to login into this WebUI)">YourHostPassword</abbr>@{{config.wsgi.basename}}/nic/update?hostname={{host.hostname}}.{{host.suffix}}&amp;myip=${IP}" -O -</pre>
+              <p>
+                Now, run the script periodically (every hour) using the following cron configuration statement.
+              </p>
+              <pre>0 * &nbsp; * * * &nbsp; root &nbsp; /your/script.sh</pre>
+            </div>
+          </div>
+        </div>
+
       </div>
 
     </div>
