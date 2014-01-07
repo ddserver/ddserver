@@ -31,11 +31,11 @@ setuptools.setup(
     author = 'Sven Reissmann',
     author_email = 'sven@0x80.io',
 
-    url = 'http://dev.open-desk.net/projects/ddserver',
+    url = 'https://ddserver.0x80.io',
 
     description = 'A server-side application for dynamic DNS management.',
     long_description = open('README').read(),
-    keywords = 'ddserver ddns',
+    keywords = 'ddserver ddns dns nsupdate',
 
     install_requires = [
         'enum >= 0.4',
@@ -68,14 +68,21 @@ setuptools.setup(
         ('/etc/init.d', ['ddserver/resources/doc/debian.init.d/ddserver']),
         ('/usr/share/ddserver/static/css', ['ddserver/resources/web/css/bootstrap.min.css',
                                             'ddserver/resources/web/css/bootstrap-theme.min.css',
-                                            'ddserver/resources/web/css/ddserver.css']),
-        ('/usr/share/ddserver/static/fonts', ['ddserver/resources/web/fonts/glyphicons-halflings-regular.eot',
-                                              'ddserver/resources/web/fonts/glyphicons-halflings-regular.svg',
-                                              'ddserver/resources/web/fonts/glyphicons-halflings-regular.ttf',
-                                              'ddserver/resources/web/fonts/glyphicons-halflings-regular.woff'
+                                            'ddserver/resources/web/css/font-awesome.min.css',
+                                            'ddserver/resources/web/css/ddserver.css'
+                                            ]),
+        ('/usr/share/ddserver/static/fonts', ['ddserver/resources/web/fonts/FontAwesome.otf',
+                                              'ddserver/resources/web/fonts/FontAwesome-webfont.eot',
+                                              'ddserver/resources/web/fonts/FontAwesome-webfont.svg',
+                                              'ddserver/resources/web/fonts/FontAwesome-webfont.ttf',
+                                              'ddserver/resources/web/fonts/FontAwesome-webfont.woff'
                                               ]),
         ('/usr/share/ddserver/static/js', ['ddserver/resources/web/js/bootstrap.min.js',
-                                           'ddserver/resources/web/js/jquery.min.js']),
+                                           'ddserver/resources/web/js/Chart.min.js',
+                                           'ddserver/resources/web/js/jquery.min.js'
+                                           'ddserver/resources/web/js/pwstrength.js'
+                                           'ddserver/resources/web/js/pwstrength.options.js'
+                                           ]),
         ('/usr/share/doc/ddserver', ['ddserver/resources/doc/schema.sql',
                                      'ddserver/resources/doc/ddserver.conf.example',
                                      'ddserver/resources/doc/ddclient.conf.example',
