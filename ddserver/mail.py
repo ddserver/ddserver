@@ -71,7 +71,7 @@ class EmailManager(object):
              messages,
              logger,
              **kwargs):
-    ''' Sends a mail.
+    ''' Sends an email.
 
         @param key: the name of the template used for the mail
         @param rcpt: the recipient mail address
@@ -84,16 +84,15 @@ class EmailManager(object):
     # Open SMTP connection
     try:
       smtp = smtplib.SMTP(host = config.smtp.host,
-                          port = config.smtp.port)
+                          port = config.smtp.port,
+                          timeout = 20)
 
     except:
-      messages.error('Failed to to send email. Please contact an administrator at %s' %
-                       config.contact.email)
-
       logger.error('Failed to contact the SMTP server at %s:%s (template %s)' %
                    config.smtp.host,
                    config.smtp.port,
                    key)
+      raise
 
     else:
       try:
@@ -105,12 +104,10 @@ class EmailManager(object):
                                       **kwargs))
 
       except:
-        messages.error('Failed to send email. Please contact an administrator at %s' %
-                       config.contact.email)
-
         logger.error('Failed to send email to %s (template %s)' %
                      rcpt,
                      key)
+        raise
 
       finally:
         # Close SMTP connection

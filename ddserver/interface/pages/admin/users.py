@@ -118,12 +118,14 @@ def get_users(user,
           username = validation.ValidUsername(min = 1, max = 255))
 @require(db = 'ddserver.db:Database',
          users = 'ddserver.interface.user:UserManager',
+         config = 'ddserver.config:Config',
          emails = 'ddserver.mail:EmailManager',
          messages = 'ddserver.interface.message:MessageManager')
 def post_users_activate(user,
                         data,
                         db,
                         users,
+                        config,
                         emails,
                         messages):
   ''' Activate a users account. '''
@@ -131,10 +133,26 @@ def post_users_activate(user,
   users.generate_authcode(data.username)
   user = users[data.username]
 
-  emails.to_user('signup_activate.mail',
-                 user = user)
+  try:
+    emails.to_user('signup_activate.mail',
+                   user = user)
 
-  messages.success('Ok, done.')
+  except:
+    # Failed to send activation email.
+    # We reset the authcode in this case, so an admin can send
+    # a new one after fixing email issues
+    with db.cursor() as cur:
+      cur.execute('''
+          UPDATE users
+          SET `authcode` = %(authcode)s
+          WHERE `username` = %(username)s
+      ''', {'authcode': None,
+            'username': data.username})
+
+    messages.error('Failed to send the activation email.')
+
+  else:
+    messages.success('Ok, done.')
 
   bottle.redirect('/admin/users/all')
 

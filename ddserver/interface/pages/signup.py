@@ -110,31 +110,53 @@ def post_signup(data,
     ''', {'username': data.username,
           'email': data.email})
 
-    # Check if the user can be activated directly
-    if (config.signup.allowed_maildomains == 'any' or
-        email_domain in config.signup.allowed_maildomains):
-      # Generate auth code
-      users.generate_authcode(data.username)
+  # Check if the user can be activated directly
+  if (config.signup.allowed_maildomains == 'any' or
+      email_domain in config.signup.allowed_maildomains):
+    # Generate auth code
+    users.generate_authcode(data.username)
 
-      # Get user record
-      user = users[data.username]
+    # Get user record
+    user = users[data.username]
 
-      # Send out activation mail
+    # Send out activation mail
+    try:
       emails.to_user('signup_activate.mail',
                      user = user)
 
-      messages.success('Your account has been created. You should receive an activation email in some minutes.')
+    except:
+      # Failed to send activation email.
+      # We reset the authcode in this case, so an admin can send
+      # a new one after fixing email issues
+      with db.cursor() as cur:
+        cur.execute('''
+            UPDATE users
+            SET `authcode` = %(authcode)s
+            WHERE `username` = %(username)s
+        ''', {'authcode': None,
+              'username': data.username})
+
+      messages.error('Failed to send activation email. Please contact an administrator at %s' %
+                     config.contact.email)
 
     else:
-      # Get user record
-      user = users[data.username]
+      messages.success('Your account has been created. You should receive an activation email in some minutes.')
 
-      messages.success('Your account has been created and will be reviewed by an administrator.')
+  else:
+    # Get user record
+    user = users[data.username]
 
-    # Notify the admin about the new account
-    if config.signup.notify_admin:
+    messages.success('Your account has been created and will be reviewed by an administrator.')
+
+  # Notify the admin about the new account
+  if config.signup.notify_admin:
+    try:
       emails.to_admin('signup_notify.mail',
                       user = user)
+
+    except:
+      messages.error('Failed to notify the administrator. Please contact %s' %
+                     config.contact.email)
 
   bottle.redirect('/')
 
