@@ -263,7 +263,7 @@
 config service 'myddns'
         option enabled '1'
         option interface 'wan'
-        option update_url 'http://[USERNAME]:[PASSWORD]@10.0.0.10:8082/nic/update?hostname=[DOMAIN]&amo;myip=[IP]'
+        option update_url '{{config.wsgi.protocol}}[USERNAME]:[PASSWORD]@{{config.wsgi.basename}}/nic/update?hostname=[DOMAIN]&amp;myip=[IP]'
         option domain '{{host.hostname}}.{{host.suffix}}'
         option username '{{session.username}}'
         option password '<abbr class="tip" title="The password you specified for updating the hostname (not the password you use to login into this WebUI)">YourHostPassword</abbr>'
@@ -274,7 +274,7 @@ config service 'myddns'
         option retry_interval '60'
         option retry_unit 'seconds'
         option force_interval '24'
-        option force_unit 'hours'{% if config.wsgi.protocol %}
+        option force_unit 'hours'{% if config.wsgi.protocol == 'https://' %}
         option use_https 1
         option cacert /etc/ssl/certs{% endif %}</pre>
 
@@ -409,7 +409,7 @@ daemon=300
 syslog=yes
 mail=root
 mail-failure=root
-<abbr class="tip" title="Set this to yes, if your update server uses SSL (https://)">ssl=yes</abbr>
+{% if config.wsgi.protocol == 'https://' %}ssl=yes{% else %}ssl=no{% endif %}
 use=web, web={{config.wsgi.protocol}}{{config.wsgi.basename}}/nic/ip
 
 # == Update server
@@ -441,7 +441,7 @@ password=<abbr class="tip" title="The password you specified for updating the ho
               <p>
                 An example usage would be:
               </p>
-              <pre>wget -q --auth-no-challenge {% if protocol == 'https://' %}--no-check-certificate {% endif %}'{{config.wsgi.protocol}}{{session.username}}:<abbr class="tip" title="The password you specified for updating the hostname (not the password you use to login into this WebUI)">YourHostPassword</abbr>@{{config.wsgi.basename}}/nic/update?hostname={{host.hostname}}.{{host.suffix}}&amp;myip=<abbr class="tip" title="The IP address you want to set">IP-Address</abbr>' -O -</pre>
+              <pre>wget -q --auth-no-challenge {% if config.wsgi.protocol == 'https://' %}--no-check-certificate {% endif %}'{{config.wsgi.protocol}}{{session.username}}:<abbr class="tip" title="The password you specified for updating the hostname (not the password you use to login into this WebUI)">YourHostPassword</abbr>@{{config.wsgi.basename}}/nic/update?hostname={{host.hostname}}.{{host.suffix}}&amp;myip=<abbr class="tip" title="The IP address you want to set">IP-Address</abbr>' -O -</pre>
               <p>
                 You can automate updates using the cron daemon. Just put the above
                 command into an executable bash script as follows
@@ -449,8 +449,8 @@ password=<abbr class="tip" title="The password you specified for updating the ho
               <pre>
 #!/bin/bash
 
-IP=$(wget -q {% if protocol == 'https://' %}--no-check-certificate {% endif %}'{{config.wsgi.protocol}}{{config.wsgi.basename}}/nic/ip' -O -)
-wget -q --auth-no-challenge {% if protocol == 'https://' %}--no-check-certificate {% endif %}"{{config.wsgi.protocol}}{{session.username}}:<abbr class="tip" title="The password you specified for updating the hostname (not the password you use to login into this WebUI)">YourHostPassword</abbr>@{{config.wsgi.basename}}/nic/update?hostname={{host.hostname}}.{{host.suffix}}&amp;myip=${IP}" -O -</pre>
+IP=$(wget -q {% if config.wsgi.protocol == 'https://' %}--no-check-certificate {% endif %}'{{config.wsgi.protocol}}{{config.wsgi.basename}}/nic/ip' -O -)
+wget -q --auth-no-challenge {% if config.wsgi.protocol == 'https://' %}--no-check-certificate {% endif %}"{{config.wsgi.protocol}}{{session.username}}:<abbr class="tip" title="The password you specified for updating the hostname (not the password you use to login into this WebUI)">YourHostPassword</abbr>@{{config.wsgi.basename}}/nic/update?hostname={{host.hostname}}.{{host.suffix}}&amp;myip=${IP}" -O -</pre>
               <p>
                 Now, run the script periodically (every hour) using the following cron configuration statement.
               </p>
