@@ -88,13 +88,17 @@
         <div class="col-md-6">
           <canvas id="hostUsageChart" width="140"></canvas>
           <p class="text-center">
-            You are using {{userhosts.count}} of your {{config.dns.max_hosts}} hostnames
+            You are using
+            {{userhosts.count}} of your {% if user.admin %}unlimited{% else %}{{config.dns.max_hosts}}{% endif %}
+            hostnames.
           </p>
         </div>
         <div class="col-md-6">
           <canvas id="allUsageChart" width="140"></canvas>
           <p class="text-center">
-            You are using {{ (userhosts.count / hosts.count * 100)|round|int }}% of our total hostnames.
+            You are using
+            {% if hosts.count %}{{ (userhosts.count / hosts.count * 100)|round|int }}{% else %}0{% endif %}%
+            of our total hostnames.
           </p>
         </div>
       </div>
@@ -102,7 +106,7 @@
       <script type="text/javascript">
         var dataUser = [
           {
-            value: {{userhosts.count}},
+            value: {% if user.admin %}0{% else %}{{userhosts.count}}{% endif %},
             color:"#cc0000"
           },
           {
@@ -116,7 +120,7 @@
             color:"#cc0000"
           },
           {
-            value : {{hosts.count - userhosts.count}},
+            value : {% if hosts.count %}{{hosts.count - userhosts.count}}{% else %}1{% endif %},
             color : "#428bca"
           }
         ];
