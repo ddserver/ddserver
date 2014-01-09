@@ -274,9 +274,9 @@ class ValidSuffix(FancyValidator):
   # TODO: validate hostname, tld, at least one dot, ...
 
   messages = {
-    'too_short': 'Suffix can not be empty',
-    'too_long': 'Suffix can not exceed 255 characters',
-    'non_letter': 'Suffix can only consist of a-z, 0-9, -, .'
+    'too_short': 'The name of the zone can not be empty',
+    'too_long': 'The name of the zone can not exceed 255 characters',
+    'non_letter': 'The name of the zone can only consist of a-z, 0-9, -, .'
   }
 
   letter_regex = re.compile(r'[a-z0-9\-\.]+')
@@ -308,7 +308,7 @@ class UniqueSuffix(ValidSuffix):
   ''' Check whether the entered entered is unique. '''
 
   messages = {
-    'not_uniq': 'This suffix already exists.'
+    'not_uniq': 'This zone already exists.'
   }
 
   @require(db = 'ddserver.db:Database')
