@@ -181,7 +181,7 @@ def authorized_by_code():
                 **kwargs):
       if (bottle.request.query.username == "" or
          bottle.request.query.authcode == ""):
-        messages.error('You have to provide username and authcode!')
+        messages.error('You have to provide username and authcode.')
         bottle.redirect('/')
 
       username = bottle.request.query.username
@@ -189,8 +189,12 @@ def authorized_by_code():
 
       user = users[username]
 
+      if user == None:
+        messages.error('The username does not exist.')
+        bottle.redirect('/')
+
       if user.authcode != authcode:
-        messages.error('The auth code you provided was invalid!')
+        messages.error('The auth code you provided was invalid.')
         bottle.redirect('/')
 
       # Inject the user in the wrapped function
