@@ -85,12 +85,16 @@
 
     <div class="box">
       <div class="row">
+        {% if user.maxhosts == 0 %}
+        <p class="text-danger text-center">You are not allowed to add any hostnames.</p>
+
+        {% else %}
         <div class="col-md-6">
           <canvas id="hostUsageChart" width="140"></canvas>
           <p class="text-center">
             You are using
             {{userhosts.count}} of
-            {% if user.maxhosts == -1 or user.admin == True %}
+            {% if user.maxhosts|int == -1 or user.admin == True %}
               unlimited
             {% else %}
               up to {% if user.maxhosts == None %}{{config.dns.max_hosts}}{% else %}{{user.maxhosts}}{% endif %}
@@ -102,40 +106,41 @@
           <canvas id="allUsageChart" width="140"></canvas>
           <p class="text-center">
             You are using
-            {% if hosts.count %}{{ (userhosts.count / hosts.count * 100)|round|int }}{% else %}0{% endif %}%
+            {% if hosts.count|int %}{{ (userhosts.count / hosts.count * 100)|round|int }}{% else %}0{% endif %}%
             of our total hostnames.
           </p>
         </div>
+
+        <script type="text/javascript">
+          var dataUser = [
+            {
+              value: {% if user.maxhosts|int == -1 or user.admin == True %}0{% else %}{{userhosts.count}}{% endif %},
+              color:"#cc0000"
+            },
+            {
+              value : {% if user.maxhosts == None %}{{config.dns.max_hosts - userhosts.count}}{% else %}{{user.maxhosts - userhosts.count}}{% endif %},
+              color : "#428bca"
+            }
+          ];
+          var dataAll = [
+            {
+              value: {{userhosts.count}},
+              color:"#cc0000"
+            },
+            {
+              value : {% if hosts.count %}{{hosts.count - userhosts.count}}{% else %}1{% endif %},
+              color : "#428bca"
+            }
+          ];
+          //Get the context of the canvas element we want to select
+          var ctx = $("#hostUsageChart").get(0).getContext("2d");
+          var pc = new Chart(ctx).Pie(dataUser, {segmentStrokeColor : "#f9f9f9"});
+
+          var ctx = $("#allUsageChart").get(0).getContext("2d");
+          var pc = new Chart(ctx).Pie(dataAll, {segmentStrokeColor : "#f9f9f9"});
+        </script>
+        {% endif %}
       </div>
-
-      <script type="text/javascript">
-        var dataUser = [
-          {
-            value: {% if user.maxhosts == -1 or user.admin == True %}0{% else %}{{userhosts.count}}{% endif %},
-            color:"#cc0000"
-          },
-          {
-            value : {% if user.maxhosts == None %}{{config.dns.max_hosts - userhosts.count}}{% else %}{{user.maxhosts - userhosts.count}}{% endif %},
-            color : "#428bca"
-          }
-        ];
-        var dataAll = [
-          {
-            value: {{userhosts.count}},
-            color:"#cc0000"
-          },
-          {
-            value : {% if hosts.count %}{{hosts.count - userhosts.count}}{% else %}1{% endif %},
-            color : "#428bca"
-          }
-        ];
-        //Get the context of the canvas element we want to select
-        var ctx = $("#hostUsageChart").get(0).getContext("2d");
-        var pc = new Chart(ctx).Pie(dataUser, {segmentStrokeColor : "#f9f9f9"});
-
-        var ctx = $("#allUsageChart").get(0).getContext("2d");
-        var pc = new Chart(ctx).Pie(dataAll, {segmentStrokeColor : "#f9f9f9"});
-      </script>
     </div>
     <div class="box">
       <table class="table table-condensed table-notopborder" style="margin-bottom: 0">

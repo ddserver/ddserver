@@ -33,7 +33,7 @@ CREATE TABLE `users` (
   `active`      BOOLEAN        NOT NULL DEFAULT FALSE,
   `created`     TIMESTAMP      NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `authcode`    VARCHAR(36)    NULL DEFAULT NULL,
-  `maxhosts`    INT            NULL DEFAULT NULL
+  `maxhosts`    INT            NULL DEFAULT NULL,
   
   INDEX (`username`)
 ) ENGINE=InnoDB DEFAULT CHARACTER SET utf8;
@@ -63,8 +63,8 @@ CREATE TABLE `hosts` (
   `password`    VARCHAR(255)    NOT NULL,
   `updated`     TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
-  FOREIGN KEY (`user_id`)       REFERENCES `users` (`id`) ON DELETE CASCADE,
-  FOREIGN KEY (`suffix_id`)     REFERENCES `suffixes` (`id`) ON DELETE CASCADE,
+  FOREIGN KEY (`user_id`)       REFERENCES `users` (`id`) ON DELETE CASCADE ,
+  FOREIGN KEY (`suffix_id`)     REFERENCES `suffixes` (`id`) ON DELETE CASCADE ,
   
   UNIQUE (`hostname`, `suffix_id`),
 
@@ -84,8 +84,7 @@ INSERT INTO `users` (
   `password`,
   `email`,
   `admin`,
-  `active`,
-  `maxhosts`
+  `active`
 ) VALUES (
   1,
   'admin',
