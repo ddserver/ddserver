@@ -26,9 +26,8 @@
           {% for host in hosts %}
           <tr>
             <td>
-              <a href="/user/host/{{host.id}}" title="Display details and configuration examples" class="tip">
-                {{host.hostname}}<span class="origin">.{{host.suffix}}</span>
-              </a>
+              {{host.hostname}}<span class="origin">.{{host.suffix}}</span>
+              {% if host.description != None %} &nbsp; <span class="small"><i class=" fa fa-info tip" title="{{host.description}}"></i></span>{% endif %}
             </td>
             <td>
               {% if host.address %}

@@ -58,7 +58,8 @@ def get_hosts_display(user,
           `host`.`hostname` AS `hostname`,
           `suffix`.`name` AS `suffix`,
           `host`.`address` AS `address`,
-          `host`.`updated` AS `updated`
+          `host`.`updated` AS `updated`,
+          `host`.`description` AS `description`
         FROM `hosts` AS `host`
         LEFT JOIN `suffixes` AS `suffix`
           ON ( `suffix`.`id` = `host`.`suffix_id` )
@@ -110,6 +111,7 @@ def get_hosts_add(user,
           hostname = validation.ValidHostname(),
           suffix = validation.Int(not_empty = True),
           address = validation.IPAddress(),
+          description = validation.String(max = 255),
           password = validation.SecurePassword(min = 8),
           password_confirm = validation.String(),
           chained_validators = [validation.FieldsMatch('password', 'password_confirm'),
@@ -144,11 +146,13 @@ def post_hosts_add(user,
       INTO `hosts`
       SET `hostname` = %(hostname)s,
           `address` = %(address)s,
+          `description` = %(description)s,
           `password` = %(password)s,
           `user_id` = %(user_id)s,
           `suffix_id` = %(suffix_id)s
     ''', {'hostname': data.hostname,
           'address': data.address,
+          'description': data.description,
           'password': encrypted_password,
           'user_id' : user.id,
           'suffix_id': data.suffix})

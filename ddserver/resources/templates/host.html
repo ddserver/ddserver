@@ -19,22 +19,29 @@
         <div class="form-group">
           <label for="inputHostname">Hostname</label>
           <div class="input-group">
-            <span class="input-group-addon"><i class="fa fa-desktop"></i></span>
+            <span class="input-group-addon"><i class="fa fa-fw fa-desktop"></i></span>
             <input class="form-control" type="text" id="inputHostname" name="hostname" value="{{host.hostname}}.{{host.suffix}}" readonly="readonly">
           </div>
         </div>
         <div class="form-group">
           <label for="inputCurAddr">Current IP-Address</label>
           <div class="input-group">
-            <span class="input-group-addon"><i class="fa fa-info"></i></span>
+            <span class="input-group-addon"><i class="fa fa-fw fa-info"></i></span>
             <input class="form-control" type="text" id="inputCurAddr" name="curAddress" value="{{host.address}}" readonly="readonly">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="inputCurDescription">Description</label>
+          <div class="input-group">
+            <span class="input-group-addon"><i class="fa fa-fw fa-align-left"></i></span>
+            <textarea class="form-control" rows="2" cols="20" id="inputCurDescription" name="curDescription" readonly="readonly">{% if host.description != None %}{{host.description}}{% endif %}</textarea>
           </div>
         </div>
       </div>
 
-      <h3>Update IP address</h3>
+      <h3>Update IP address or description</h3>
       <p>
-        Manually set a new IP address for the hostname
+        You can manually set a new IP address for your hostname or update its description.
       </p>
       <div class="box">
         <form role="form" action="/user/host/updateAddress" method="post">
@@ -52,7 +59,14 @@
             </script>
           </div>
           <div class="form-group">
-            <button type="submit" class="btn btn-success btn-primary">Update address</button>
+            <label for="inputDescription">Description <span>(optional)</span></label>
+            <div class="input-group">
+              <span class="input-group-addon"><i class="fa fa-fw fa-align-left"></i></span>
+              <textarea class="form-control" rows="2" cols="20" id="inputDescription" placeholder="Description" name="description"></textarea>
+            </div>
+          </div>
+          <div class="form-group">
+            <button type="submit" class="btn btn-success btn-primary">Update</button>
             <button type="reset" class="btn btn-default">Cancel</button>
           </div>
         </form>
@@ -60,7 +74,7 @@
 
       <h3>Update host password</h3>
       <p>
-        Set a new password for updating this hostname
+        Set a new password for updating this hostname.
       </p>
       <div class="box">
         <form role="form" action="/user/host/updatePassword" method="post" id="pwdcontainer">
