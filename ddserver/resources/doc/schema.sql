@@ -61,9 +61,9 @@ CREATE TABLE `hosts` (
   `description` VARCHAR(255)    NULL DEFAULT NULL,
   `password`    VARCHAR(255)    NOT NULL,
   `updated`     TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  
-  FOREIGN KEY (`user_id`)       REFERENCES `users` (`id`),
-  FOREIGN KEY (`suffix_id`)     REFERENCES `suffixes` (`id`),
+
+  FOREIGN KEY (`user_id`)       REFERENCES `users` (`id`) ON DELETE CASCADE ,
+  FOREIGN KEY (`suffix_id`)     REFERENCES `suffixes` (`id`) ON DELETE CASCADE ,
   
   UNIQUE (`hostname`, `suffix_id`),
 
@@ -73,16 +73,6 @@ CREATE TABLE `hosts` (
   INDEX (`user_id`, `hostname`)
 ) ENGINE=InnoDB DEFAULT CHARACTER SET utf8;
 
-
-ALTER TABLE `hosts`
-  ADD FOREIGN KEY ( `user_id` )
-  REFERENCES `users` (`id`)
-  ON DELETE CASCADE ;
-
-ALTER TABLE `hosts`
-  ADD FOREIGN KEY ( `suffix_id` )
-  REFERENCES `suffixes` (`id`)
-  ON DELETE CASCADE ;
 
 --
 -- default user admin with password admin
