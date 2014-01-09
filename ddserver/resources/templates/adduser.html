@@ -7,33 +7,37 @@
 
   <div class="row">
     <div class="col-md-8">
-      <h3>Create a new user account</h3></div>
       <p>
-        TODO
+        You can add new useraccounts manually using this form.
+        Please enter the data for the new user account. The new user will receive
+        an activation email to the specified email address, allowing him to activate
+        his account and to specify a password for logging in.
       </p>
     </div>
 
     <div class="col-md-4">
-      <form role="form" action="/admin/adduser" method="post">
-        <div class="form-group">
-          <label for="inputUsername">Username</label>
-          <div class="input-group">
-            <span class="input-group-addon"><i class="fa fa-fw fa-user"></i></span>
-            <input class="form-control" type="text" id="inputUsername" placeholder="Username" name="username" required="required">
+      <div class="box">
+        <form role="form" action="/admin/users/add" method="post">
+          <div class="form-group">
+            <label for="inputUsername">Username</label>
+            <div class="input-group">
+              <span class="input-group-addon"><i class="fa fa-fw fa-user"></i></span>
+              <input class="form-control" type="text" id="inputUsername" placeholder="Username" name="username" required="required">
+            </div>
           </div>
-        </div>
-        <div class="form-group">
-          <label for="inputEmail">Email address</label>
-          <div class="input-group">
-            <span class="input-group-addon"><i class="fa fa-fw fa-envelope"></i></span>
-            <input class="form-control" type="email" id="inputEmail" name="email" placeholder="user@example.com" required="required">
+          <div class="form-group">
+            <label for="inputEmail">Email address</label>
+            <div class="input-group">
+              <span class="input-group-addon"><i class="fa fa-fw fa-envelope"></i></span>
+              <input class="form-control" type="email" id="inputEmail" name="email" placeholder="user@example.com" required="required">
+            </div>
           </div>
-        </div>
-        <div class="form-group">
-          <button type="submit" class="btn btn-success btn-primary">Create</button>
-          <a class="btn" href="/admin/users/all">Go back</a>
-        </div>
-      </form>
+          <div class="form-group">
+            <button type="submit" class="btn btn-success btn-primary">Create</button>
+            <a class="btn btn-default" href="/admin/users/all">Go back</a>
+          </div>
+        </form>
+      </div>
     </div>
 
   </div>
