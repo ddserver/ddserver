@@ -61,7 +61,8 @@ class Database(object):
                                    user = config.db.username,
                                    passwd = config.db.password,
                                    db = config.db.name,
-                                   cursorclass = MySQLdb.cursors.DictCursor)
+                                   cursorclass = MySQLdb.cursors.DictCursor,
+                                   charset = 'utf8')
       setattr(self.thread_local, 'connection', connection)
 
     else:
