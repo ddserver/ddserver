@@ -41,17 +41,17 @@
 
       <div class="collapse navbar-collapse navbar-inverse " id="mainmenu">
         <ul class="nav navbar-nav pull-right">
-          <li><a href="/"><i class="fa fa-home"></i> Start</a></li>
+          <li><a href="/"><i class="fa fa-fw fa-home"></i> Start</a></li>
           {% if user %}
-          <li><a href="/user/hosts/add"><i class="fa fa-desktop"></i> Hostnames</a></li>
-          <li><a href="/user/account"><i class="fa fa-user"></i> Account</a></li>
+          <li><a href="/user/hosts/add"><i class="fa fa-fw fa-desktop"></i> Hostnames</a></li>
+          <li><a href="/user/account"><i class="fa fa-fw fa-user"></i> Account</a></li>
             {% if user.admin %}
             <li class="divider"></li>
-            <li><a href="/admin/users/all"><i class="fa fa-users"></i> Users</a></li>
-            <li><a href="/admin/suffixes/list"><i class="fa fa-sitemap"></i> Zones</a></li>
+            <li><a href="/admin/users/all"><i class="fa fa-fw fa-users"></i> Users</a></li>
+            <li><a href="/admin/suffixes/list"><i class="fa fa-fw fa-sitemap"></i> Zones</a></li>
             {% endif %}
           <li class="divider"></li>
-          <li><a href="/logout"><i class="fa fa-power-off"></i> Logout</a></li>
+          <li><a href="/logout"><i class="fa fa-fw fa-power-off"></i> Logout</a></li>
           {% endif %}
         </ul>
       </div>

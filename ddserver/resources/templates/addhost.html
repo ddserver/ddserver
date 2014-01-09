@@ -54,7 +54,7 @@
           <div class="form-group">
             <label for="inputHostname">Hostname</label>
             <div class="input-group">
-              <span class="input-group-addon"><i class="fa fa-desktop"></i></span>
+              <span class="input-group-addon"><i class="fa fa-fw fa-desktop"></i></span>
               <input class="form-control" type="text" id="inputHostname" placeholder="Hostname" name="hostname" required="required">
             </div>
           </div>
@@ -63,7 +63,7 @@
           <div class="form-group">
             <label for="inputSuffix">Zone</label>
             <div class="input-group">
-              <span class="input-group-addon"><i class="fa fa-sitemap"></i></span>
+              <span class="input-group-addon"><i class="fa fa-fw fa-sitemap"></i></span>
               <select class="form-control" name="suffix" id="inputSuffix">
                 {% for suffix in suffixes %}
                 <option value="{{suffix.id}}">{{suffix.name}}</option>
@@ -76,9 +76,9 @@
           {% endif %}
 
           <div class="form-group">
-            <label for="hostPassword">Password <span><i class="fa fa-magic tip" id="generatePasswordButton" title="Generate a random password"></i></span></label>
+            <label for="hostPassword">Password <span><i class="fa fa-fw fa-magic tip" id="generatePasswordButton" title="Generate a random password"></i></span></label>
             <div class="input-group">
-              <span class="input-group-addon"><i class="fa fa-lock"></i></span>
+              <span class="input-group-addon"><i class="fa fa-fw fa-lock"></i></span>
               <input class="form-control" type="password" id="hostPassword" placeholder="Password" name="password" required="required">
             </div>
             <script type="text/javascript">
@@ -103,7 +103,7 @@
           <div class="form-group">
             <label for="hostPassword2">Retype</label>
             <div class="input-group">
-              <span class="input-group-addon"><i class="fa fa-lock"></i></span>
+              <span class="input-group-addon"><i class="fa fa-fw fa-lock"></i></span>
               <input class="form-control" type="password" id="hostPassword2" placeholder="Retype" name="password_confirm" required="required">
             </div>
           </div>
@@ -117,11 +117,10 @@
                 $('#hostPassword').pwstrength(pwdstrength_options);
             });
           </script>
-
           <div class="form-group">
-            <label for="inputAddress">Initial Address <span>(optional) <i class="fa fa-home tip" id="curIPbutton" title="Use your current IP address ({{current_ip}})"></i></span></label>
+            <label for="inputAddress">Initial Address <span>(optional) <i class="fa fa-fw fa-home tip" id="curIPbutton" title="Use your current IP address ({{current_ip}})"></i></span></label>
             <div class="input-group">
-              <span class="input-group-addon"><i class="fa fa-info"></i></span>
+              <span class="input-group-addon"><i class="fa fa-fw fa-info"></i></span>
               <input class="form-control" type="text" id="inputAddress" placeholder="Initial address" name="address">
             </div>
             <script type="text/javascript">
