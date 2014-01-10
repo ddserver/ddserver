@@ -47,7 +47,7 @@
               <form class="form-horizontal" action="/admin/users/updateMaxhosts" method="post" id="userHostEditForm{{u.id}}">
               <input type="hidden" name="user_id" value="{{u.id}}">
                 <div class="input-group">
-                  <input class="form-control" type="text" name="max_hosts" style="margin: 0" value="{% if u.maxhosts != -1 %}{% if u.maxhosts == None %}{{config.dns.max_hosts}}{% else %}{{u.maxhosts}}{% endif %}{% endif %}">
+                  <input class="form-control tip" type="text" name="max_hosts" style="margin: 0" title="Use -1 for unlimited hostnames" value="{% if u.maxhosts != -1 %}{% if u.maxhosts == None %}{{config.dns.max_hosts}}{% else %}{{u.maxhosts}}{% endif %}{% endif %}">
                   <span class="input-group-addon" id="userHostSubmitButton{{u.id}}" style="cursor: pointer"><i class="fa fa-fw fa-check"></i></span>
                 </div>
                 <script type="text/javascript">

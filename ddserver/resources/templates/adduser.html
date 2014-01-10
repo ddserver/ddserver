@@ -6,6 +6,16 @@
   </div>
 
   <div class="row">
+    <div class="col-md-12">
+      <ul class="nav nav-tabs">
+        <li {% if mode == 'all' %}class="active" {% endif %}><a href="/admin/users/all">All Users</a></li>
+        <li {% if mode == 'inactive' %}class="active" {% endif %}><a href="/admin/users/inactive">Awaiting Activation</a></li>
+        <li {% if mode == 'admins' %}class="active" {% endif %}><a href="/admin/users/admins">Administrators</a></li>
+        <li class="active"><a href="/admin/users/add">Add new user</a></li>
+      </ul>
+      <br>
+    </div>
+
     <div class="col-md-8">
       <p>
         You can add new useraccounts manually using this form.
