@@ -134,7 +134,7 @@ def post_host_update_password(user,
         AND  `user_id` = %(user_id)s
     ''', {'password': encrypted_password,
           'host_id': data.host_id,
-          'user_id' : user.id})
+          'user_id': user.id})
 
   messages.success('Ok, done.')
 

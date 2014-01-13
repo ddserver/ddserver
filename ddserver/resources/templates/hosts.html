@@ -27,7 +27,7 @@
           <tr>
             <td>
               {{host.hostname}}<span class="origin">.{{host.suffix}}</span>
-              {% if host.description != None %} &nbsp; <span class="small"><i class=" fa fa-info tip" title="{{host.description}}"></i></span>{% endif %}
+              {% if host.description != None and host.description != "" %} &nbsp; <span class="small"><i class=" fa fa-info tip" title="{{host.description}}"></i></span>{% endif %}
             </td>
             <td>
               {% if host.address %}
