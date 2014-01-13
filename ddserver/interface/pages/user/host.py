@@ -36,11 +36,13 @@ import formencode
 @route('/user/host/<host_id>', method = 'GET')
 @authorized()
 @require(db = 'ddserver.db:Database',
-         templates = 'ddserver.interface.template:TemplateManager')
+         templates = 'ddserver.interface.template:TemplateManager',
+         messages = 'ddserver.interface.message:MessageManager')
 def get_host_display(user,
                      host_id,
                      db,
-                     templates):
+                     templates,
+                     messages):
   ''' Display the users hostnames and a form for adding new ones. '''
 
   with db.cursor() as cur:
@@ -56,8 +58,14 @@ def get_host_display(user,
         LEFT JOIN `suffixes` AS `suffix`
           ON ( `suffix`.`id` = `host`.`suffix_id` )
         WHERE `host`.`id` = %(id)s
-    ''', {'id': host_id})
+          AND `host`. `user_id` = %(user_id)s
+    ''', {'id': host_id,
+          'user_id': user.id})
     host = cur.fetchone()
+
+  if host is None:
+    messages.error('Hostname not found or no access!')
+    bottle.redirect('/user/hosts/list')
 
   return templates['host.html'](host = host,
                                 current_ip = bottle.request.remote_addr)
