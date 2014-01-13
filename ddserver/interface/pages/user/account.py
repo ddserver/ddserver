@@ -125,8 +125,7 @@ def post_account_delete(user,
         DELETE
         FROM users
         WHERE id = %(id)s
-        LIMIT 1
-    ''', {'id' : user.id})
+    ''', {'id': user.id})
 
   auth.logout()
 
