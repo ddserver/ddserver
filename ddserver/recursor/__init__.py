@@ -1,4 +1,4 @@
-'''
+"""
 Copyright 2013 Dustin Frisch <fooker@lab.sh>
 
 This file is part of ddserver.
@@ -15,4 +15,4 @@ GNU Affero General Public License for more details.
 
 You should have received a copy of the GNU Affero General Public License
 along with ddserver. If not, see <http://www.gnu.org/licenses/>.
-'''
+"""
