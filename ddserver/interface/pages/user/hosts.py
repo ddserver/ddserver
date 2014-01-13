@@ -48,7 +48,7 @@ def config_auth(config_decl):
 def get_hosts_display(user,
                       db,
                       templates):
-  ''' Display the users hostnames and a form for adding new ones. '''
+  ''' Display a list of the users hostnames '''
 
   with db.cursor() as cur:
     # Get hosts of the user
@@ -80,7 +80,7 @@ def get_hosts_add(user,
                   db,
                   config,
                   templates):
-  ''' form for adding new hostnames '''
+  ''' Display a form for adding new hostnames '''
 
   with db.cursor() as cur:
     # Get all available suffixes
@@ -90,17 +90,7 @@ def get_hosts_add(user,
     ''')
     suffixes = cur.fetchall()
 
-    # Get number of hosts of the user
-    cur.execute('''
-        SELECT
-          COUNT(`host`.`id`) AS `count`
-        FROM `hosts` AS `host`
-        WHERE `user_id` = %(user_id)s
-    ''', {'user_id': user.id})
-    hosts = cur.fetchone()
-
-  return templates['addhost.html'](hosts = hosts,
-                                   suffixes = suffixes,
+  return templates['addhost.html'](suffixes = suffixes,
                                    current_ip = bottle.request.remote_addr)
 
 
@@ -158,7 +148,7 @@ def post_hosts_add(user,
           'address': data.address,
           'description': data.description,
           'password': encrypted_password,
-          'user_id' : user.id,
+          'user_id': user.id,
           'suffix_id': data.suffix})
 
   messages.success('Ok, done.')

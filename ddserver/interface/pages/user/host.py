@@ -82,12 +82,12 @@ def get_host_display(user,
 @require(db = 'ddserver.db:Database',
          config = 'ddserver.config:Config',
          messages = 'ddserver.interface.message:MessageManager')
-def post_hosts_update_address(user,
-                              data,
-                              db,
-                              config,
-                              messages):
-  ''' Update the IP address of a hostname. '''
+def post_host_update_address(user,
+                             data,
+                             db,
+                             config,
+                             messages):
+  ''' Update the IP address and/or description of a hostname. '''
 
   with db.cursor() as cur:
     cur.execute('''
@@ -99,7 +99,7 @@ def post_hosts_update_address(user,
     ''', {'address': data.address,
           'description': data.description,
           'host_id': data.host_id,
-          'user_id' : user.id})
+          'user_id': user.id})
 
   messages.success('Ok, done.')
 
@@ -117,11 +117,11 @@ def post_hosts_update_address(user,
 @require(db = 'ddserver.db:Database',
          config = 'ddserver.config:Config',
          messages = 'ddserver.interface.message:MessageManager')
-def post_hosts_update_password(user,
-                               data,
-                               db,
-                               config,
-                               messages):
+def post_host_update_password(user,
+                              data,
+                              db,
+                              config,
+                              messages):
   ''' Update the password of a hostname. '''
 
   encrypted_password = pwd.encrypt(data.password)
