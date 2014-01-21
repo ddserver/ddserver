@@ -34,7 +34,7 @@ setuptools.setup(
     url = 'https://ddserver.0x80.io',
 
     description = 'A server-side application for dynamic DNS management.',
-    long_description = open('README').read(),
+    long_description = open('README.md').read(),
     keywords = 'ddserver ddns dns nsupdate',
 
     install_requires = [
