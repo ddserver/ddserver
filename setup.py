@@ -84,15 +84,17 @@ setuptools.setup(
                                            'ddserver/resources/web/js/pwstrength.options.js'
                                            ]),
         ('/usr/share/doc/ddserver', ['ddserver/resources/doc/schema.sql',
+                                     'ddserver/resources/doc/schema.upgrade.sql',
                                      'ddserver/resources/doc/ddserver.conf.example',
                                      'ddserver/resources/doc/ddclient.conf.example',
-                                     'README', 'VERSION', 'LICENSE', 'CHANGES']),
+                                     'README.md', 'INSTALL.md', 'VERSION', 'LICENSE',
+                                     'CHANGES.md', 'UPGRADING.md']),
         ('/usr/share/doc/ddserver/centos.init.d', ['ddserver/resources/doc/centos.init.d/ddserver']),
         ('/usr/share/doc/ddserver/debian.init.d', ['ddserver/resources/doc/debian.init.d/ddserver'])
     ],
 
     entry_points = {
-        'console_scripts' : [
+        'console_scripts': [
             'ddserver-interface = ddserver.interface.__main__:main',
             'ddserver-updater = ddserver.updater.__main__:main',
             'ddserver-bundle = ddserver.__main__:main',
