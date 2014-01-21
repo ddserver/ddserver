@@ -34,8 +34,7 @@ CREATE TABLE `users` (
   `created`     TIMESTAMP      NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `authcode`    VARCHAR(36)    NULL DEFAULT NULL,
   `maxhosts`    INT            NULL DEFAULT NULL,
-  
-  INDEX (`username`)
+
 ) ENGINE=InnoDB DEFAULT CHARACTER SET utf8;
 
 
@@ -45,8 +44,7 @@ CREATE TABLE `users` (
 CREATE TABLE `suffixes` (
   `id`          INT             NOT NULL AUTO_INCREMENT PRIMARY KEY,
   `name`        VARCHAR(255)    NOT NULL UNIQUE,
-  
-  INDEX (`name`)
+
 ) ENGINE=InnoDB DEFAULT CHARACTER SET utf8;
 
 
@@ -68,10 +66,9 @@ CREATE TABLE `hosts` (
   
   UNIQUE (`hostname`, `suffix_id`),
 
-  INDEX (`hostname`),
   INDEX (`address`),
-  
   INDEX (`user_id`, `hostname`)
+
 ) ENGINE=InnoDB DEFAULT CHARACTER SET utf8;
 
 
