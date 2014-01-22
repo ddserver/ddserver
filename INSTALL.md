@@ -8,9 +8,9 @@ Prerequisites
 -------------
 
 Before you start to install ddserver, please make sure that you have installed
-python2.7, MySQL and PowerDNS on your server.
+python2.7, MySQL and PowerDNS (including the pipe-backend) on your server.
 
-On debian you will need to install these packages:
+On Debian GNU/Linux you will need to install these packages:
 
  libmysqlclient-dev
  python-dev
@@ -27,10 +27,12 @@ Installation
 ------------
 
 1. To install ddserver you can just run:
-  python setup.py install
+```
+    python setup.py install
+```
 
 2. After this step, ddserver installed to the following locations:
-  * <CurrentDirectory>/build contains the installed python packages
+  * /usr/local/lib/python2.7/dist-packages/ contains the installed python packages
   * /etc/ddserver contains the configuration file
   * /etc/init.d/ddserver is a debian init-script for controlling ddserver
   * /usr/share/doc/ddserver contains the database schema and some readme files
@@ -52,10 +54,10 @@ Installation
 
 7. Run the ddserver-recursor by adding the following lines to your powerdns
    configuration and restart powerdns.
-
-   launch=pipe
-   pipe-command=/usr/local/bin/ddserver-recursor
-
+```
+    launch=pipe
+    pipe-command=/usr/local/bin/ddserver-recursor
+```
 
 Documentation and Support
 -------------------------

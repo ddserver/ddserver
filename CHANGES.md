@@ -12,6 +12,7 @@ New features:
 * Added description field to hostnames
 * Set an individual number of maximum hostnames per user
 * Added a manual add-user function for administrators
+* Added basic support for blacklisting hostnames
 
 Fixes:
 
