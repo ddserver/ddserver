@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <div class="row">
+    <div class="col-md-12"><h1>Manage zones</h1></div>
+  </div>
+
+  <ul class="nav nav-tabs">
+    <li class="active"><a href="/admin/suffixes/add">Add zone</a></li>
+    <li><a href="/admin/suffixes/list">Configured zones</a></li>
+  </ul>
+  <br>
+
+  <div class="row">
+    <div class="col-md-8">
+      <p>
+        Add new zones, in which hostnames can be defined ($ORIGIN). When 
+        specifying a new hostname, the user can choose in which zone it should be.
+        By adding a zone <i>example.org</i>, a user can create a hostname like
+        <i>myhost.example.org</i>.
+      </p>
+      <p>
+        Be aware, that no duplicates are allowed! Specifying a zone here means,
+        users are allowed to add any RFC-compilant subdomain (i.e. <i>mail</i>) to 
+        it. None of the subdomains may appear in your regular powerdns database! 
+      </p>
+    </div>
+
+    <div class="col-md-4">
+      <div class="box">
+        <form role="form" action="/admin/suffixes/add" method="post">
+          <div class="form-group">
+            <label for="inputSuffix">Zone</label>
+            <div class="input-group">
+              <span class="input-group-addon"><i class="fa fa-fw fa-desktop"></i></span>
+              <input class="form-control" type="text" id="inputSuffix" placeholder="Zone" name="suffix_name" required="required">
+            </div>
+          </div>
+          <div class="form-group">
+            <button type="submit" class="btn btn-success btn-primary">Add zone</button>
+            <button type="reset" class="btn btn-default">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+{% endblock %}

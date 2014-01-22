@@ -7,87 +7,93 @@
     var RecaptchaOptions = { theme : 'custom', custom_theme_widget: 'recaptcha_widget' };
   </script>
   {% endif %}
-    
+
   <div class="row">
-    <div class="span12"><h1>Welcome to ddserver</h1></div>
+    <div class="col-md-12"><h1>Signup for an account</h1></div>
   </div>
 
-  <div class="row-fluid">
-  
-    {% if user %}
-      <div class="span12">
-        <h3>Error</h3>
-        <p>
-          You can not signup for an account while you are logged in.
-        </p>
-      </div>
+  <div class="row">
+    <div class="col-md-8">
+      <p>
+        <strong>ddserver</strong> allows you to add hostnames whose IP address
+        can be updated dynamically using the <a href="http://www.noip.com/integrate">dyndns2 protocol</a>.
+        To use ddserver you have to register for an account using the form on
+        the right.
+      </p>
+      <p>
+        Please specify a username and an email address, where we can send you an
+        activation email to.
+        {% if config.captcha.enabled %}
+        Fill out the captcha, which is needed to prevent automatic registration
+        by spammers.
+        {% endif %}
+        Finally, click the Signup-button and check your inbox.
+      </p>
+      <p>
+        Depending on the system settings and the email address you are using
+        to register for an account, you will receive an email instantly or after
+        an administrator accepts your registration. The email will contain further
+        information as well as an activation code.
+      </p>
+      <p>
+        If you have any trouble with the signup process or you do not receive
+        your activation email in reasonable time, please contact us.
+      </p>
+      <p>
+        <a href="mailto:{{config.contact.email}}">{{config.contact.name}} &lt;{{config.contact.email}}&gt;</a>
+      </p>
+    </div>
 
-    {% else %}
+    <div class="col-md-4">
       <div class="box">
-        <div class="span12"><h3>Create an account</h3></div>
-        <div class="row-fluid">
-          <div class="span6">
-            <p>
-              If you want to use our dynamic DNS service, you may signup for an
-              account. Please specify a username and email address and click the 
-              Signup-button.
-            </p>
-            <p>
-              You will receive an email with all information you need to
-              activate your ddserver account.
-            </p>
+        <form role="form" action="/signup" method="post">
+          <div class="form-group">
+            <label for="inputUsername">Username</label>
+            <div class="input-group">
+              <span  class="input-group-addon"><i class="fa fa-fw fa-user"></i></span>
+              <input class="form-control" type="text" id="inputUsername" placeholder="Username" name="username" required="required">
+            </div>
           </div>
-      
-          <div class="span6">
-            <form class="form-horizontal" action="/signup" method="post">
-              <div class="control-group">
-                <label class="control-label" for="inputUsername">Username</label>
-                <div class="controls">
-                  <div class="input-prepend">
-                    <span class="add-on"><i class="icon-user"></i></span>
-                    <input type="text" id="signupUsername" placeholder="Username" name="username" required="required">
-                  </div>
-                </div>
-              </div>
-              <div class="control-group">
-                <label class="control-label" for="inputEmail">Email address</label>
-                <div class="controls">
-                  <div class="input-prepend">
-                    <span class="add-on"><i class="icon-envelope"></i></span>
-                    <input type="text" id="inputEmail" name="email" placeholder="user@example.com" required="required" type="email">
-                  </div>
-                </div>
-              </div>
-              {% if config.captcha.enabled %}
-                <div class="control-group">
-                  <label class="control-label" for="signupPassword2">Human check</label>
-                  <div class="controls">
-                    <div id="recaptcha_widget" style="display:none">
-                      <div class="input-prepend">
-                        <span class="add-on"><i class="icon-eye-open"></i></span>
-                        <input type="text" id="recaptcha_response_field" placeholder="Enter the words above" name="recaptcha_response_field">
-                        <a href="javascript:Recaptcha.reload()"><i class="icon-repeat" title="Get another CAPTCHA"></i></a>
-                        <a href="javascript:Recaptcha.showhelp()"><i class="icon-question-sign" title="Help"></i></a>
-                      </div>
-                      <div id="recaptcha_image"></div>
-                    </div>
-                    <script type="text/javascript" src="https://www.google.com/recaptcha/api/challenge?k={{config.captcha.recaptcha_public_key}}"></script>
-                    <noscript>Please enable JavaScript to sign up.</noscript>
-                  </div>
-                </div>
-              {% endif %}
-              <div class="control-group">
-                <div class="controls">
-                  <button type="submit" class="btn btn-success btn-primary">Signup</button>
-                  <a class="btn" href="/">Go back</a>
-                </div>
-              </div>
-            </form>
+          <div class="form-group">
+            <label for="inputEmail">Email address</label>
+            <div class="input-group">
+              <span class="input-group-addon"><i class="fa fa-fw fa-envelope"></i></span>
+              <input class="form-control" type="email" id="inputEmail" name="email" placeholder="user@example.com" required="required">
+            </div>
           </div>
-        </div>
+
+          {% if config.captcha.enabled %}
+          <div class="form-group">
+            <label for="recaptcha_response_field">Human check</label>
+            <div id="recaptcha_widget" style="display: none;">
+              <div class="input-group">
+                <span class="input-group-addon"><i class="fa fa-fw fa-eye"></i></span>
+                <input class="form-control" type="text" id="recaptcha_response_field" placeholder="Enter the text from below" name="recaptcha_response_field">
+              </div>
+              <table>
+                <tr>
+                  <td>
+                    <div id="recaptcha_image"></div>
+                  </td>
+                  <td>
+                    <a href="javascript:Recaptcha.reload()"><i class="fa fa-fw fa-repeat tip" title="Get another CAPTCHA"></i></a><br>
+                    <a href="javascript:Recaptcha.showhelp()"><i class="fa fa-fw fa-question tip" title="Help"></i></a>
+                  </td>
+                </tr>
+              </table>
+              <script type="text/javascript" src="https://www.google.com/recaptcha/api/challenge?k={{config.captcha.recaptcha_public_key}}"></script>
+              <noscript>Please enable JavaScript to sign up.</noscript>
+            </div>
+          </div>
+          {% endif %}
+
+          <div class="form-group">
+            <button type="submit" class="btn btn-success btn-primary">Signup</button>
+            <a class="btn btn-default" href="/">Go back</a>
+          </div>
+        </form>
       </div>
-    {% endif %}
-    
-  </div>  
-  
+    </div>
+  </div>
+
 {% endblock %}

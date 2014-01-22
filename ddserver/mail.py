@@ -61,13 +61,17 @@ class EmailManager(object):
                                                                           'email'))
 
 
-  @require(config = 'ddserver.config:Config')
+  @require(config = 'ddserver.config:Config',
+           messages = 'ddserver.interface.message:MessageManager',
+           logger = 'ddserver.utils.logger:Logger')
   def __send(self,
              key,
              rcpt,
              config,
+             messages,
+             logger,
              **kwargs):
-    ''' Sends a mail.
+    ''' Sends an email.
 
         @param key: the name of the template used for the mail
         @param rcpt: the recipient mail address
@@ -78,18 +82,36 @@ class EmailManager(object):
     template = self.__environment.get_template(key)
 
     # Open SMTP connection
-    smtp = smtplib.SMTP(host = config.smtp.host,
-                        port = config.smtp.port)
+    try:
+      smtp = smtplib.SMTP(host = config.smtp.host,
+                          port = config.smtp.port,
+                          timeout = 20)
 
-    # Send mail
-    smtp.sendmail(config.contact.email,
-                  [rcpt],
-                  template.render(rcpt = rcpt,
-                                  config = config,
-                                  **kwargs))
+    except:
+      logger.error('Failed to contact the SMTP server at %s:%s (template %s)' %
+                   config.smtp.host,
+                   config.smtp.port,
+                   key)
+      raise
 
-    # Close SMTP connection
-    smtp.quit()
+    else:
+      try:
+        # Send mail
+        smtp.sendmail(config.contact.email,
+                      [rcpt],
+                      template.render(rcpt = rcpt,
+                                      config = config,
+                                      **kwargs))
+
+      except:
+        logger.error('Failed to send email to %s (template %s)' %
+                     rcpt,
+                     key)
+        raise
+
+      finally:
+        # Close SMTP connection
+        smtp.quit()
 
 
   def to_user(self,

@@ -1,4 +1,4 @@
-'''
+"""
 Copyright 2013 Dustin Frisch<fooker@lab.sh>
 
 This file is part of ddserver.
@@ -15,64 +15,71 @@ GNU Affero General Public License for more details.
 
 You should have received a copy of the GNU Affero General Public License
 along with ddserver. If not, see <http://www.gnu.org/licenses/>.
-'''
+"""
 
 import sys
 
-from ddserver.utils.deps import require
+from ddserver.utils.deps import require, extend
 from ddserver.utils.txtprot import (LexerDeclaration,
                                     FormatterDeclaration,
                                     MessageDeclaration,
                                     FieldDeclaration)
 
 
-
-# See http://doc.powerdns.com/html/backends-detail.html#pipebackend for further
-# protocol specification
-
+# See http://doc.powerdns.com/html/backends-detail.html#pipebackend
+# for further protocol specification
 
 
 # Declaration of the PowerDNS pipe protocol
-lexer = LexerDeclaration(splitter = '\t',
-                         messages = (MessageDeclaration('HELO',
-                                                        FieldDeclaration('version', int)),
+lexer = LexerDeclaration(splitter='\t',
+                         messages=(MessageDeclaration('HELO',
+                                                      FieldDeclaration('version', int)),
 
-                                     MessageDeclaration('Q',
-                                                        FieldDeclaration('qname', str),
-                                                        FieldDeclaration('qclass', str),
-                                                        FieldDeclaration('qtype', str),
-                                                        FieldDeclaration('id', int),
-                                                        FieldDeclaration('remote', str)),
+                                   MessageDeclaration('Q',
+                                                      FieldDeclaration('qname', str),
+                                                      FieldDeclaration('qclass', str),
+                                                      FieldDeclaration('qtype', str),
+                                                      FieldDeclaration('id', int),
+                                                      FieldDeclaration('remote', str)),
 
-                                     MessageDeclaration('AXFR',
-                                                        FieldDeclaration('id', int)),
+                                   MessageDeclaration('AXFR',
+                                                      FieldDeclaration('id', int)),
 
-                                     MessageDeclaration('PING')))
-
-
-formatter = FormatterDeclaration(splitter = '\t',
-                                 messages = (MessageDeclaration('OK',
-                                                                FieldDeclaration('banner', str)),
-
-                                             MessageDeclaration('DATA',
-                                                                FieldDeclaration('qname', str),
-                                                                FieldDeclaration('qclass', str),
-                                                                FieldDeclaration('qtype', str),
-                                                                FieldDeclaration('ttl', str),
-                                                                FieldDeclaration('id', int),
-                                                                FieldDeclaration('content', str)),
-
-                                             MessageDeclaration('LOG',
-                                                                FieldDeclaration('message', str)),
-
-                                             MessageDeclaration('END'),
-                                             MessageDeclaration('FAIL')))
+                                   MessageDeclaration('PING')))
 
 
+formatter = FormatterDeclaration(splitter='\t',
+                                 messages=(MessageDeclaration('OK',
+                                                              FieldDeclaration('banner', str)),
 
-@require(logger = 'ddserver.utils.logger:Logger')
+                                           MessageDeclaration('DATA',
+                                                              FieldDeclaration('qname', str),
+                                                              FieldDeclaration('qclass', str),
+                                                              FieldDeclaration('qtype', str),
+                                                              FieldDeclaration('ttl', str),
+                                                              FieldDeclaration('id', int),
+                                                              FieldDeclaration('content', str)),
+
+                                           MessageDeclaration('LOG',
+                                                              FieldDeclaration('message', str)),
+
+                                           MessageDeclaration('END'),
+                                           MessageDeclaration('FAIL')))
+
+
+@extend('ddserver.config:ConfigDeclaration')
+def config_dns(config_decl):
+  with config_decl.declare('dns') as s:
+    s('ttl',
+      conv=int,
+      default=60)
+
+
+@require(logger='ddserver.utils.logger:Logger')
 def receiver(logger):
-  # Read lines from standard input
+  """ Receive and process messages from PowerDNS
+  """
+
   while True:
     # Read a line
     line = sys.stdin.readline()
@@ -84,24 +91,26 @@ def receiver(logger):
 
     # Check if we got a message
     if message is None:
-      logger.error('Unknown tag: %s', line)
+      logger.error('recursor: Unknown tag: %s', line)
       continue
 
-    logger.debug('Received message: %s', message)
+    logger.debug('recursor: Received message: %s', message)
 
     # Forward the message
     yield message
 
 
-
-@require(logger = 'ddserver.utils.logger:Logger')
+@require(logger='ddserver.utils.logger:Logger')
 def send(cls,
          logger,
          **kwargs):
+  """ Send responses to PowerDNS
+  """
+
   # Create message
   message = cls(**kwargs)
 
-  logger.debug('Responding message: %s', message)
+  logger.debug('recursor: Responding message: %s', message)
 
   # Format the response
   line = formatter(message)
@@ -111,11 +120,12 @@ def send(cls,
   sys.stdout.flush()
 
 
-
-@require(db = 'ddserver.db:Database')
+@require(db='ddserver.db:Database')
 def answer_soa(query,
                db):
-  # Handle SOA records and response with defined suffixes
+  """ Handle SOA records and respond with defined suffixes
+  """
+
   with db.cursor() as cur:
     cur.execute('''
       SELECT *
@@ -125,24 +135,28 @@ def answer_soa(query,
     suffix = cur.fetchone()
 
     if suffix:
-      send(formatter.DATA, qname = query.qname,
-                           qclass = query.qclass,
-                           qtype = 'SOA',
-                           ttl = 3600,
-                           id = query.id,
-                           content = ' '.join(('ns.' + query.qname,
-                                               'webmaster.' + query.qname,
-                                               '0',
-                                               '86400',  # 24h
-                                               '7200',  # 2h
-                                               '3600000',  # 1000h
-                                               '172800')))  # 2d
+      send(formatter.DATA, qname=query.qname,
+                           qclass=query.qclass,
+                           qtype='SOA',
+                           ttl=3600,
+                           id=query.id,
+                           content=' '.join(('ns.' + query.qname,
+                                             'webmaster.' + query.qname,
+                                             '0',
+                                             '86400',     # 24h
+                                             '7200',      # 2h
+                                             '3600000',   # 1000h
+                                             '172800')))  # 2d
 
 
-
-@require(db = 'ddserver.db:Database')
+@require(db='ddserver.db:Database',
+         config='ddserver.config:Config')
 def answer_a(query,
-             db):
+             db,
+             config):
+  """ Handle A records
+  """
+
   with db.cursor() as cur:
     cur.execute('''
         SELECT
@@ -158,16 +172,18 @@ def answer_a(query,
     host = cur.fetchone()
 
     if host:
-      send(formatter.DATA, qname = query.qname,
-                           qclass = query.qclass,
-                           qtype = 'A',
-                           ttl = 3600,
-                           id = query.id,
-                           content = host['address'])
-
+      send(formatter.DATA, qname=query.qname,
+                           qclass=query.qclass,
+                           qtype='A',
+                           ttl=config.dns.ttl,
+                           id=query.id,
+                           content=host['address'])
 
 
 def answer(query):
+  """ Determine query type and respond to it
+  """
+
   if query.qtype == 'SOA' or query.qtype == 'ANY':
     answer_soa(query)
 
@@ -180,7 +196,7 @@ def answer(query):
 
 
 
-@require(logger = 'ddserver.utils.logger:Logger')
+@require(logger='ddserver.utils.logger:Logger')
 def main(logger):
   messages = receiver()
 
@@ -190,26 +206,26 @@ def main(logger):
     if message.tag == 'HELO':
       # Expecting ABI version 1
       if message.version != 1:
-        logger.error('Unappropriate ABI version: %s', message.version)
+        logger.error('recursor: Unappropriate ABI version: %s', message.version)
         send(formatter.FAIL)
 
       send(formatter.OK,
-           banner = 'ddserver')
+           banner='ddserver')
       break
 
     else:
-      logger.error('Missing HELO before command: %s', message.tag)
+      logger.error('recursor: Missing HELO before command: %s', message.tag)
       send(formatter.FAIL)
 
   # Handle all messages after HELO
   for message in messages:
     if message.tag == 'HELO':
-      logger.error('Duplicated HELO')
+      logger.error('recursor: Duplicated HELO')
       send(formatter.FAIL)
 
     elif message.tag == 'Q':
       # Handle query
-      answer(query = message)
+      answer(query=message)
 
       send(formatter.END)
 
@@ -222,10 +238,9 @@ def main(logger):
       send(formatter.END)
 
     else:
-      logger.error('Unhandled message tag: %s', message)
+      logger.error('recursor: Unhandled message tag: %s', message)
       send(formatter.FAIL)
 
 
-
 if __name__ == '__main__':
-    main()
+  main()

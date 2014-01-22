@@ -48,7 +48,7 @@ def config_auth(config_decl):
 def get_hosts_display(user,
                       db,
                       templates):
-  ''' Display the users hostnames and a form for adding new ones. '''
+  ''' Display a list of the users hostnames '''
 
   with db.cursor() as cur:
     # Get hosts of the user
@@ -58,7 +58,8 @@ def get_hosts_display(user,
           `host`.`hostname` AS `hostname`,
           `suffix`.`name` AS `suffix`,
           `host`.`address` AS `address`,
-          `host`.`updated` AS `updated`
+          `host`.`updated` AS `updated`,
+          `host`.`description` AS `description`
         FROM `hosts` AS `host`
         LEFT JOIN `suffixes` AS `suffix`
           ON ( `suffix`.`id` = `host`.`suffix_id` )
@@ -79,7 +80,7 @@ def get_hosts_add(user,
                   db,
                   config,
                   templates):
-  ''' form for adding new hostnames '''
+  ''' Display a form for adding new hostnames '''
 
   with db.cursor() as cur:
     # Get all available suffixes
@@ -89,17 +90,7 @@ def get_hosts_add(user,
     ''')
     suffixes = cur.fetchall()
 
-    # Get number of hosts of the user
-    cur.execute('''
-        SELECT
-          COUNT(`host`.`id`) AS `count`
-        FROM `hosts` AS `host`
-        WHERE `user_id` = %(user_id)s
-    ''', {'user_id': user.id})
-    hosts = cur.fetchone()
-
-  return templates['addhost.html'](hosts = hosts,
-                                   suffixes = suffixes,
+  return templates['addhost.html'](suffixes = suffixes,
                                    current_ip = bottle.request.remote_addr)
 
 
@@ -110,6 +101,7 @@ def get_hosts_add(user,
           hostname = validation.ValidHostname(),
           suffix = validation.Int(not_empty = True),
           address = validation.IPAddress(),
+          description = validation.String(max = 255),
           password = validation.SecurePassword(min = 8),
           password_confirm = validation.String(),
           chained_validators = [validation.FieldsMatch('password', 'password_confirm'),
@@ -135,7 +127,11 @@ def post_hosts_add(user,
       WHERE `user_id` = %(user_id)s
     ''', {'user_id': user.id})
 
-    if (not user.admin) and (cur.rowcount >= config.dns.max_hosts):
+    # users can have an individual hostname limit, unlimited hostnames (-1)
+    # or have no limit set in the db to use the default from the config
+    if ((user.maxhosts is None and cur.rowcount >= int(config.dns.max_hosts)) or
+        (user.maxhosts is not None and
+         (int(cur.rowcount >= user.maxhosts) and int(user.maxhosts) is not -1))):
       messages.error('Maximum number of hosts reached')
       bottle.redirect('/user/hosts/list')
 
@@ -144,13 +140,15 @@ def post_hosts_add(user,
       INTO `hosts`
       SET `hostname` = %(hostname)s,
           `address` = %(address)s,
+          `description` = %(description)s,
           `password` = %(password)s,
           `user_id` = %(user_id)s,
           `suffix_id` = %(suffix_id)s
     ''', {'hostname': data.hostname,
           'address': data.address,
+          'description': data.description,
           'password': encrypted_password,
-          'user_id' : user.id,
+          'user_id': user.id,
           'suffix_id': data.suffix})
 
   messages.success('Ok, done.')

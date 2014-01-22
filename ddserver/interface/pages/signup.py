@@ -51,13 +51,22 @@ def config_signup(config_decl):
 
 @route('/signup', method = 'GET')
 @require(config = 'ddserver.config:Config',
-         templates = 'ddserver.interface.template:TemplateManager')
+         templates = 'ddserver.interface.template:TemplateManager',
+         messages = 'ddserver.interface.message:MessageManager',
+         session = 'ddserver.interface.session:SessionManager')
 def get_signup(config,
-               templates):
+               templates,
+               messages,
+               session):
   ''' Display the sign up page. '''
 
   if config.signup.enabled:
-    return templates['signup.html']()
+    if not session.username:
+      return templates['signup.html']()
+
+    else:
+      messages.error('You can not signup for an account while you are logged in.')
+      bottle.redirect('/')
 
   else:
     return templates['nosignup.html']()
@@ -101,31 +110,53 @@ def post_signup(data,
     ''', {'username': data.username,
           'email': data.email})
 
-    # Check if the user can be activated directly
-    if (config.signup.allowed_maildomains == 'any' or
-        email_domain in config.signup.allowed_maildomains):
-      # Generate auth code
-      users.generate_authcode(data.username)
+  # Check if the user can be activated directly
+  if (config.signup.allowed_maildomains == 'any' or
+      email_domain in config.signup.allowed_maildomains):
+    # Generate auth code
+    users.generate_authcode(data.username)
 
-      # Get user record
-      user = users[data.username]
+    # Get user record
+    user = users[data.username]
 
-      # Send out activation mail
+    # Send out activation mail
+    try:
       emails.to_user('signup_activate.mail',
                      user = user)
 
-      messages.success('Your account has been created. You should receive an activation email in some minutes.')
+    except:
+      # Failed to send activation email.
+      # We reset the authcode in this case, so an admin can send
+      # a new one after fixing email issues
+      with db.cursor() as cur:
+        cur.execute('''
+            UPDATE users
+            SET `authcode` = %(authcode)s
+            WHERE `username` = %(username)s
+        ''', {'authcode': None,
+              'username': data.username})
+
+      messages.error('Failed to send activation email. Please contact an administrator at %s' %
+                     config.contact.email)
 
     else:
-      # Get user record
-      user = users[data.username]
+      messages.success('Your account has been created. You should receive an activation email in some minutes.')
 
-      messages.success('Your account has been created and will be reviewed by an administrator.')
+  else:
+    # Get user record
+    user = users[data.username]
 
-    # Notify the admin about the new account
-    if config.signup.notify_admin:
+    messages.success('Your account has been created and will be reviewed by an administrator.')
+
+  # Notify the admin about the new account
+  if config.signup.notify_admin:
+    try:
       emails.to_admin('signup_notify.mail',
                       user = user)
+
+    except:
+      messages.error('Failed to notify the administrator. Please contact %s' %
+                     config.contact.email)
 
   bottle.redirect('/')
 
