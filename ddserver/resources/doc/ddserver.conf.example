@@ -15,6 +15,7 @@ password = YourDatabasePassword
 [dns]
 ;max_hosts = 5
 ;ttl = 60
+;blacklist = www, mail, ftp, test
 
 [signup]
 ;enabled = True

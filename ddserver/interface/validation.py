@@ -31,7 +31,7 @@ from formencode.validators import (FancyValidator,
                                    String,  # @UnusedImport: for exporting
                                    Int)  # @UnusedImport: for exporting
 
-from ddserver.utils.deps import require
+from ddserver.utils.deps import require, extend
 
 
 
@@ -89,6 +89,15 @@ def validate(__on_error__ = '/',
 
 
 
+@extend('ddserver.config:ConfigDeclaration')
+def config_blacklist(config_decl):
+  with config_decl.declare('dns') as s:
+    s('blacklist',
+      conv = lambda v: set(s.strip() for s in v.split(',')),
+      default = set())
+
+
+
 class ValidHostname(FancyValidator):
   ''' Check for valid hostname. '''
 
@@ -96,14 +105,22 @@ class ValidHostname(FancyValidator):
     'too_short': 'Hostname can not be empty',
     'too_long': 'Hostname can not exceed 63 characters',
     'non_letter': 'Hostname can only consist of a-z, 0-9 or the minus (-) character',
-    'invalid_start': 'Hostnames must start with an aplhanumeric character'
+    'invalid_start': 'Hostnames must start with an aplhanumeric character',
+    'not_allowed': 'Sorry, this hostname is reserved by the administrator.'
   }
 
   letter_regex = re.compile(r'^[a-z0-9\-]+$')
 
+  @require(config = 'ddserver.config:Config')
   def validate_python(self,
                       value,
-                      state):
+                      state,
+                      config):
+    if value in config.dns.blacklist:
+      raise formencode.Invalid(self.message('not_allowed', state),
+                               value,
+                               state)
+
     if len(value) < 1:
       raise formencode.Invalid(self.message("too_short",
                                             value),
