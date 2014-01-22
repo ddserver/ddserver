@@ -61,54 +61,74 @@ def get_users(user,
 
 
 
-# @route('/admin/users/add', method = 'GET')
-# @authorized_admin()
-# @require(templates = 'ddserver.interface.template:TemplateManager')
-# def get_user_add(templates):
-#   ''' Adds a new user. '''
-#
-#   return templates['adduser.html']()
-#
-#
-#
-# @route('/admin/users/add', method = 'POST')
-# @authorized_admin()
-# @validate('/admin/users/add',
-#           username = validators.UniqueUsername(),
-#           email = validators.Email())
-# @require(db = 'ddserver.db:Database',
-#          users = 'ddserver.interface.user:UserManager',
-#          emails = 'ddserver.mail:EmailManager',
-#          messages = 'ddserver.interface.message:MessageManager')
-# def post_user_add(username,
-#                   email,
-#                   db,
-#                   users,
-#                   emails,
-#                   messages):
-#   ''' Adds a new user. '''
-#
-#   with db.cursor() as cur:
-#     cur.execute('''
-#       INSERT
-#       INTO users
-#       SET `username` = %(username)s,
-#           `email` = %(email)s,
-#           `admin` = 0,
-#           `active` = 0,
-#           `created` = CURRENT_TIMESTAMP
-#     ''', {'username': username,
-#           'email': email})
-#
-#   users.generate_authcode(username)
-#   user = users[username]
-#
-#   emails.to_user('signup_activate.mail',
-#                  user = user)
-#
-#   messages.success('Account created. The user will get an activation email.')
-#
-#   bottle.redirect('/admin/users/all')
+@route('/admin/users/add', method = 'GET')
+@authorized_admin()
+@require(templates = 'ddserver.interface.template:TemplateManager')
+def get_user_add(user,
+                 templates):
+  ''' Adds a new user. '''
+  return templates['adduser.html']()
+
+
+
+@route('/admin/users/add', method = 'POST')
+@authorized_admin()
+@validate('/admin/users/add',
+          username = validation.UniqueUsername(max = 255),
+          email = validation.Email())
+@require(db = 'ddserver.db:Database',
+         users = 'ddserver.interface.user:UserManager',
+         emails = 'ddserver.mail:EmailManager',
+         messages = 'ddserver.interface.message:MessageManager')
+def post_user_add(user,
+                  data,
+                  db,
+                  users,
+                  emails,
+                  messages):
+  ''' Manually add a new user. '''
+
+  with db.cursor() as cur:
+    cur.execute('''
+      INSERT
+      INTO users
+      SET `username` = %(username)s,
+          `email` = %(email)s,
+          `admin` = 0,
+          `active` = 0,
+          `created` = CURRENT_TIMESTAMP
+    ''', {'username': data.username,
+          'email': data.email})
+
+   # Generate auth code
+  users.generate_authcode(data.username)
+
+  # Get user record
+  user = users[data.username]
+
+  # Send out activation mail
+  try:
+    emails.to_user('signup_activate.mail',
+                   user = user)
+
+  except:
+    # Failed to send activation email.
+    # We reset the authcode in this case, so an admin can send
+    # a new one after fixing email issues
+    with db.cursor() as cur:
+      cur.execute('''
+          UPDATE users
+          SET `authcode` = %(authcode)s
+          WHERE `username` = %(username)s
+      ''', {'authcode': None,
+            'username': data.username})
+
+    messages.error('Failed to send activation email.')
+
+  else:
+    messages.success('Account created. The user will get an activation email.')
+
+  bottle.redirect('/admin/users/all')
 
 
 
@@ -118,23 +138,41 @@ def get_users(user,
           username = validation.ValidUsername(min = 1, max = 255))
 @require(db = 'ddserver.db:Database',
          users = 'ddserver.interface.user:UserManager',
+         config = 'ddserver.config:Config',
          emails = 'ddserver.mail:EmailManager',
          messages = 'ddserver.interface.message:MessageManager')
 def post_users_activate(user,
                         data,
                         db,
                         users,
+                        config,
                         emails,
                         messages):
   ''' Activate a users account. '''
 
   users.generate_authcode(data.username)
-  user = users[data.user_name]
+  user = users[data.username]
 
-  emails.to_user('signup_activate.mail',
-                 user = user)
+  try:
+    emails.to_user('signup_activate.mail',
+                   user = user)
 
-  messages.success('Ok, done.')
+  except:
+    # Failed to send activation email.
+    # We reset the authcode in this case, so an admin can send
+    # a new one after fixing email issues
+    with db.cursor() as cur:
+      cur.execute('''
+          UPDATE users
+          SET `authcode` = %(authcode)s
+          WHERE `username` = %(username)s
+      ''', {'authcode': None,
+            'username': data.username})
+
+    messages.error('Failed to send the activation email.')
+
+  else:
+    messages.success('Ok, done.')
 
   bottle.redirect('/admin/users/all')
 
@@ -212,4 +250,35 @@ def post_user_rmadmin(user,
   messages.success('Ok, done.')
 
   bottle.redirect('/admin/users/admin')
+
+
+
+@route('/admin/users/updateMaxhosts', method = 'POST')
+@authorized_admin()
+@validate('/admin/users/all',
+          max_hosts = validation.Int(not_empty = True,
+                                     min = -2),
+          user_id = validation.Int(not_empty = True))
+@require(db = 'ddserver.db:Database',
+         messages = 'ddserver.interface.message:MessageManager')
+def post_user_updatemaxhosts(user,
+                             data,
+                             db,
+                             messages):
+  ''' Update the maximum allowed hostnames of a user . '''
+
+  if data.max_hosts == -2:
+    data.max_hosts = None
+
+  with db.cursor() as cur:
+    cur.execute('''
+        UPDATE `users`
+        SET `maxhosts` = %(max_hosts)s
+        WHERE `id` = %(user_id)s
+    ''', {'max_hosts': data.max_hosts,
+          'user_id': data.user_id})
+
+  messages.success('Ok, done.')
+
+  bottle.redirect('/admin/users/all')
 

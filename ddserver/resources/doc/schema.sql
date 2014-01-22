@@ -27,14 +27,14 @@ DROP TABLE IF EXISTS `hosts`;
 CREATE TABLE `users` (
   `id`          INT            NOT NULL AUTO_INCREMENT PRIMARY KEY,
   `username`    VARCHAR(255)   NOT NULL UNIQUE,
-  `password`    VARCHAR(255)   NULL,
+  `password`    VARCHAR(255)   NULL DEFAULT NULL,
   `email`       VARCHAR(255)   NOT NULL,
   `admin`       BOOLEAN        NOT NULL DEFAULT FALSE,
   `active`      BOOLEAN        NOT NULL DEFAULT FALSE,
   `created`     TIMESTAMP      NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `authcode`    VARCHAR(36)    NULL,
-  
-  INDEX (`username`)
+  `authcode`    VARCHAR(36)    NULL DEFAULT NULL,
+  `maxhosts`    INT            NULL DEFAULT NULL
+
 ) ENGINE=InnoDB DEFAULT CHARACTER SET utf8;
 
 
@@ -43,9 +43,8 @@ CREATE TABLE `users` (
 -- 
 CREATE TABLE `suffixes` (
   `id`          INT             NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  `name`        VARCHAR(255)    NOT NULL UNIQUE,
-  
-  INDEX (`name`)
+  `name`        VARCHAR(255)    NOT NULL UNIQUE
+
 ) ENGINE=InnoDB DEFAULT CHARACTER SET utf8;
 
 
@@ -57,32 +56,20 @@ CREATE TABLE `hosts` (
   `user_id`     INT             NOT NULL,
   `suffix_id`   INT             NOT NULL,
   `hostname`    VARCHAR(255)    NOT NULL,
-  `address`     VARCHAR(15)     NULL,
-  `description` VARCHAR(255)    NULL,
+  `address`     VARCHAR(15)     NULL DEFAULT NULL,
+  `description` VARCHAR(255)    NULL DEFAULT NULL,
   `password`    VARCHAR(255)    NOT NULL,
   `updated`     TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  
-  FOREIGN KEY (`user_id`)       REFERENCES `users` (`id`),
-  FOREIGN KEY (`suffix_id`)     REFERENCES `suffixes` (`id`),
+
+  FOREIGN KEY (`user_id`)       REFERENCES `users` (`id`) ON DELETE CASCADE ,
+  FOREIGN KEY (`suffix_id`)     REFERENCES `suffixes` (`id`) ON DELETE CASCADE ,
   
   UNIQUE (`hostname`, `suffix_id`),
 
-  INDEX (`hostname`),
   INDEX (`address`),
-  
   INDEX (`user_id`, `hostname`)
+
 ) ENGINE=InnoDB DEFAULT CHARACTER SET utf8;
-
-
-ALTER TABLE `hosts`
-  ADD FOREIGN KEY ( `user_id` )
-  REFERENCES `users` (`id`)
-  ON DELETE CASCADE ;
-
-ALTER TABLE `hosts`
-  ADD FOREIGN KEY ( `suffix_id` )
-  REFERENCES `suffixes` (`id`)
-  ON DELETE CASCADE ;
 
 
 --

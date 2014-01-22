@@ -1,4 +1,4 @@
-include README LICENSE VERSION
+include README.md LICENSE VERSION CHANGES.md UPGRADING.md
 include setup.cfg setup.py
 recursive-include ddserver *
 recursive-exclude docs *.pyc

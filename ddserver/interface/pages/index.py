@@ -23,6 +23,8 @@ import bottle
 
 from ddserver.web import route
 
+from ddserver.interface.user import authorized
+
 from ddserver.utils.deps import require, extend
 
 
@@ -48,8 +50,57 @@ def get_static(path,
 
 
 @route('/', method = 'GET')
-@require(templates = 'ddserver.interface.template:TemplateManager')
-def get_index(templates):
+@require(db = 'ddserver.db:Database',
+         templates = 'ddserver.interface.template:TemplateManager',
+         session = 'ddserver.interface.session:SessionManager')
+def get_index(db,
+              templates,
+              session):
   ''' Display the index page. '''
 
-  return templates['index.html']()
+  if session.username:
+    (users, zones, hosts, userhosts) = get_statistics()
+    return templates['index.html'](users = users,
+                                   zones = zones,
+                                   hosts = hosts,
+                                   userhosts = userhosts,
+                                   current_ip = bottle.request.remote_addr)
+
+  else:
+    return templates['index.html']()
+
+
+
+@require(db = 'ddserver.db:Database')
+@authorized()
+def get_statistics(user,
+                   db):
+  # get some statistics
+  with db.cursor() as cur:
+    cur.execute('''
+      SELECT COUNT(`id`) AS count
+      FROM `users`
+    ''')
+    users = cur.fetchone()
+
+    cur.execute('''
+      SELECT COUNT(`id`) AS count
+      FROM `suffixes`
+    ''')
+    zones = cur.fetchone()
+
+    cur.execute('''
+      SELECT COUNT(`id`) AS count
+      FROM `hosts`
+    ''')
+    hosts = cur.fetchone()
+
+
+    cur.execute('''
+      SELECT COUNT(`id`) AS count
+      FROM `hosts`
+      WHERE `user_id` = %(user_id)s
+    ''', {'user_id': user.id })
+    userhosts = cur.fetchone()
+
+    return (users, zones, hosts, userhosts)

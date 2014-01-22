@@ -1,4 +1,4 @@
-'''
+"""
 Copyright 2013 Dustin Frisch <fooker@lab.sh>
 
 This file is part of ddserver.
@@ -15,7 +15,7 @@ GNU Affero General Public License for more details.
 
 You should have received a copy of the GNU Affero General Public License
 along with ddserver. If not, see <http://www.gnu.org/licenses/>.
-'''
+"""
 
 import functools
 import bottle
@@ -28,31 +28,28 @@ from ddserver.utils.deps import require
 from ddserver.web import route
 
 
-
 # See http://www.noip.com/integrate for further protocol specification
 
 
-
 class Response(object):
-  ''' The response send to the client. '''
+  """ The response send to the client. """
   __slots__ = ['name',
                'value']
 
 
   def __init__(self, name, value):
-      self.name = name
-      self.value = value
+    self.name = name
+    self.value = value
 
 
   def __str__(self):
-      if self.value:
-          return '%s %s' % (self.name, self.value)
+    if self.value:
+      return '%s %s' % (self.name, self.value)
 
-      else:
-          return '%s' % (self.name)
+    else:
+      return '%s' % self.name
 
   __repr__ = __str__
-
 
 
 # Existing response codes
@@ -67,10 +64,10 @@ resp_911 = functools.partial(Response, '911', None)
 
 
 
-@require(logger = 'ddserver.utils.logger:Logger',
-         db = 'ddserver.db:Database')
+@require(logger='ddserver.utils.logger:Logger',
+         db='ddserver.db:Database')
 def update(logger, db, username, password, hostnames, address):
-  ''' Update the records.
+  """ Update the records.
 
       The very first step is to check username and password. If they are not
       provided or the username does not exist, a bad credentials answer is
@@ -78,70 +75,84 @@ def update(logger, db, username, password, hostnames, address):
 
       If the credentials are checked, for each given hostname, the address is
       stored in the database.
-  '''
+  """
 
   # Check if we get some credentials
   if not username or not password:
-    logger.warning('Missing credentials')
+    logger.warning('updater: Update attempt with missing credentials')
     return resp_badauth()
 
   # Try to get user ID from database
   with db.cursor() as cur:
     cur.execute('''
-        SELECT `id`, `password`
+      SELECT `id`, `password`
         FROM `users`
-        WHERE `username` = %(username)s
-          AND `active` = 1
+       WHERE `username` = %(username)s
+         AND `active` = 1
     ''', {'username': username})
     user = cur.fetchone()
 
   # Check if we have a valid user
   if not user:
-    logger.warning('Invalid username %s', username)
+    logger.warning('updater: Update attempt with invalid username %s',
+                   username)
     return resp_badauth()
 
-  logger.debug('Found user in DB: %s', user)
+  logger.debug('updater: Found user in DB: %s', user)
+
+  # Validate the IP address
+  try:
+    validator = formencode.validators.IPAddress()
+    validator.to_python(address)
+
+  except formencode.Invalid:
+    logger.warning('updater: Update attempt using an invalid IP address: %s',
+                   address)
+    return resp_abuse()
 
   # The specification allows to give multiple hosts separated by comma
   responses = []
   for hostname in hostnames:
-    logger.debug('Fetching existing host entry for %s', hostname)
+    logger.debug('updater: Fetching existing host entry for %s', hostname)
 
     # Get the host entry for the current hostname from the database
     with db.cursor() as cur:
       cur.execute('''
-          SELECT
-            `host`.`id`,
-            `host`.`address`,
-            `host`.`password`
-          FROM `hosts` AS `host`
-          LEFT JOIN `suffixes` AS `suffix`
-            ON ( `suffix`.`id` = `host`.`suffix_id` )
-          WHERE `host`.`user_id` = %(user_id)s
-            AND CONCAT(`host`.`hostname`, '.', `suffix`.`name`) = %(hostname)s
+        SELECT
+          `host`.`id`,
+          `host`.`address`,
+          `host`.`password`
+        FROM `hosts` AS `host`
+        LEFT JOIN `suffixes` AS `suffix`
+           ON ( `suffix`.`id` = `host`.`suffix_id` )
+        WHERE `host`.`user_id` = %(user_id)s
+          AND CONCAT(`host`.`hostname`, '.', `suffix`.`name`) = %(hostname)s
       ''', {'user_id': user['id'],
             'hostname': hostname})
       host = cur.fetchone()
 
     # Check if we got a host entry for the queried hostname
     if not host:
-      logger.debug('No such host entry found: %s', hostname)
+      logger.warning('updater: Update attempt for non-existing hostname %s',
+                     hostname)
 
       responses.append(resp_nohost())
       continue
 
     # Check the users credentials (passwords are assigned to hosts)
     if not pwd.verify(password, host['password']):
-      logger.warning('Mismatching credentials for host %s', hostname)
+      logger.warning('updater: Mismatching credentials for host %s',
+                     hostname)
 
       responses.append(resp_badauth())
       continue
 
     # Check if the address has changed
     if host['address'] == address:
-      logger.debug('Address has not changed: %s', address)
+      logger.debug('updater: Address has not changed: %s',
+                   address)
 
-      responses.append(resp_nochg(value = address))
+      responses.append(resp_nochg(value=address))
       continue
 
     # validate the ip address
@@ -165,62 +176,70 @@ def update(logger, db, username, password, hostnames, address):
       ''', {'id': host['id'],
             'address': address})
 
-    logger.debug('Host entry updated: %s = %s', hostname, address)
+    logger.info('updater: Host entry updated: %s = %s', hostname, address)
 
-    responses.append(resp_good(value = address))
+    responses.append(resp_good(value=address))
 
   return responses
 
 
-
-@route('/nic/ip', method = 'GET')
+@route('/nic/ip', method='GET')
 def get_ip():
-  ''' Returns the IP address of the client. '''
+  """ Return the IP address of the client extracted from
+      the HTTP header.
+  """
 
-  # Return the client's IP extracted from the header
   return bottle.request.remote_addr
 
 
-
-@route('/nic/update', method = 'GET')
-@require(logger = 'ddserver.utils.logger:Logger')
+@route('/nic/update', method='GET')
+@require(logger='ddserver.utils.logger:Logger')
 def get_update(logger):
-  ''' Handles an update request from a ddclient implementation. '''
+  """ Handles an update request from a ddclient implementation.
+  """
 
-  # Extract the hostnames separated by comma, the new IP address and the offline
-  # flag from the query
-  hostnames = bottle.request.query.get('hostname', None).split(',')
-  address = bottle.request.query.get('myip', None)
-  offline = bottle.request.query.get('offline', 'NO') == 'YES'
+  # Extract the hostnames separated by comma, the new IP address
+  # and the offline flag from the query
+  hostnames = bottle.request.query.get('hostname', None)
+  if hostnames:
+    hostnames = hostnames.split(',')
+    address = bottle.request.query.get('myip', None)
+    offline = bottle.request.query.get('offline', 'NO') == 'YES'
 
-  # Fetch the the credentials from HTTP header
-  if bottle.request.auth:
-    username, password = bottle.request.auth
+    # Fetch the the credentials from HTTP header
+    if bottle.request.auth:
+      username, password = bottle.request.auth
 
+    else:
+      username, password = None, None
+
+    # Clear the address if the offline flag is set
+    if offline:
+      address = None
+
+    logger.info('updater: Update request for %s as %s', hostnames, address)
+
+    # Call the update function
+    try:
+      responses = update(username=username,
+                         password=password,
+                         hostnames=hostnames,
+                         address=address)
+
+    except:
+      responses = resp_911()
+
+    # Blow up responses if we got a single response
+    if isinstance(responses, Response):
+      responses = [responses] * len(hostnames)
+
+  # if no hostnames were provided, this is invalid usage of
+  # the update protocol.
   else:
-    username, password = None, None
+    responses = resp_abuse()
+    responses = [responses]
 
-  # Clear the address if the offline flag is set
-  if offline:
-    address = None
-
-  logger.debug('Update request for %s as %s', hostnames, address)
-
-  # Call the update function
-  try:
-    responses = update(username = username,
-                       password = password,
-                       hostnames = hostnames,
-                       address = address)
-
-  except:
-    responses = resp_911()
-
-  # Blow up responses if we got a single response
-  if isinstance(responses, Response):
-    responses = [responses] * len(hostnames)
-
-  logger.debug('Update responses: %s', responses)
+  logger.debug('updater: Update responses: %s', responses)
 
   # Return responses as string
   return '\n'.join(str(response)

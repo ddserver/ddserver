@@ -53,7 +53,8 @@ def get_host_display(user,
           `host`.`hostname` AS `hostname`,
           `suffix`.`name` AS `suffix`,
           `host`.`address` AS `address`,
-          `host`.`updated` AS `updated`
+          `host`.`updated` AS `updated`,
+          `host`.`description` AS `description`
         FROM `hosts` AS `host`
         LEFT JOIN `suffixes` AS `suffix`
           ON ( `suffix`.`id` = `host`.`suffix_id` )
@@ -76,26 +77,29 @@ def get_host_display(user,
 @authorized()
 @validate('/user/hosts/list',
           host_id = formencode.validators.Int(),
-          address = validation.IPAddress())
+          address = validation.IPAddress(),
+          description = validation.String(max = 255))
 @require(db = 'ddserver.db:Database',
          config = 'ddserver.config:Config',
          messages = 'ddserver.interface.message:MessageManager')
-def post_hosts_update_address(user,
-                              data,
-                              db,
-                              config,
-                              messages):
-  ''' Update the IP address of a hostname. '''
+def post_host_update_address(user,
+                             data,
+                             db,
+                             config,
+                             messages):
+  ''' Update the IP address and/or description of a hostname. '''
 
   with db.cursor() as cur:
     cur.execute('''
       UPDATE `hosts`
-        SET  `address` = %(address)s
+        SET  `address` = %(address)s,
+             `description` = %(description)s
       WHERE  `id` = %(host_id)s
         AND  `user_id` = %(user_id)s
     ''', {'address': data.address,
+          'description': data.description,
           'host_id': data.host_id,
-          'user_id' : user.id})
+          'user_id': user.id})
 
   messages.success('Ok, done.')
 
@@ -113,11 +117,11 @@ def post_hosts_update_address(user,
 @require(db = 'ddserver.db:Database',
          config = 'ddserver.config:Config',
          messages = 'ddserver.interface.message:MessageManager')
-def post_hosts_update_password(user,
-                               data,
-                               db,
-                               config,
-                               messages):
+def post_host_update_password(user,
+                              data,
+                              db,
+                              config,
+                              messages):
   ''' Update the password of a hostname. '''
 
   encrypted_password = pwd.encrypt(data.password)
@@ -130,7 +134,7 @@ def post_hosts_update_password(user,
         AND  `user_id` = %(user_id)s
     ''', {'password': encrypted_password,
           'host_id': data.host_id,
-          'user_id' : user.id})
+          'user_id': user.id})
 
   messages.success('Ok, done.')
 

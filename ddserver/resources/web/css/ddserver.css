@@ -25,9 +25,27 @@ h1 {
 }
 
 h3 {
-  font-size: 16px;
+  font-size: 18px;
   padding-top: 0px;
   margin-top: 0px;
+}
+
+h3 .glyphicon {
+  font-size: 14px;
+}
+
+/*
+ * links
+ */
+a {
+  transition: color 0.5s ease;
+  -webkit-transition: color 0.5s ease;
+  -moz-transition: color 0.5s ease;
+  -o-transition: color 0.5s ease;
+  -ms-transition: color 0.5s ease;
+}
+a:hover {
+  color: #0069ba
 }
 
 /*
@@ -49,12 +67,8 @@ label span {
   color: #999;
 }
 
-p.j {
+.text-justify {
   text-align: justify;
-}
-
-p.c {
-  text-align: center;
 }
 
 span.origin {
@@ -66,8 +80,8 @@ form {
   padding:0;
 }
 
-.table td {
-  vertical-align: middle;
+.table tbody tr td {
+  vertical-align: baseline;
 }
 
 td.noresults {
@@ -75,18 +89,43 @@ td.noresults {
   text-align: center;
 }
 
+.table-notopborder tr:first-child td,
+.table-notopborder tr:first-child th {
+  border-top: 0px;
+}
+
 /*
  * navigation bar
  */
 .navbar {
+  height: 44px;
+  min-height: 44px;
   box-shadow: 0px 3px 4px rgba(0, 0, 0, 0.4);
 }
 
-.navbar-inverse .divider-vertical {
+.navbar li a {
+  padding-top: 12px;
+  padding-bottom: 12px;
+}
+
+.navbar-brand {
+  padding: 12px;
+}
+
+.divider {
   border-left-color: #111111;
   border-right-color: #333333;
 }
 
+.alert-error {
+  background-image: -webkit-linear-gradient(top,#f2dede 0,#e7c3c3 100%);
+  background-image: linear-gradient(to bottom,#f2dede 0,#e7c3c3 100%);
+  background-repeat: repeat-x;
+  border-color: #dca7a7;
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#fff2dede',endColorstr='#ffe7c3c3',GradientType=0);
+  color: #a94442;
+  background-color: #f2dede;
+}
 
 /*
  * recaptcha
@@ -114,21 +153,4 @@ td.noresults {
 #generatePasswordButton {
   margin-left: 5px;
   border-radius: 3px;
-}
-
-.brand span.beta {
-    margin: 0 0 0 10px;
-    color: #FF0000;
-    font-family: monospace;
-    font-weight: bold;
-    font-size: 20px;
-    border-radius: 5px 5px 5px 5px;
-    box-shadow: 0 0 15px 5px #FF2222;
-    text-shadow: 0 0 5px #FF2222;
-    display: inline-block;
-    -moz-transform: rotate(33deg);
-    -o-transform: rotate(33deg);
-    -webkit-transform: rotate(33deg);
-    -ms-transform: rotate(33deg);
-    transform: rotate(33deg);
 }

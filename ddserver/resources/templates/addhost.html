@@ -1,177 +1,176 @@
 {% extends "base.html" %}
 
 {% block content %}
-
-  <div class="row-fluid">
-    <div class="span12"><h1>Manage Hostnames</h1></div>
+  <div class="row">
+    <div class="col-md-12"><h1>Manage hostnames</h1></div>
   </div>
-  
+
   <ul class="nav nav-tabs">
     <li class="active"><a href="/user/hosts/add">Add hostname</a></li>
     <li><a href="/user/hosts/list">Your hostnames</a></li>
   </ul>
-      
-  <div class="row-fluid">
-    <div class="box">
-      <div class="span12"><h3><i class="icon-tag"></i> Add a new hostname</h3></div>
-      <div class="row-fluid">
-        <div class="span6">
-        
-          {% if suffixes %}
-          
-          {% if hosts.count < config.dns.max_hosts %}
-            <p class="j">
-              Use the from to specify your hostnames. You can add up to 
-              {{config.dns.max_hosts}} hostnames with a maximum length of 
-              63 characters each. Only alphanumeric characters are allowed.
-            </p>
-            
-            {% if suffixes|count > 1 %}
-              <p class="j">
-                From the dropdown menu, you can choose from a list of available 
-                suffixes for your DNS name. 
-              </p>
-            {% endif %}
-            
-            <p class="j">
-              Each hostname you add gets its individual password for updating.
-              The minimum password length is {{config.auth.password_min_chars}} 
-              characters. If you want to update multiple hostnames at once, you
-              have to use the same password for them.
-            </p>
-            
-            <p class="j">
-              If you specify an initial IP address, your hostname will instantly
-              be available. If you leave the IP address field blank, you have to
-              update it using your homerouter or the ddclient program, before it
-              will respond to DNS queries.
-            </p>
-            <p>
-              After adding a new hostname, you can modify it or display configuration
-              examples by navigating to the <i>Your hostnames</i> tab and click the
-              details button.
-            </p>
-          </div>
-        
-          <div class="span6">
-            <form class="form-horizontal" action="/user/hosts/add" method="post">
-              <div class="control-group">
-                <label class="control-label" for="inputHostname">Hostname</label>
-                <div class="controls">
-                  <div class="input-prepend">
-                    <span class="add-on"><i class="icon-th-large"></i></span>
-                    <input type="text" id="inputHostname" placeholder="Hostname" name="hostname" required="required">
-                  </div>
-                </div>
-              </div>
-    
-              {% if suffixes|count > 1 %}
-                <div class="control-group">
-                  <label class="control-label" for="inputSuffix">Suffix</label>
-                    <div class="controls">
-                      <div class="input-prepend">
-                        <span class="add-on"><i class="icon-th-large"></i></span>
-                        <select name="suffix">
-                          {% for suffix in suffixes %}
-                            <option value="{{suffix.id}}">{{suffix.name}}</option>
-                          {% endfor %}
-                        </select>
-                      </div>
-                    </div>
-                </div>
-              {% else %}
-                <input type="hidden" name="suffix" value="{{suffixes[0].id}}">
-              {% endif %}
-              
-              <div class="control-group">
-                <label class="control-label" for="hostPassword">Password</label>
-                <div class="controls">
-                  <div class="input-prepend">
-                    <span class="add-on"><i class="icon-lock"></i></span>
-                    <input type="password" id="hostPassword" placeholder="Password" name="password" required="required">
-                    <button class="btn" type="button" title="Generate a random password" id="generatePasswordButton">
-                      <i class="icon-gift"></i>
-                    </button>
-                    <script type="text/javascript">
-                      $('#generatePasswordButton').click(function() {
-                        var password = '';
-                        var possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  <br>
 
-                        for( var i=0; i < 12; i++ )
-                          password += possible.charAt(Math.floor(Math.random() * possible.length));
-                        
-                        $('#hostPassword').get(0).type = 'text';
-                        $('#hostPassword').val(password);
-                        
-                        $('#hostPassword2').get(0).type = 'text';
-                        $('#hostPassword2').prop('readonly', true);
-                        $('#hostPassword2').val(password);
-                      });
-                    </script>
-                  </div>
-                </div>
-              </div>
-              <div class="control-group">
-                <label class="control-label" for="hostPassword2">Retype</label>
-                <div class="controls">
-                  <div class="input-prepend">
-                    <span class="add-on"><i class="icon-lock"></i></span>
-                    <input type="password" id="hostPassword2" placeholder="Retype" name="password_confirm" required="required">
-                  </div>
-                </div>
-              </div>
-              
-              <div class="control-group">
-                <label class="control-label" for="inputAddress">Initial Address<br><span>(optional)</span></label>
-                <div class="controls">
-                  <div class="input-prepend">
-                    <span class="add-on"><i class="icon-th-large"></i></span>
-                    <input type="text" id="inputAddress" placeholder="Initial address" name="address">
-                    <button class="btn" type="button" title="Use your current IP address ({{current_ip}})" id="curIPbutton">
-                      <i class="icon-home"></i>
-                    </button>
-                    <script type="text/javascript">
-                      $('#curIPbutton').click(function() {
-                        $('#inputAddress').val("{{current_ip}}")
-                      });
-                    </script>
-                  </div>
-                </div>
-              </div>
-              <div class="control-group">
-                <div class="controls">
-                  <button type="submit" class="btn btn-success btn-primary">Add hostname</button>
-                  <button type="reset" class="btn" id="resetFormButton">Cancel</button>
-                  <script type="text/javascript">
-                    $('#resetFormButton').click(function() {
-                      $('#hostPassword').get(0).type = 'password';
-                      $('#hostPassword2').get(0).type = 'password';
-                      $('#hostPassword2').prop('readonly', false);
-                    });
-                  </script>
-                </div>
-              </div>
-            </form>
-          </div>
-          
-          
-        {% else%}
-        {# MAX HOSTS DEFINED #}
-          <p class="j text-error">
-            You already have the maximum possible number of hostnames defined. 
-          </p>
-        {% endif %}
-        
-        
+  <div class="row">
+    {% if suffixes %}
+    <div class="col-md-8">
+      <p>
+        Use the from to specify your hostnames. You can add
+        {% if user.maxhosts == -1 or user.admin == True %}
+          unlimited
         {% else %}
-        {# NO SUFFIXES DEFINED YET #}
-          <p class="j text-error">
-            There are no suffixes configured yet. Please try again later.
-          </p>
+          up to {% if user.maxhosts == None %}({{config.dns.max_hosts}}){% else %}{{user.maxhosts}}{% endif %}
         {% endif %}
-        
+        hostnames with a maximum length of
+        63 characters each. Only alphanumeric characters plus the minus (-)
+        character are allowed.
+      </p>
+
+      {% if suffixes|count > 1 %}
+      <p>
+        From the dropdown menu, you can choose from a list of available 
+        zones for your DNS name. 
+      </p>
+      {% endif %}
+
+      <p>
+        Each hostname you add gets its individual password for updating.
+        The minimum password length is {{config.auth.password_min_chars}} 
+        characters. If you want to update multiple hostnames at once, you
+        have to use the same password for them.
+      </p>
+
+      <p>
+        If you specify an initial IP address, your hostname will instantly
+        be available. If you leave the IP address field blank, you have to
+        update it using your homerouter or the ddclient program, before it
+        will respond to DNS queries.
+      </p>
+      <p>
+        After adding a new hostname, you can modify it or display configuration
+        examples by navigating to the <em><a href="/user/hosts/list">Your hostnames</a></em>
+        tab and click the <em>Details</em> button.
+      </p>
+    </div>
+
+    <div class="col-md-4">
+      <div class="box">
+        <form role="form" action="/user/hosts/add" method="post" id="pwdcontainer">
+          <div class="form-group">
+            <label for="inputHostname">Hostname</label>
+            <div class="input-group">
+              <span class="input-group-addon"><i class="fa fa-fw fa-desktop"></i></span>
+              <input class="form-control" type="text" id="inputHostname" placeholder="Hostname" name="hostname" required="required">
+            </div>
+          </div>
+
+          {% if suffixes|count > 1 %}
+          <div class="form-group">
+            <label for="inputSuffix">Zone</label>
+            <div class="input-group">
+              <span class="input-group-addon"><i class="fa fa-fw fa-sitemap"></i></span>
+              <select class="form-control" name="suffix" id="inputSuffix">
+                {% for suffix in suffixes %}
+                <option value="{{suffix.id}}">{{suffix.name}}</option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+          {% else %}
+          <input type="hidden" name="suffix" value="{{suffixes[0].id}}">
+          {% endif %}
+
+          <div class="form-group">
+            <label for="hostPassword">Password <span><i class="fa fa-fw fa-magic tip" id="generatePasswordButton" title="Generate a random password"></i></span></label>
+            <div class="input-group">
+              <span class="input-group-addon"><i class="fa fa-fw fa-lock"></i></span>
+              <input class="form-control" type="password" id="hostPassword" placeholder="Password" name="password" required="required">
+            </div>
+            <script type="text/javascript">
+              $('#generatePasswordButton').click(function() {
+                var password = '';
+                var possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz01234567891234567890!$+-#';
+
+                for( var i=0; i < 12; i++ )
+                  password += possible.charAt(Math.floor(Math.random() * possible.length));
+
+                $('#hostPassword').get(0).type = 'text';
+                $('#hostPassword').val(password);
+
+                $('#hostPassword2').get(0).type = 'text';
+                $('#hostPassword2').prop('readonly', true);
+                $('#hostPassword2').val(password);
+
+                $('#hostPassword').trigger('keyup');
+              });
+            </script>
+          </div>
+          <div class="form-group">
+            <label for="hostPassword2">Retype</label>
+            <div class="input-group">
+              <span class="input-group-addon"><i class="fa fa-fw fa-lock"></i></span>
+              <input class="form-control" type="password" id="hostPassword2" placeholder="Retype" name="password_confirm" required="required">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="inputPWStrength">Password strength</label>
+            <span class="pwstrength_viewport_progress" id="inputPWStrength"></span>
+          </div>
+          <script type="text/javascript">
+            jQuery(document).ready(function () {
+                "use strict";
+                $('#hostPassword').pwstrength(pwdstrength_options);
+            });
+          </script>
+          <div class="form-group">
+            <label for="inputAddress">Initial Address <span>(optional) <i class="fa fa-fw fa-home tip" id="curIPbutton" title="Use your current IP address ({{current_ip}})"></i></span></label>
+            <div class="input-group">
+              <span class="input-group-addon"><i class="fa fa-fw fa-info"></i></span>
+              <input class="form-control" type="text" id="inputAddress" placeholder="Initial address" name="address">
+            </div>
+            <script type="text/javascript">
+              $('#curIPbutton').click(function() {
+                $('#inputAddress').val("{{current_ip}}")
+              });
+            </script>
+          </div>
+          <div class="form-group">
+            <label for="inputDescription">Description <span>(optional)</span></label>
+            <div class="input-group">
+              <span class="input-group-addon"><i class="fa fa-fw fa-align-left"></i></span>
+              <textarea class="form-control" rows="2" cols="20" id="inputDescription" placeholder="Description" name="description"></textarea>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <button type="submit" class="btn btn-success btn-primary">Add hostname</button>
+            <button type="reset" class="btn btn-default" id="resetFormButton">Cancel</button>
+            <script type="text/javascript">
+              $('#resetFormButton').click(function() {
+                $('#hostPassword').get(0).type = 'password';
+                $('#hostPassword2').get(0).type = 'password';
+                $('#hostPassword2').prop('readonly', false);
+
+                $('#hostPassword').val('');
+                $('#hostPassword2').val('');
+
+                $('#hostPassword').trigger('keyup');
+              });
+            </script>
+          </div>
+        </form>
       </div>
     </div>
-    
+
+    {% else %}
+
+    <div class="col-md-12">
+      <p class="text-danger text-center">
+        There are no zones configured so far. Please try again later.
+      </p>
+    </div>
+
+    {% endif %}
+
   </div>
 {% endblock %}

@@ -1,48 +1,63 @@
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html">
+<html lang="en">
 <head>
-  <title>ddserver</title>
-  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+  <title>ddserver - A dynamic DNS service</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="cache-control" content="no-cache">
+  <meta http-equiv="pragma" content="no-cache">
 
   <script type="text/javascript" src="/static/js/jquery.min.js"></script>
   <script type="text/javascript" src="/static/js/bootstrap.min.js"></script>
-    
-  <link rel="stylesheet" href="/static/css/bootstrap.min.css">
-  <link rel="stylesheet" href="/static/css/bootstrap-responsive.min.css">
-  <link rel="stylesheet" href="/static/css/ddserver.css">
+  <script type="text/javascript" src="/static/js/Chart.min.js"></script>
+  <script type="text/javascript" src="/static/js/pwstrength.js"></script>
+  <script type="text/javascript" src="/static/js/pwstrength.options.js"></script>
+
+  <link rel="stylesheet" type="text/css" href="/static/css/bootstrap.min.css">
+  <link rel="stylesheet" type="text/css" href="/static/css/bootstrap-theme.min.css">
+  <link rel="stylesheet" type="text/css" href="/static/css/font-awesome.min.css">
+  <link rel="stylesheet" type="text/css" href="/static/css/ddserver.css">
+
   <script type="text/javascript">
     $(function () {
-        $("[rel='tooltip']").tooltip();
+        $('.tip').tooltip();
     });
   </script>
 </head>
 
 <body>
-  <div class="navbar navbar-inverse navbar-fixed-top">
-    <div class="navbar-inner">
-      <div class="container">
-        <a class="brand" href="/">ddserver<span class="beta">BETA</span></a>
-        <div class="nav-collapse collapse">
-          <ul class="nav pull-right">
-            <li><a href="/" title="Start"><i class="icon-home icon-white"></i> Start</a></li>
-            {% if user %}
-            <li><a href="/user/hosts/add" title="Manage Hostnames"><i class="icon-th-large icon-white"></i> Hostnames</a></li>
-            <li><a href="/user/account" title="Manage Account"><i class="icon-user icon-white"></i> Account</a></li>
-              {% if user.admin %}
-              <li class="divider-vertical"></li>
-              <li><a href="/admin/users/all" title="Manage Users"><i class="icon-th-large icon-white"></i> Users</a></li>
-              <li><a href="/admin/suffixes" title="Manage Suffixes"><i class="icon-th-large icon-white"></i> Suffixes</a></li>
-              {% endif %}
-            <li class="divider-vertical"></li>
-            <li><a href="/logout" title="Logout"><i class="icon-off icon-white"></i> Logout</a></li>
+  <header class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#mainmenu">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="/">ddserver</a>
+      </div>
+
+      <div class="collapse navbar-collapse navbar-inverse " id="mainmenu">
+        <ul class="nav navbar-nav pull-right">
+          <li><a href="/"><i class="fa fa-fw fa-home"></i> Start</a></li>
+          {% if user %}
+          <li><a href="/user/hosts/add"><i class="fa fa-fw fa-desktop"></i> Hostnames</a></li>
+          <li><a href="/user/account"><i class="fa fa-fw fa-user"></i> Account</a></li>
+            {% if user.admin %}
+            <li class="divider"></li>
+            <li><a href="/admin/users/all"><i class="fa fa-fw fa-users"></i> Users</a></li>
+            <li><a href="/admin/suffixes/list"><i class="fa fa-fw fa-sitemap"></i> Zones</a></li>
             {% endif %}
-          </ul>
-        </div>
+          <li class="divider"></li>
+          <li><a href="/logout"><i class="fa fa-fw fa-power-off"></i> Logout</a></li>
+          {% endif %}
+        </ul>
       </div>
     </div>
-  </div>
-  
+  </header>
+
   <div class="container main">
     {% for message in messages.popall() %}
       <div class="alert alert-block alert-{{message.level}}">
@@ -50,9 +65,9 @@
           {{message.message}}
       </div>
     {% endfor %}
-    
+
     {% block content %}
     {% endblock %}
-  </div>  
+  </div>
 </body>
 </html>

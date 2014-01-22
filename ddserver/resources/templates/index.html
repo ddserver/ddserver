@@ -2,32 +2,29 @@
 
 {% block content %}
   <div class="row">
-    <div class="span12"><h1>Welcome to ddserver</h1></div>
+    <div class="col-md-12"><h1>Welcome to ddserver</h1></div>
   </div>
 
-  <div class="row-fluid">
-    <div class="span6">
-      <h3>About</h3>
+  <div class="row">
+    <div class="col-md-8">
       <p>
-        <b>ddserver</b> is a server-side application for dynamic DNS management.
+        <strong>ddserver</strong> is a server-side application for dynamic DNS management.
       </p>
       <p>
-        It allows you to specify hostnames (subdomains) inside a dynamic DNS
-        zone, and to update the IP address of those hostnames using a dynamic
-        update protocol (<a href="http://www.noip.com/integrate">dyndns2 protocol</a>).
-        This enables you to access hosts with
-        dynamic IP addresses by a static domain name, even if its IP address
-        changes. As updates of the IP address are performed using the dyndns2
-        update protocol, most DSL home-routers are able to send updates of the
-        IP address. Also, there is a tool called
-        <a href="http://sourceforge.net/p/ddclient/wiki/Home/">ddclient</a>,
+        It allows you to specify hostnames (subdomains) inside a dynamic DNS zone, and to 
+        update the IP address of those hostnames using a dynamic update protocol
+        (<a href="http://www.noip.com/integrate">dyndns2 protocol</a>). This enables you
+        to access hosts with dynamic IP addresses by a static domain name, even if its IP
+        address changes. As updates of the IP address are performed using the dyndns2 update
+        protocol, most DSL home-routers are able to send updates of the IP address. Also,
+        there is a tool called <a href="http://sourceforge.net/p/ddclient/wiki/Home/">ddclient</a>,
         which can be used to send updates from any *NIX-based operating system.
       </p>
 
       <h3>Documentation and Support</h3>
       <p>
-        For further documentation, please refer to the ddserver project homepage
-        at <a href="http://ddserver.0x80.io">http://ddserver.0x80.io</a>.
+        For further documentation, please refer to the ddserver project homepage at
+        <a href="http://ddserver.0x80.io">http://ddserver.0x80.io</a>.
       </p>
       <p>
         Please report bugs or suggest features to help us to improve ddserver.<br>
@@ -44,47 +41,128 @@
         for the full text of the license.
       </p>
     </div>
-    
+
+    <div class="col-md-4">
+
     {% if not user %}
-    <div class="span6">
       <div class="box">
-        <h3><i class="icon-tag"></i> Login</h3>
-        <form class="form-horizontal" action="/login" method="post">
-          <div class="control-group">
-            <label class="control-label" for="loginUsername">Username</label>
-            <div class="controls">
-              <div class="input-prepend">
-                <span class="add-on"><i class="icon-user"></i></span>
-                <input type="text" id="loginUsername" placeholder="Username" name="username" required="required">
-              </div>
+        <h3>Login</h3>
+        <form role="form" action="/login" method="post">
+          <div class="form-group">
+            <div class="input-group">
+              <span class="input-group-addon"><i class="fa fa-fw fa-user"></i></span>
+              <input class="form-control" type="text" id="loginUsername" placeholder="Username" name="username" required="required">
             </div>
           </div>
-          <div class="control-group">
-            <label class="control-label" for="loginPassword">Password</label>
-            <div class="controls">
-              <div class="input-prepend">
-                <span class="add-on"><i class="icon-lock"></i></span>
-                <input type="password" id="loginPassword" placeholder="Password" name="password" required="required">
-              </div>
+          <div class="form-group">
+            <div class="input-group">
+              <span class="input-group-addon"><i class="fa fa-fw fa-lock"></i></span>
+              <input class="form-control" type="password" id="loginPassword" placeholder="Password" name="password" required="required">
             </div>
           </div>
-          <div class="control-group">
-            <div class="controls">
-              <button type="submit" class="btn btn-success btn-primary">Login</button>
-              <a href="/lostpass">Lost your password?</a>
-            </div>
+          <div class="form-group">
+            <button type="submit" class="btn btn-success btn-primary">Login</button>&nbsp;
+            <span class="small"><a href="/lostpass">Lost your password?</a></span>
           </div>
         </form>
       </div>
-      
+
       {% if config.signup.enabled %}
       <div class="box">
-        <h3><i class="icon-tag"></i> Signup</h3>
-        <p class="c">Want to use dynamic DNS?</p>
-        <p class="c"><a class="btn btn-primary" href="/signup">Create an account</a></p>
+        <h3>Signup</h3>
+        <p class="text-center">Want to use dynamic DNS? Signup now!</p>
+        <p class="text-center"><a class="btn btn-primary" href="/signup">Create an account</a></p>
       </div>
       {% endif %}
+
+    {% else %}
+    <div class="box">
+      <p>
+        Your current IP-Address:
+      </p>
+      <p class="text-center"><strong style="font-size: 2.5em;">{{current_ip}}</strong></p>
     </div>
+
+    <div class="box">
+      <div class="row">
+        {% if user.maxhosts == 0 %}
+        <p class="text-danger text-center">You are not allowed to add any hostnames.</p>
+
+        {% else %}
+        <div class="col-md-6">
+          <canvas id="hostUsageChart" width="140"></canvas>
+          <p class="text-center">
+            You are using
+            {{userhosts.count}} of
+            {% if user.maxhosts|int == -1 or user.admin == True %}
+              unlimited
+            {% else %}
+              up to {% if user.maxhosts == None %}{{config.dns.max_hosts}}{% else %}{{user.maxhosts}}{% endif %}
+            {% endif %}
+            hostnames.
+          </p>
+        </div>
+        <div class="col-md-6">
+          <canvas id="allUsageChart" width="140"></canvas>
+          <p class="text-center">
+            You are using
+            {% if hosts.count|int %}{{ (userhosts.count / hosts.count * 100)|round|int }}{% else %}0{% endif %}%
+            of our total hostnames.
+          </p>
+        </div>
+
+        <script type="text/javascript">
+          var dataUser = [
+            {
+              value: {% if user.maxhosts|int == -1 or user.admin == True %}0{% else %}{{userhosts.count}}{% endif %},
+              color:"#cc0000"
+            },
+            {
+              value : {% if user.maxhosts == None %}{{config.dns.max_hosts - userhosts.count}}{% else %}{{user.maxhosts - userhosts.count}}{% endif %},
+              color : "#428bca"
+            }
+          ];
+          var dataAll = [
+            {
+              value: {{userhosts.count}},
+              color:"#cc0000"
+            },
+            {
+              value : {% if hosts.count %}{{hosts.count - userhosts.count}}{% else %}1{% endif %},
+              color : "#428bca"
+            }
+          ];
+          //Get the context of the canvas element we want to select
+          var ctx = $("#hostUsageChart").get(0).getContext("2d");
+          var pc = new Chart(ctx).Pie(dataUser, {segmentStrokeColor : "#f9f9f9"});
+
+          var ctx = $("#allUsageChart").get(0).getContext("2d");
+          var pc = new Chart(ctx).Pie(dataAll, {segmentStrokeColor : "#f9f9f9"});
+        </script>
+        {% endif %}
+      </div>
+    </div>
+    <div class="box">
+      <table class="table table-condensed table-notopborder" style="margin-bottom: 0">
+        <tr>
+          <th>Available zones</th>
+          <td>{{zones.count}}</td>
+        </tr>
+        <tr>
+          <th>Overall users</th>
+          <td>{{users.count}}</td>
+        </tr>
+        <tr>
+          <th>Overall hostnames</th>
+          <td>{{hosts.count}}</td>
+        </tr>
+      </table>
+    </div>
+
     {% endif %}
-  </div>  
+
+    </div>
+
+  </div>
+
 {% endblock %}
