@@ -72,7 +72,14 @@
                       <div id="recaptcha_image"></div>
                     </div>
                     <script type="text/javascript" src="https://www.google.com/recaptcha/api/challenge?k={{config.captcha.recaptcha_public_key}}"></script>
-                    <noscript>Please enable JavaScript to sign up.</noscript>
+                    <noscript>
+                      <iframe src="http://www.google.com/recaptcha/api/noscript?k={{config.captcha.recaptcha_public_key}}"
+                        height="300" width="500" frameborder="0">
+                      </iframe><br />
+                      <textarea name="recaptcha_challenge_field" rows="3" cols="40" />
+                      <input type="hidden" name="recaptcha_response_field" 
+                        value="manual_challenge">
+                    </noscript>
                   </div>
                 </div>
               {% endif %}
