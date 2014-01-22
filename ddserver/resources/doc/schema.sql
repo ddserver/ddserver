@@ -33,7 +33,7 @@ CREATE TABLE `users` (
   `active`      BOOLEAN        NOT NULL DEFAULT FALSE,
   `created`     TIMESTAMP      NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `authcode`    VARCHAR(36)    NULL DEFAULT NULL,
-  `maxhosts`    INT            NULL DEFAULT NULL,
+  `maxhosts`    INT            NULL DEFAULT NULL
 
 ) ENGINE=InnoDB DEFAULT CHARACTER SET utf8;
 
@@ -43,7 +43,7 @@ CREATE TABLE `users` (
 -- 
 CREATE TABLE `suffixes` (
   `id`          INT             NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  `name`        VARCHAR(255)    NOT NULL UNIQUE,
+  `name`        VARCHAR(255)    NOT NULL UNIQUE
 
 ) ENGINE=InnoDB DEFAULT CHARACTER SET utf8;
 
