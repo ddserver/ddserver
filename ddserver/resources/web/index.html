@@ -8,16 +8,13 @@
   <meta http-equiv="cache-control" content="no-cache">
   <meta http-equiv="pragma" content="no-cache">
 
-  <script type="text/javascript" src="/static/js/jquery.min.js"></script>
-  <script type="text/javascript" src="/static/js/bootstrap.min.js"></script>
-  <script type="text/javascript" src="/static/js/Chart.min.js"></script>
-  <script type="text/javascript" src="/static/js/pwstrength.js"></script>
-  <script type="text/javascript" src="/static/js/pwstrength.options.js"></script>
+  <script type="text/javascript" src="static/js/lib/require.js" data-main="static/js/main.js"></script>
 
-  <link rel="stylesheet" type="text/css" href="/static/css/bootstrap.min.css">
-  <link rel="stylesheet" type="text/css" href="/static/css/bootstrap-theme.min.css">
-  <link rel="stylesheet" type="text/css" href="/static/css/font-awesome.min.css">
-  <link rel="stylesheet" type="text/css" href="/static/css/ddserver.css">
+  <link rel="stylesheet" type="text/css" href="static/css/bootstrap.min.css">
+  <link rel="stylesheet" type="text/css" href="static/css/bootstrap-theme.min.css">
+  <link rel="stylesheet" type="text/css" href="static/css/font-awesome.min.css">
+  <link rel="stylesheet" type="text/css" href="static/css/pager.css">
+  <link rel="stylesheet" type="text/css" href="static/css/ddserver.css">
 
   <script type="text/javascript">
     $(function () {
@@ -41,6 +38,17 @@
 
       <div class="collapse navbar-collapse navbar-inverse " id="mainmenu">
         <ul class="nav navbar-nav pull-right">
+          <!-- ko foreach: $__page__.children -->
+            <!-- ko if: ($data.getId() !== '?' && $data.getId() !== 'system') -->
+              <li data-bind="css: {active: isVisible}">
+                <a data-bind="page-href: $data, text: val('title')"></a>
+              </li>
+            <!-- /ko -->
+          <!-- /ko -->
+
+          <!--
+          @TODO: implement backend functions to check login and admin status
+
           <li><a href="/"><i class="fa fa-fw fa-home"></i> Start</a></li>
           {% if user %}
           <li><a href="/user/hosts/add"><i class="fa fa-fw fa-desktop"></i> Hostnames</a></li>
@@ -53,21 +61,24 @@
           <li class="divider"></li>
           <li><a href="/logout"><i class="fa fa-fw fa-power-off"></i> Logout</a></li>
           {% endif %}
+          -->
         </ul>
       </div>
     </div>
   </header>
 
   <div class="container main">
+    <div data-bind="page: {id: 'dashboard', title: 'Dashboard', sourceOnShow: requireHTML('dashboard'), withOnShow: requireVM('dashboard'), role: 'start'}"></div>
+    <!--
+    @TODO: move to coffee script
+
     {% for message in messages.popall() %}
       <div class="alert alert-block alert-{{message.level}}">
         <a class="close" data-dismiss="alert" href="#">×</a>
           {{message.message}}
       </div>
     {% endfor %}
-
-    {% block content %}
-    {% endblock %}
+    -->
   </div>
 </body>
 </html>

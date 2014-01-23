@@ -50,25 +50,10 @@ def get_static(path,
 
 
 @route('/', method = 'GET')
-@require(db = 'ddserver.db:Database',
-         templates = 'ddserver.interface.template:TemplateManager',
-         session = 'ddserver.interface.session:SessionManager')
-def get_index(db,
-              templates,
-              session):
+def get_index():
   ''' Display the index page. '''
 
-  if session.username:
-    (users, zones, hosts, userhosts) = get_statistics()
-    return templates['index.html'](users = users,
-                                   zones = zones,
-                                   hosts = hosts,
-                                   userhosts = userhosts,
-                                   current_ip = bottle.request.remote_addr)
-
-  else:
-    return templates['index.html']()
-
+  return open(os.path.join('resources/web', u'index.html'))
 
 
 @require(db = 'ddserver.db:Database')
