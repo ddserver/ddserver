@@ -1,10 +1,7 @@
-{% extends "base.html" %}
-
-{% block content %}
   <div class="row">
     <div class="col-md-12"><h1>Welcome to ddserver</h1></div>
   </div>
-
+<pre data-bind="text: JSON.stringify(ko.toJS($data), null, 2)"></pre>
   <div class="row">
     <div class="col-md-8">
       <p>
@@ -44,45 +41,47 @@
 
     <div class="col-md-4">
 
-    {% if not user %}
+    <!-- ko ifnot: parent.authorized -->
       <div class="box">
         <h3>Login</h3>
-        <form role="form" action="/login" method="post">
+        <form role="form">
           <div class="form-group">
             <div class="input-group">
               <span class="input-group-addon"><i class="fa fa-fw fa-user"></i></span>
-              <input class="form-control" type="text" id="loginUsername" placeholder="Username" name="username" required="required">
+              <input class="form-control" type="text" id="loginUsername" placeholder="Username" name="username" required="required" data-bind="value: $parent.username">
             </div>
           </div>
           <div class="form-group">
             <div class="input-group">
               <span class="input-group-addon"><i class="fa fa-fw fa-lock"></i></span>
-              <input class="form-control" type="password" id="loginPassword" placeholder="Password" name="password" required="required">
+              <input class="form-control" type="password" id="loginPassword" placeholder="Password" name="password" required="required" data-bind="value: $parent.password">
             </div>
           </div>
           <div class="form-group">
-            <button type="submit" class="btn btn-success btn-primary">Login</button>&nbsp;
+            <a href="#" class="btn btn-success btn-primary" data-bind="click: $parent.login">Login</a>&nbsp;
             <span class="small"><a href="/lostpass">Lost your password?</a></span>
           </div>
         </form>
       </div>
 
-      {% if config.signup.enabled %}
+      <!--
       <div class="box">
         <h3>Signup</h3>
         <p class="text-center">Want to use dynamic DNS? Signup now!</p>
         <p class="text-center"><a class="btn btn-primary" href="/signup">Create an account</a></p>
       </div>
-      {% endif %}
+      -->
 
-    {% else %}
+    <!-- /ko -->
+
+    <!-- ko if: parent.authorized -->
     <div class="box">
       <p>
         Your current IP-Address:
       </p>
       <p class="text-center"><strong style="font-size: 2.5em;">{{current_ip}}</strong></p>
     </div>
-
+    <!--
     <div class="box">
       <div class="row">
         {% if user.maxhosts == 0 %}
@@ -158,11 +157,9 @@
         </tr>
       </table>
     </div>
-
-    {% endif %}
+    -->
+    <!-- /ko -->
 
     </div>
 
   </div>
-
-{% endblock %}

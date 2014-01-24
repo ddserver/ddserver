@@ -23,14 +23,14 @@ from ddserver.web import route
 
 from ddserver.utils.deps import require
 
-from ddserver.interface.user import authorized_by_code
+from ddserver.interface.user import authorized_by_code, authorized
 
 from ddserver.interface import validation
 from ddserver.interface.validation import validate
 
 
 
-@route('/login', method = 'POST')
+@route('/_auth/login', method = 'POST')
 @validate('/',
           username = validation.ValidUsername(min = 1, max = 255),
           password = validation.String())
@@ -42,15 +42,27 @@ def post_login(data,
   users.login(username = data.username,
               password = data.password)
 
-  bottle.redirect('/')
+  return {
+          'success': 'true',
+          'message': 'Authenticated as ' + username + '.'
+          }
 
 
-
-@route('/logout', method = 'GET')
+@route('/_auth/logout', method = 'GET')
 @require(users = 'ddserver.interface.user:UserManager')
 def get_logout(users):
   ''' Handles user logout. '''
 
   users.logout()
 
-  bottle.redirect('/')
+  return {
+          'success': 'true',
+          'message': 'Logged out.'
+          }
+
+
+@route('/api/v1/profile', method='GET')
+@authorized()
+def get_login_status():
+  return {'test': 'success'}
+

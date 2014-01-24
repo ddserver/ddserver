@@ -14,20 +14,23 @@ require.config
     pager: 'lib/pager.min'
     bootstrap: 'lib/bootstrap.min'
     pwstrength: 'lib/pwstrength'
-    chart: 'chart.min'
-    text: 'text'
+    chart: 'lib/chart.min'
+    text: 'lib/text'
     vars: 'vars'
+  shim:
+    'bootstrap':
+      deps: [ 'jquery' ]
 
 
 @requireVM = (module) ->
   (callback) ->
-    require ["/pages/#{module}/model.js"], (vm) ->
+    require ["/static/pages/#{module}/model.js"], (vm) ->
       callback new vm
 
 
 @requireHTML = (module) ->
   (page, callback) ->
-    require ["text!/pages/#{module}/view.html"], (html) ->
+    require ["text!/static/pages/#{module}/view.html"], (html) ->
       $(page.element).html html
       callback()
 
@@ -35,10 +38,14 @@ require.config
 require ['jquery', 'knockout', 'pager', 'bootstrap'], ($, ko, pager) ->
   class VM
     constructor: ->
-      @ui_displayMainMenu = ko.computed =>
-        @username() != ""
-        
       @username = ko.observable ""
+      @password = ko.observable ""
+      @authorized = ko.observable false
+
+      $.ajaxSetup
+        beforeSend: (xhr) ->
+           xhr.setRequestHeader 'Authorization', "Basic #{btoa(@username + ":" + @password)}"
+
 
     # check whether the current user is logged in or not
     # redirect to login page, if not logged in
@@ -56,7 +63,16 @@ require ['jquery', 'knockout', 'pager', 'bootstrap'], ($, ko, pager) ->
           @error error
           window.location.href = "/#system/login"
 
-    # logout
+    login: ->
+      console.log "LALA"
+      $.ajax
+        url: '/api/v1/profile'
+        dataType: 'json'
+        success: (result) =>
+          console.log "OK"
+          @authorized true
+
+
     logout: ->
       $.ajax
         url: '/_auth/logout'
@@ -72,6 +88,7 @@ require ['jquery', 'knockout', 'pager', 'bootstrap'], ($, ko, pager) ->
 
   pager.onBindingError.add( 
     (event) ->
+      console.log event               # DEBUG
       page = event.page
       $(page.element).empty().append('<div class="text-danger"> Error Loading Page</div>')
   )

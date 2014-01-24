@@ -15,15 +15,31 @@
   <link rel="stylesheet" type="text/css" href="static/css/font-awesome.min.css">
   <link rel="stylesheet" type="text/css" href="static/css/pager.css">
   <link rel="stylesheet" type="text/css" href="static/css/ddserver.css">
-
-  <script type="text/javascript">
-    $(function () {
-        $('.tip').tooltip();
-    });
-  </script>
 </head>
 
 <body>
+  <noscript>
+    <div class="modal" style="display: block">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            <h4 class="modal-title">Javascript required</h4>
+          </div>
+          <div class="modal-body">
+            <p>
+              This Website does not work without Javascript.<br>
+              Please activate Javascript in your browser or move along.
+            </p>
+          </div>
+          <div class="modal-footer">
+            <a target="_blank" href="http://www.enable-javascript.com" class="btn btn-primary">Need Help? - Klick here</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </noscript>
+
   <header class="navbar navbar-inverse navbar-fixed-top">
     <div class="container">
       <div class="navbar-header">
@@ -41,7 +57,10 @@
           <!-- ko foreach: $__page__.children -->
             <!-- ko if: ($data.getId() !== '?' && $data.getId() !== 'system') -->
               <li data-bind="css: {active: isVisible}">
-                <a data-bind="page-href: $data, text: val('title')"></a>
+                <a data-bind="page-href: $data">
+                  <i class="fa fa-fw fa-home"></i>
+                  <span data-bind="text: val('title')"></span>
+                </a>
               </li>
             <!-- /ko -->
           <!-- /ko -->
@@ -68,7 +87,21 @@
   </header>
 
   <div class="container main">
-    <div data-bind="page: {id: 'dashboard', title: 'Dashboard', sourceOnShow: requireHTML('dashboard'), withOnShow: requireVM('dashboard'), role: 'start'}"></div>
+    <div data-bind="page: {id: 'start', title: 'Start', sourceOnShow: requireHTML('start'), withOnShow: requireVM('start'), role: 'start'}"></div>
+    <div data-bind="page: {id: 'dashboard', title: 'Dashboard', sourceOnShow: requireHTML('dashboard'), withOnShow: requireVM('dashboard')}"></div>
+    <div data-bind="page: {id: 'hostnames', title: 'Hostnames', sourceOnShow: requireHTML('hostnames'), withOnShow: requireVM('hostnames')}"></div>
+
+    <!-- other pages -->
+    <div data-bind="page: {id: 'system'}">
+      <div data-bind="page: {id: 'help', title: 'Help', sourceOnShow: requireHTML('help')}"></div>
+      <div data-bind="page: {id: 'about', title: 'About', sourceOnShow: requireHTML('about')}"></div>
+      <div data-bind="page: {id: 'adduser', title: 'Add User', sourceOnShow: requireHTML('adduser')}"></div>
+      <div data-bind="page: {id: '?', title: 'page not found', sourceOnShow: '/static/404.html' }"></div>
+
+      <div data-bind="page: {id: 'login', title: 'Login', sourceOnShow: requireHTML('login'), withOnShow: requireVM('login') }"></div>
+    </div>
+    <div data-bind="page: {id: '?', title: 'page not found', sourceOnShow: '/static/404.html' }"></div>
+
     <!--
     @TODO: move to coffee script
 

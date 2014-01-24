@@ -19,15 +19,20 @@ Affero General Public License version 3. See <http://www.gnu.org/licenses/>.
       pager: 'lib/pager.min',
       bootstrap: 'lib/bootstrap.min',
       pwstrength: 'lib/pwstrength',
-      chart: 'chart.min',
-      text: 'text',
+      chart: 'lib/chart.min',
+      text: 'lib/text',
       vars: 'vars'
+    },
+    shim: {
+      'bootstrap': {
+        deps: ['jquery']
+      }
     }
   });
 
   this.requireVM = function(module) {
     return function(callback) {
-      return require(["/pages/" + module + "/model.js"], function(vm) {
+      return require(["/static/pages/" + module + "/model.js"], function(vm) {
         return callback(new vm);
       });
     };
@@ -35,7 +40,7 @@ Affero General Public License version 3. See <http://www.gnu.org/licenses/>.
 
   this.requireHTML = function(module) {
     return function(page, callback) {
-      return require(["text!/pages/" + module + "/view.html"], function(html) {
+      return require(["text!/static/pages/" + module + "/view.html"], function(html) {
         $(page.element).html(html);
         return callback();
       });
@@ -47,11 +52,14 @@ Affero General Public License version 3. See <http://www.gnu.org/licenses/>.
     VM = (function() {
       function VM() {
         this.isLoggedIn = __bind(this.isLoggedIn, this);
-        var _this = this;
-        this.ui_displayMainMenu = ko.computed(function() {
-          return _this.username() !== "";
-        });
         this.username = ko.observable("");
+        this.password = ko.observable("");
+        this.authorized = ko.observable(false);
+        $.ajaxSetup({
+          beforeSend: function(xhr) {
+            return xhr.setRequestHeader('Authorization', "Basic " + (btoa(this.username + ":" + this.password)));
+          }
+        });
       }
 
       VM.prototype.isLoggedIn = function(page, route, callback) {
@@ -70,6 +78,19 @@ Affero General Public License version 3. See <http://www.gnu.org/licenses/>.
           error: function(jqXHR, status, error) {
             _this.error(error);
             return window.location.href = "/#system/login";
+          }
+        });
+      };
+
+      VM.prototype.login = function() {
+        var _this = this;
+        console.log("LALA");
+        return $.ajax({
+          url: '/api/v1/profile',
+          dataType: 'json',
+          success: function(result) {
+            console.log("OK");
+            return _this.authorized(true);
           }
         });
       };
@@ -93,6 +114,7 @@ Affero General Public License version 3. See <http://www.gnu.org/licenses/>.
     ko.applyBindings(vm);
     pager.onBindingError.add(function(event) {
       var page;
+      console.log(event);
       page = event.page;
       return $(page.element).empty().append('<div class="text-danger"> Error Loading Page</div>');
     });
