@@ -57,7 +57,8 @@
             <!-- /ko -->
           </td>
           <td data-bind="text: updated"></td>
-          <td style="width: 120px; text-align: center;">
+          <td style="width: 200px; text-align: center;">
+            <a class="btn btn-default tip" data-bind="attr: { href: '/user/host/' + id }" title="Display details and configuration examples">Details</a>
             <a class="btn btn-danger tip" data-toggle="modal" data-bind="attr: { href: '#modal' + id }" title="Delete this suffix">Delete</a>
             <div class="modal fade" data-bind="attr: {id: 'modal' + id}">
               <div class="modal-dialog">
