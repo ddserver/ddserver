@@ -205,12 +205,9 @@ def post_signup_activate(user,
 
 @route('/signup/cancel', method = 'POST')
 @authorized_by_code()
-@validate(username = validation.String(),
-          authcode = validation.String())
 @require(db = 'ddserver.db:Database',
          messages = 'ddserver.interface.message:MessageManager')
 def post_signup_cancel(user,
-                       data,
                        db,
                        messages):
   ''' Cancels a sign up. '''
@@ -220,7 +217,7 @@ def post_signup_cancel(user,
         DELETE
         FROM users
         WHERE `id` = %(user_id)s
-    ''', { 'user_id': user.id})
+    ''', {'user_id': user.id})
 
   messages.success('Signup cancelled. Your account has been removed.')
 

@@ -59,6 +59,13 @@
   </header>
 
   <div class="container main">
+    <noscript>
+      <div class="alert alert-block alert-warning">
+        <a class="close" data-dismiss="alert" href="#">×</a>
+        In order to use this application, you must have JavaScript turned on.
+      </div>
+    </noscript>
+
     {% for message in messages.popall() %}
       <div class="alert alert-block alert-{{message.level}}">
         <a class="close" data-dismiss="alert" href="#">×</a>
