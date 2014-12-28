@@ -57,6 +57,7 @@ def get_users(user,
     users = cur.fetchall()
 
   return templates['users.html'](users = users,
+                                 user = user,
                                  mode = mode)
 
 
