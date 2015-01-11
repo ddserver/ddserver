@@ -20,7 +20,7 @@ along with ddserver.  If not, see <http://www.gnu.org/licenses/>.
 import sys
 import logging
 
-from ddserver.utils.deps import extend, export
+from require import extend, export
 
 
 

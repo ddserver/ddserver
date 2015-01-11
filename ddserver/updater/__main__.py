@@ -17,7 +17,7 @@ You should have received a copy of the GNU Affero General Public License
 along with ddserver. If not, see <http://www.gnu.org/licenses/>.
 """
 
-from ddserver.utils.deps import require
+from require import require
 
 import ddserver.updater.nic  # @UnusedImport: for web application
 

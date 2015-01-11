@@ -31,7 +31,7 @@ from formencode.validators import (FancyValidator,
                                    String,  # @UnusedImport: for exporting
                                    Int)  # @UnusedImport: for exporting
 
-from ddserver.utils.deps import require, extend
+from require import require, extend
 
 
 

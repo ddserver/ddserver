@@ -19,7 +19,7 @@ along with ddserver. If not, see <http://www.gnu.org/licenses/>.
 
 import bottle
 
-from ddserver.utils.deps import extend, export, require
+from require import extend, export, require
 
 
 

@@ -22,7 +22,7 @@ import ConfigParser as configparser
 import collections
 import contextlib
 
-from ddserver.utils.deps import export
+from require import export
 
 
 

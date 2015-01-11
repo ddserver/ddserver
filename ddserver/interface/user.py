@@ -24,7 +24,7 @@ import collections
 
 from passlib.apps import custom_app_context as pwd
 
-from ddserver.utils.deps import export, extend, require
+from require import export, extend, require
 
 
 
