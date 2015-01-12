@@ -19,6 +19,8 @@ along with ddserver. If not, see <http://www.gnu.org/licenses/>.
 
 import bottle
 
+import requests
+
 from ddserver.utils.deps import extend, require
 
 
@@ -57,21 +59,28 @@ def captcha_check(__on_error__):
                 *args,
                 **kwargs):
       if config.captcha.enabled:
-        from recaptcha.client import captcha
 
-        challenge = bottle.request.POST.pop('recaptcha_challenge_field', None)
-        response = bottle.request.POST.pop('recaptcha_response_field', None)
+        print bottle.request.POST.items()
 
-        if challenge is None or response is None:
+        response = bottle.request.POST.pop('g-recaptcha-response', None)
+
+        if response is None:
           messages.error('Captcha values are missing')
           bottle.redirect('/')
 
-        result = captcha.submit(challenge,
-                                response,
-                                config.captcha.recaptcha_private_key,
-                                bottle.request.remote_addr)
+        request = requests.get('https://www.google.com/recaptcha/api/siteverify',
+                               params = {
+                                   'secret': config.captcha.recaptcha_private_key,
+                                   'response': response,
+                                   'remoteip': bottle.request.remote_addr
+                               })
 
-        if not result.is_valid:
+        print request.url
+        print request.text
+
+        response = request.json()
+
+        if not response['success']:
           messages.error('Captcha invalid')
           bottle.redirect(__on_error__)
 

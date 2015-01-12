@@ -1,18 +1,12 @@
 {% extends "base.html" %}
 
 {% block content %}
-  {% if config.captcha.enabled %}
-  <script type="text/javascript">
-    var RecaptchaOptions = { theme : 'custom', custom_theme_widget: 'recaptcha_widget' };
-  </script>
-  {% endif %}
-
   <div class="row">
     <div class="col-md-12"><h1>Password recovery</h1></div>
   </div>
 
   <div class="row">
-    <div class="col-md-8">
+    <div class="col-md-7">
       <p>
         You lost your accounts password? Don't panic. You may request a
         password recovery process using the from on the right. In just a few
@@ -37,7 +31,7 @@
       </p>
     </div>
 
-    <div class="col-md-4">
+    <div class="col-md-5">
       <div class="box">
         <form role="form" action="/lostpass" method="post">
           <div class="form-group">
@@ -50,24 +44,13 @@
 
           {% if config.captcha.enabled %}
           <div class="form-group">
-            <label for="recaptcha_response_field">Human check</label>
-            <div id="recaptcha_widget" style="display: none;">
+            <label>Human check</label>
+            <div id="recaptcha_widget">
               <div class="input-group">
                 <span class="input-group-addon"><i class="fa fa-fw fa-eye"></i></span>
-                <input class="form-control" type="text" id="recaptcha_response_field" placeholder="Enter the text from below" name="recaptcha_response_field">
+                <div class="g-recaptcha" data-sitekey="{{config.captcha.recaptcha_public_key}}"></div>
               </div>
-              <table>
-                <tr>
-                  <td>
-                    <div id="recaptcha_image"></div>
-                  </td>
-                  <td>
-                    <a href="javascript:Recaptcha.reload()"><i class="fa fa-fw fa-repeat tip" title="Get another CAPTCHA"></i></a><br>
-                    <a href="javascript:Recaptcha.showhelp()"><i class="fa fa-fw fa-question tip" title="Help"></i></a>
-                  </td>
-                </tr>
-              </table>
-              <script type="text/javascript" src="https://www.google.com/recaptcha/api/challenge?k={{config.captcha.recaptcha_public_key}}"></script>
+              <script src='https://www.google.com/recaptcha/api.js'></script>
               <noscript>Please enable JavaScript to sign up.</noscript>
             </div>
           </div>

@@ -45,7 +45,8 @@ setuptools.setup(
         'formencode >= 1.2',
         'passlib >= 1.6',
         'recaptcha-client >= 1.0',
-        'MySQL-python >= 1.2.0'
+        'MySQL-python >= 1.2.0',
+        'requests >= 2.5.0'
     ],
 
     packages = setuptools.find_packages(),
