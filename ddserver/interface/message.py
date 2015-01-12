@@ -26,8 +26,9 @@ from require import export, require, extend
 
 @export()
 class MessageManager(object):
-  Level = enum.Enum('success',
-                    'error')
+  class Level(enum.Enum):
+    success = 'success'
+    error = 'error'
 
   Message = collections.namedtuple('Message', ['level',
                                                'message'])
