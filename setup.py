@@ -38,11 +38,10 @@ setuptools.setup(
     keywords = 'ddserver ddns dns nsupdate',
 
     install_requires = [
-        'enum >= 0.4',
         'beaker >= 1.6',
         'bottle >= 0.11',
         'jinja2 >= 2.6',
-        'formencode >= 1.3.0',
+        'formencode >= 1.3.0a1',
         'passlib >= 1.6',
         'recaptcha-client >= 1.0',
         'mysql-connector-python >= 2.0.0',
