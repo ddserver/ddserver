@@ -26,6 +26,13 @@ from require import export
 
 
 
+def parse_bool(value):
+    """ Helper function to parse boolean config values.
+    """
+    return value.lower() in ['y', 'yes', 't', 'true', 1, 'on']
+
+
+
 @export()
 class ConfigDeclaration(object):
   ''' Declaration of the configuration.
