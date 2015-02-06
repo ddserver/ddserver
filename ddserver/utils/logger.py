@@ -22,13 +22,15 @@ import logging
 
 from ddserver.utils.deps import extend, export
 
+from ddserver.config import parse_bool
+
 
 
 @extend('ddserver.config:ConfigDeclaration')
 def config_logging(config_decl):
   with config_decl.declare('logging') as s:
     s('verbose',
-      conv = bool,
+      conv = parse_bool,
       default = False)
     s('file',
       conv = str,

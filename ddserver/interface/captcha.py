@@ -21,13 +21,15 @@ import bottle
 
 from ddserver.utils.deps import extend, require
 
+from ddserver.config import parse_bool
+
 
 
 @extend('ddserver.config:ConfigDeclaration')
 def config_captcha(config_decl):
   with config_decl.declare('captcha') as s:
     s('enabled',
-      conv = bool,
+      conv = parse_bool,
       default = False)
     s('recaptcha_public_key',
       conv = str,

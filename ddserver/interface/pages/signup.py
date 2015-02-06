@@ -32,19 +32,21 @@ from ddserver.interface.captcha import captcha_check
 
 from passlib.apps import custom_app_context as pwd
 
+from ddserver.config import parse_bool
+
 
 
 @extend('ddserver.config:ConfigDeclaration')
 def config_signup(config_decl):
   with config_decl.declare('signup') as s:
     s('enabled',
-      conv = bool,
+      conv = parse_bool,
       default = True)
     s('allowed_maildomains',
       conv = str,
       default = 'any')
     s('notify_admin',
-      conv = bool,
+      conv = parse_bool,
       default = True)
 
 
