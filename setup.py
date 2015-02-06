@@ -83,8 +83,9 @@ setuptools.setup(
                                            'ddserver/resources/web/js/pwstrength.js',
                                            'ddserver/resources/web/js/pwstrength.options.js'
                                            ]),
-        ('/usr/share/doc/ddserver', ['ddserver/resources/doc/schema.sql',
-                                     'ddserver/resources/doc/schema.upgrade.sql',
+        ('/usr/share/doc/ddserver', ['ddserver/resources/doc/schema.001.sql',
+                                     'ddserver/resources/doc/schema.002.sql',
+                                     'ddserver/resources/doc/schema.003.sql',
                                      'ddserver/resources/doc/ddserver.conf.example',
                                      'ddserver/resources/doc/ddclient.conf.example',
                                      'README.md', 'INSTALL.md', 'VERSION', 'LICENSE',

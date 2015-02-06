@@ -27,7 +27,8 @@ from formencode.validators import (FancyValidator,
                                    Email,  # @UnusedImport: for exporting
                                    IPAddress,  # @UnusedImport: for exporting
                                    String,  # @UnusedImport: for exporting
-                                   Int)  # @UnusedImport: for exporting
+                                   Int,  # @UnusedImport: for exporting
+                                   Bool)  # @UnusedImport: for exporting
 
 from require import require, extend
 
