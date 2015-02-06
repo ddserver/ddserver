@@ -207,6 +207,10 @@ def get_update(logger):
     address = bottle.request.query.get('myip', None)
     offline = bottle.request.query.get('offline', 'NO') == 'YES'
 
+    # If no IP was provided in the request, use the one from the request
+    if not address:
+        address = bottle.request.remote_addr
+
     # Fetch the the credentials from HTTP header
     if bottle.request.auth:
       username, password = bottle.request.auth
