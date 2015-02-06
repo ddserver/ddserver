@@ -80,12 +80,10 @@ def get_host_display(user,
           address = validation.IPAddress(),
           description = validation.String(max = 255))
 @require(db = 'ddserver.db:Database',
-         config = 'ddserver.config:Config',
          messages = 'ddserver.interface.message:MessageManager')
 def post_host_update_address(user,
                              data,
                              db,
-                             config,
                              messages):
   ''' Update the IP address and/or description of a hostname. '''
 
