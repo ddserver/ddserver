@@ -216,7 +216,8 @@ def get_update(logger):
       username, password = bottle.request.auth
 
     else:
-      username, password = None, None
+      username = bottle.request.query.get('username', None)
+      password = bottle.request.query.get('password', None)
 
     # Clear the address if the offline flag is set
     if offline:
