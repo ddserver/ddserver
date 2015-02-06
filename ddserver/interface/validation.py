@@ -91,7 +91,7 @@ def validate(__on_error__ = '/',
 def config_reserved(config_decl):
   with config_decl.declare('dns') as s:
     s('reserved',
-      conv = lambda values: set(filter(None, (value.strip() for value in values.splitlines))),
+      conv = lambda values: set(filter(None, (value.strip() for value in values.splitlines()))),
       default = set())
 
 
