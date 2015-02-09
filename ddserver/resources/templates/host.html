@@ -160,9 +160,9 @@
                 To update your hostname, you have to configure dynamic DNS updates
                 on your homerouter or any of your computer systems. The update is done
                 by a HTTP-GET request, as specified by the
-                <a href="http://www.noip.com/integrate/request">dyndns2 update protocol</a>.
+                <a target="_blank" href="http://www.noip.com/integrate/request">dyndns2 update protocol</a>.
                 Authentication is performed using
-                <a href="http://www.ietf.org/rfc/rfc2617.txt">HTTP Basic Authentication</a>.
+                <a target="_blank" href="http://www.ietf.org/rfc/rfc2617.txt">HTTP Basic Authentication</a>.
               </p>
               <p>
                 Your client has to access the following URL in order to trigger an update
@@ -170,6 +170,16 @@
               </p>
               <pre>
 {{config.wsgi.protocol}}{{session.username}}:<abbr class="tip" title="The password you specified for updating the hostname (not the password you use to login into this WebUI)">YourHostPassword</abbr>@{{config.wsgi.basename}}/nic/update?hostname={{host.hostname}}.{{host.suffix}}&amp;myip=<abbr class="tip" title="The IP address you want to set">IP-Address</abbr>
+              </pre>
+              <p>
+                Note: Many recent browsers won't allow you to specify HTTP basic authentication parameters
+                within the URL for security reasons (for more information refer to
+                <a target="_blank" href="http://kb.mozillazine.org/Network.http.phishy-userpass-length">[1]</a> and
+                <a target="_blank" href="https://code.google.com/p/chromium/issues/detail?id=123150">[2]</a>).
+                To overcome this limitation, you may specify authentication parameters as follows:
+              </p>
+              <pre>
+{{config.wsgi.protocol}}{{config.wsgi.basename}}/nic/update?hostname={{host.hostname}}.{{host.suffix}}&amp;myip=<abbr class="tip" title="The IP address you want to set">IP-Address</abbr>&amp;username={{session.username}}&amp;password=<abbr class="tip" title="The password you specified for updating the hostname (not the password you use to login into this WebUI)">YourHostPassword</abbr>
               </pre>
             </div>
           </div>
