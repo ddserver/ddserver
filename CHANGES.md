@@ -6,6 +6,10 @@ New features:
 * Added support for python 3.3
 * Use the public require library insted of the out-dated buildin one
 
+Fixes:
+
+* Fixed wrong comparison when modifying own admin privileges
+
 0.2
 ===
 

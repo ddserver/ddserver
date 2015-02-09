@@ -78,15 +78,15 @@
             {% if u.admin == 0 %}
             <form action="/admin/users/mkadmin" method="post">
               <input type="hidden" name="user_id" value="{{u.id}}">
-              <input type="submit" class="btn btn-default tip" value="&nbsp;User&nbsp;" style="width: 90px;" title="Klick to add Admin privileges">
+              <input type="submit" class="btn btn-default tip" value="&nbsp;User&nbsp;" style="width: 90px;" title="Klick to add admin privileges">
             </form>
             {% else %}
             <form action="/admin/users/rmadmin" method="post">
               <input type="hidden" name="user_id" value="{{u.id}}">
-              {% if u.id == u.id %}
-              <input type="button" class="btn btn-default active tip" value="Admin" style="width: 90px;" title="You can not remove your own Admin privileges">
+              {% if u.id == user.id %}
+              <input type="button" class="btn btn-default active tip" value="Admin" style="width: 90px;" title="You cannot remove your own admin privileges">
               {% else %}
-              <input type="submit" class="btn btn-default active tip" value="Admin" style="width: 90px;" title="Klick to remove Admin privileges">
+              <input type="submit" class="btn btn-default active tip" value="Admin" style="width: 90px;" title="Klick to remove admin privileges">
               {% endif %}
             </form>
             {% endif %}
@@ -102,7 +102,11 @@
           {% endif %}
           </td>
           <td style="width: 90px; border-left: 0px">
-            <a href="#modal{{u.id}}" data-toggle="modal" class="btn btn-danger tip" title="Delete this user">Delete</a>
+            {% if u.id == user.id %}
+              <a href="#modal{{u.id}}" class="btn btn-danger tip" title="You cannot delete yourself">Delete</a>
+            {% else %}
+              <a href="#modal{{u.id}}" data-toggle="modal" class="btn btn-danger tip" title="Delete this user">Delete</a>
+            {% endif %}
             <div class="modal fade" id="modal{{u.id}}">
               <div class="modal-dialog">
                 <div class="modal-content">
