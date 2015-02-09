@@ -22,7 +22,14 @@ import ConfigParser as configparser
 import collections
 import contextlib
 
-from ddserver.utils.deps import export
+from require import export
+
+
+
+def parse_bool(value):
+    """ Helper function to parse boolean config values.
+    """
+    return value.lower() in ['y', 'yes', 't', 'true', 1, 'on']
 
 
 

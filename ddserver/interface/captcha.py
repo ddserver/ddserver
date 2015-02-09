@@ -19,7 +19,9 @@ along with ddserver. If not, see <http://www.gnu.org/licenses/>.
 
 import bottle
 
-from ddserver.utils.deps import extend, require
+from require import extend, require
+
+from ddserver.config import parse_bool
 
 
 
@@ -27,7 +29,7 @@ from ddserver.utils.deps import extend, require
 def config_captcha(config_decl):
   with config_decl.declare('captcha') as s:
     s('enabled',
-      conv = bool,
+      conv = parse_bool,
       default = False)
     s('recaptcha_public_key',
       conv = str,

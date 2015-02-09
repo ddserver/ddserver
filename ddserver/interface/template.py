@@ -17,7 +17,7 @@ You should have received a copy of the GNU Affero General Public License
 along with ddserver. If not, see <http://www.gnu.org/licenses/>.
 '''
 
-from ddserver.utils.deps import export, extend, require
+from require import export, extend, require
 
 import functools
 import jinja2

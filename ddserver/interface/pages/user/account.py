@@ -19,9 +19,9 @@ along with ddserver. If not, see <http://www.gnu.org/licenses/>.
 
 import bottle
 
-from ddserver.web import route
+from require import extend, require
 
-from ddserver.utils.deps import extend, require
+from ddserver.web import route
 
 from ddserver.interface.user import authorized
 from ddserver.interface.user import authorized_by_code

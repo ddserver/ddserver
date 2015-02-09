@@ -19,7 +19,9 @@ along with ddserver. If not, see <http://www.gnu.org/licenses/>.
 
 import bottle
 
-from ddserver.utils.deps import extend, export, require
+from require import extend, export, require
+
+from ddserver.config import parse_bool
 
 
 
@@ -33,7 +35,7 @@ def config_web(config_decl):
       conv = int,
       default = 8080)
     s('debug',
-      conv = bool,
+      conv = parse_bool,
       default = False)
 
 

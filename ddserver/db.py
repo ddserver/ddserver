@@ -22,7 +22,7 @@ import threading
 
 import MySQLdb.cursors
 
-from ddserver.utils.deps import extend, export, require
+from require import extend, export, require
 
 
 
