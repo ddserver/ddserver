@@ -49,10 +49,10 @@
           <td data-bind="text: created"></td>
           <td>
             <span data-bind="attr: { id: 'userHostDisplay' + id }">
-              <!-- ko if: maxhosts == -1 -->
+              <!-- ko if: maxhosts == '-1' -->
                 <i>unlimited</i>
               <!-- /ko -->
-              <!-- ko ifnot: maxhosts == -1 -->
+              <!-- ko ifnot: maxhosts == '-1' -->
                 <!-- ko if: maxhosts == 'None' -->
                   <i>default ({{config.dns.max_hosts}})</i>
                 <!-- /ko -->
@@ -70,13 +70,11 @@
               <form class="form-horizontal" action="/admin/users/updateMaxhosts" method="post" data-bind="attr: { id: 'userHostEditForm' + id }">
               <input type="hidden" name="user_id" data-bind="value: id">
                 <div class="input-group">
-                  <!-- ko if: maxhosts != -1 -->
-                    <!-- ko if: maxhosts == 'None' -->
-                      <input class="form-control tip" type="text" name="max_hosts" style="margin: 0" title="Use -1 for unlimited hostnames" value="{{config.dns.max_hosts}}">
-                    <!-- /ko -->
-                    <!-- ko ifnot: maxhosts == 'None' -->
-                      <input class="form-control tip" type="text" name="max_hosts" style="margin: 0" title="Use -1 for unlimited hostnames" data-bind="value: maxhosts">
-                    <!-- /ko -->
+                  <!-- ko if: maxhosts == 'None' -->
+                    <input class="form-control tip" type="text" name="max_hosts" style="margin: 0" title="Use -1 for unlimited hostnames" value="{{config.dns.max_hosts}}">
+                  <!-- /ko -->
+                  <!-- ko ifnot: maxhosts == 'None' -->
+                    <input class="form-control tip" type="text" name="max_hosts" style="margin: 0" title="Use -1 for unlimited hostnames" data-bind="value: maxhosts">
                   <!-- /ko -->
                   <span class="input-group-addon" data-bind="click: function() { $('#userHostEditForm' + id).submit(); }" style="cursor: pointer"><i class="fa fa-fw fa-check"></i></span>
                 </div>
