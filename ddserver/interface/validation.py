@@ -20,8 +20,6 @@ along with ddserver. If not, see <http://www.gnu.org/licenses/>.
 import re
 import bottle
 
-from recaptcha.client import captcha
-
 import formencode
 
 from formencode.validators import (FancyValidator,
@@ -31,7 +29,7 @@ from formencode.validators import (FancyValidator,
                                    String,  # @UnusedImport: for exporting
                                    Int)  # @UnusedImport: for exporting
 
-from ddserver.utils.deps import require, extend
+from require import require, extend
 
 
 
@@ -78,8 +76,8 @@ def validate(__on_error__ = '/',
              data = Values(data),
              **kwargs)
 
-      except formencode.Invalid, e:
-        for msg in e.error_dict.itervalues():
+      except formencode.Invalid as e:
+        for msg in e.error_dict.values():
           messages.error(msg)
 
       bottle.redirect(__on_error__)
@@ -90,10 +88,10 @@ def validate(__on_error__ = '/',
 
 
 @extend('ddserver.config:ConfigDeclaration')
-def config_blacklist(config_decl):
+def config_reserved(config_decl):
   with config_decl.declare('dns') as s:
-    s('blacklist',
-      conv = lambda v: set(s.strip() for s in v.split(',')),
+    s('reserved',
+      conv = lambda values: set(filter(None, (value.strip() for value in values.splitlines()))),
       default = set())
 
 
@@ -116,7 +114,7 @@ class ValidHostname(FancyValidator):
                       value,
                       state,
                       config):
-    if value in config.dns.blacklist:
+    if value in config.dns.reserved:
       raise formencode.Invalid(self.message('not_allowed', state),
                                value,
                                state)

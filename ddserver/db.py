@@ -20,9 +20,9 @@ along with ddserver. If not, see <http://www.gnu.org/licenses/>.
 import contextlib
 import threading
 
-import MySQLdb.cursors
+import mysql.connector
 
-from ddserver.utils.deps import extend, export, require
+from require import extend, export, require
 
 
 
@@ -56,13 +56,12 @@ class Database(object):
   def cursor(self, config):
     # Ensure we have a connection for this thread
     if not hasattr(self.thread_local, 'connection'):
-      connection = MySQLdb.connect(host = config.db.host,
-                                   port = config.db.port,
-                                   user = config.db.username,
-                                   passwd = config.db.password,
-                                   db = config.db.name,
-                                   cursorclass = MySQLdb.cursors.DictCursor,
-                                   charset = 'utf8')
+      connection = mysql.connector.connect(host = config.db.host,
+                                           port = config.db.port,
+                                           user = config.db.username,
+                                           password = config.db.password,
+                                           database = config.db.name,
+                                           charset = 'utf8')
       setattr(self.thread_local, 'connection', connection)
 
     else:
@@ -72,7 +71,7 @@ class Database(object):
       # Reconnect if connection is down
       connection.ping(True)
 
-    cursor = connection.cursor()
+    cursor = connection.cursor(dictionary=True)
 
     try:
       yield cursor

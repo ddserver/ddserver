@@ -71,7 +71,7 @@
     </noscript>
 
     {% for message in messages.popall() %}
-      <div class="alert alert-block alert-{{message.level}}">
+      <div class="alert alert-block alert-{{message.level.value}}">
         <a class="close" data-dismiss="alert" href="#">×</a>
           {{message.message}}
       </div>
