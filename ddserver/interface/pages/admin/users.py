@@ -70,8 +70,7 @@ def get_users(user,
 def get_user_hosts(user,
                    userid,
                    db,
-                   templates,
-                   mode = 'all'):
+                   templates):
   """ Display a list of a users hostnames.
   """
 
@@ -90,8 +89,7 @@ def get_user_hosts(user,
     hosts = cur.fetchall()
 
   return templates['userhosts.html'](hosts = hosts,
-                                     user = user,
-                                     mode = mode)
+                                     user = user)
 
 
 @route('/admin/users/add', method = 'GET')

@@ -2,7 +2,7 @@
 
 {% block content %}
   <div class="row">
-    <div class="col-md-12"><h1>Manage hostnames</h1></div>
+    <div class="col-md-12"><h1>Users hostnames</h1></div>
   </div>
 
   <div class="row">
@@ -17,6 +17,7 @@
       <br>
 
       {% if hosts %}
+        <h3>User: {{hosts.0.username}}</h3>
         <div data-bind='simpleSortableGrid: gridViewModel, simpleSortableGridTemplate: "gridTemplate"'></div>
       {% else %}
         <p class="text-center">
