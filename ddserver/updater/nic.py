@@ -24,7 +24,8 @@ import formencode
 
 from passlib.apps import custom_app_context as pwd
 
-from ddserver.utils.deps import require
+from require import require
+
 from ddserver.web import route
 
 

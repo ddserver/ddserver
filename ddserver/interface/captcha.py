@@ -19,7 +19,7 @@ along with ddserver. If not, see <http://www.gnu.org/licenses/>.
 
 import bottle
 
-from ddserver.utils.deps import extend, require
+from require import extend, require
 
 from ddserver.config import parse_bool
 
