@@ -38,7 +38,9 @@ def get_users(user,
               db,
               templates,
               mode = 'all'):
-  ''' Display a list of users that are waiting for account activation. '''
+  """ Display a list of users. Depending on the mode, show all users,
+      only show admins, or only show accounts that are awaiting activation.
+  """
 
   if mode == 'admins':
       where = 'WHERE `admin` = 1'
@@ -60,6 +62,36 @@ def get_users(user,
                                  user = user,
                                  mode = mode)
 
+
+@route('/admin/user/<userid>/hosts')
+@authorized_admin()
+@require(db = 'ddserver.db:Database',
+         templates = 'ddserver.interface.template:TemplateManager')
+def get_user_hosts(user,
+                   userid,
+                   db,
+                   templates,
+                   mode = 'all'):
+  """ Display a list of a users hostnames.
+  """
+
+  with db.cursor() as cur:
+    cur.execute('''
+        SELECT `hosts`.*,
+               `suffixes`.`name` AS suffix,
+               `users`.`username` AS username
+        FROM `hosts`
+        RIGHT JOIN `suffixes`
+          ON `suffixes`.`id` = `hosts`.`suffix_id`
+        RIGHT JOIN `users`
+          ON `hosts`.`user_id` = `users`.`id`
+        WHERE `user_id` = %(userid)s
+    ''', {'userid': int(userid)})
+    hosts = cur.fetchall()
+
+  return templates['userhosts.html'](hosts = hosts,
+                                     user = user,
+                                     mode = mode)
 
 
 @route('/admin/users/add', method = 'GET')

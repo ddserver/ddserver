@@ -2,25 +2,25 @@
 
 {% block content %}
   <div class="row">
-    <div class="col-md-12"><h1>Manage zones</h1></div>
+    <div class="col-md-12"><h1>Manage hostnames</h1></div>
   </div>
-
-  <ul class="nav nav-tabs">
-    <li><a href="/admin/suffixes/add">Add zone</a></li>
-    <li><a href="/admin/suffixes/list">Configured zones</a></li>
-    <li class="active"><a href="/admin/suffix/{{suffix.suffixid}}">Zone content</a></li>
-  </ul>
-  <br>
 
   <div class="row">
     <div class="col-md-12">
-      <h3>Zone: {{suffix.suffixname}}</h3>
+      <ul class="nav nav-tabs">
+        <li><a href="/admin/users/all">All Users</a></li>
+        <li><a href="/admin/users/inactive">Awaiting Activation</a></li>
+        <li><a href="/admin/users/admins">Administrators</a></li>
+        <li><a href="/admin/users/add">Add new user</a></li>
+        <li class="active"><a href="#">Users hostnames</a></li>
+      </ul>
+      <br>
 
-      {% if hostlist %}
+      {% if hosts %}
         <div data-bind='simpleSortableGrid: gridViewModel, simpleSortableGridTemplate: "gridTemplate"'></div>
       {% else %}
-        <p class="text-danger text-center">
-          No hostnames defined so far.
+        <p class="text-center">
+          No hostnames to display.
         </p>
       {% endif %}
     </div>
@@ -43,8 +43,14 @@
       </thead>
       <tbody data-bind="foreach: itemsOnCurrentPage">
         <tr>
-          <td data-bind="text: hostname"></td>
-          <td><a href="#" class="tip" data-bind="text: username, attr: { href: '/admin/user/' + userid + '/hosts', title: 'Display this users hostnames' }"></a></td>
+          <td>
+            <span data-bind="text: hostname"></span><a class="tip origin" data-bind="text: '.' + suffix, attr: { href: '/admin/suffix/' + suffix_id, title: 'Display all hosts in this zone' }"></a>
+            <!-- ko if: description != 'None' -->
+              <!-- ko if: description != '' -->
+                &nbsp; <span class="small"><i class="fa fa-info tip" data-bind="attr: {title: description}"></i></span>
+              <!-- /ko -->
+            <!-- /ko -->
+          </td>
           <td>
             <!-- ko if: address != 'None' -->
               <span data-bind="text: address"></span>
@@ -55,7 +61,7 @@
           </td>
           <td data-bind="text: updated"></td>
           <td style="width: 120px; text-align: center;">
-            <a class="btn btn-danger tip" data-toggle="modal" data-bind="attr: { href: '#modal' + id }" title="Delete this hostname">Delete</a>
+            <a class="btn btn-danger tip" data-toggle="modal" data-bind="attr: { href: '#modal' + id }" title="Delete this suffix">Delete</a>
             <div class="modal fade" data-bind="attr: {id: 'modal' + id}">
               <div class="modal-dialog">
                 <div class="modal-content">
@@ -69,7 +75,7 @@
                       Do you really want to delete this hostname?
                     </p>
                     <p>
-                      Hostname: <b data-bind="text: hostname"></b><span class="origin" data-bind="text: '.' + zone"></span><br />
+                      Hostname: <b data-bind="text: hostname"></b><span class="origin" data-bind="text: '.' + suffix"></span><br />
                       Owner: <b data-bind="text: username"></b>
                     </p>
                   </div>
@@ -93,8 +99,8 @@
 
   <script type="text/javascript">
       var items = [
-      {% for host in hostlist %}
-          { id: {{host.id}}, hostname: "{{host.hostname}}", username: "{{host.username}}", userid: {{host.user_id}}, address: "{{host.address}}", updated: "{{host.updated}}", zone: "{{suffix.suffixname}}" },
+      {% for host in hosts %}
+          { id: {{host.id}}, hostname: "{{host.hostname}}", username: "{{host.username}}", suffix: "{{host.suffix}}", suffix_id: {{host.suffix_id}}, address: "{{host.address}}", updated: "{{host.updated}}", description: "{{host.description}}" },
         {% endfor %}
       ];
       var PagedGridModel = function (items) {
@@ -103,9 +109,8 @@
           data: this.items,
           columns: [
             { headerText: "Hostname", rowText: "hostname", isSortable: true },
-            { headerText: "User", rowText: "username", isSortable: true },
             { headerText: "Address", rowText: "address", isSortable: true },
-            { headerText: "Updated", rowText: "updated", isSortable: true },
+            { headerText: "Last update", rowText: "updated", isSortable: true },
             { headerText: "Actions", rowText: "actions", isSortable: false }
           ],
           pageSize: pagination_items_per_page

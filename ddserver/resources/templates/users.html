@@ -44,7 +44,7 @@
       </thead>
       <tbody data-bind="foreach: itemsOnCurrentPage">
         <tr>
-          <td data-bind="text: username"></td>
+          <td><a href="#" class="tip" data-bind="text: username, attr: { href: '/admin/user/' + id + '/hosts', title: 'Display this users hostnames' }"></a></td>
           <td data-bind="text: email"></td>
           <td data-bind="text: created"></td>
           <td>
