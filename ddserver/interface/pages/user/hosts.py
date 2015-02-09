@@ -40,7 +40,6 @@ def config_auth(config_decl):
        default = 5)
 
 
-
 @route('/user/hosts/list', method = 'GET')
 @authorized()
 @require(db = 'ddserver.db:Database',
@@ -74,11 +73,9 @@ def get_hosts_display(user,
 @route('/user/hosts/add', method = 'GET')
 @authorized()
 @require(db = 'ddserver.db:Database',
-         config = 'ddserver.config:Config',
          templates = 'ddserver.interface.template:TemplateManager')
 def get_hosts_add(user,
                   db,
-                  config,
                   templates):
   ''' Display a form for adding new hostnames '''
 
@@ -118,22 +115,24 @@ def post_hosts_add(user,
 
   # We do net check passed suffix, as mysql will tell us later on
 
-  encrypted_password = pwd.encrypt(data.password)
-
   with db.cursor() as cur:
+    # Users can have an individual hostname limit, unlimited hostnames (-1)
+    # or have no limit set in the db to use the default from the config
     cur.execute('''
-      SELECT *
+      SELECT COUNT(*) AS count
       FROM `hosts`
       WHERE `user_id` = %(user_id)s
     ''', {'user_id': user.id})
 
-    # users can have an individual hostname limit, unlimited hostnames (-1)
-    # or have no limit set in the db to use the default from the config
-    if ((user.maxhosts is None and cur.rowcount >= int(config.dns.max_hosts)) or
-        (user.maxhosts is not None and
-         (int(cur.rowcount >= user.maxhosts) and int(user.maxhosts) is not -1))):
+    count = cur.fetchone()
+    if not ((user.maxhosts is None and (count['count'] < config.dns.max_hosts)) or
+            (user.maxhosts is not None and (count['count'] < user.maxhosts)) or
+            (user.maxhosts == -1)):
       messages.error('Maximum number of hosts reached')
-      bottle.redirect('/user/hosts/list')
+      bottle.redirect('/user/hosts/add')
+
+    # Encrypt the host password for for storage
+    encrypted_password = pwd.encrypt(data.password)
 
     cur.execute('''
       INSERT

@@ -1,3 +1,11 @@
+0.3
+===
+
+New features:
+
+* Added support for python 3.3
+* Use the public require library insted of the out-dated buildin one
+
 0.2
 ===
 

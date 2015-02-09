@@ -48,7 +48,7 @@ class TemplateManager(object):
     # Return the render function of the template
     return functools.partial(template.render, **{name : func()
                                                  for name, func
-                                                 in self.__globals.iteritems()})
+                                                 in self.__globals.items()})
 
 
   @property
