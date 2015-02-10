@@ -123,7 +123,7 @@ class UserManager(object):
           UPDATE users
           SET `authcode` = %(authcode)s
           WHERE `username` = %(username)s
-      ''', {'authcode': authcode,
+      ''', {'authcode': str(authcode),
             'username': username})
 
     return authcode
