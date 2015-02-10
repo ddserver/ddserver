@@ -1,5 +1,5 @@
-'''
-Copyright 2013 Dustin Frisch <fooker@lab.sh>
+"""
+Copyright 2015 Sven Reissmann <sven@0x80.io>
 
 This file is part of ddserver.
 
@@ -15,4 +15,14 @@ GNU Affero General Public License for more details.
 
 You should have received a copy of the GNU Affero General Public License
 along with ddserver. If not, see <http://www.gnu.org/licenses/>.
-'''
+"""
+
+from require import extend
+
+
+@extend('ddserver.config:ConfigDeclaration')
+def config_auth(config_decl):
+  with config_decl.declare('wsgi') as s:
+    s('pagination_max_items',
+       conv = int,
+       default = 25)

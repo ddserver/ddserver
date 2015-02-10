@@ -33,6 +33,7 @@ password = YourDatabasePassword
 ;protocol = http://
 ;basename = localhost:8080
 ;static_files = /usr/share/ddserver/static
+;pagination_max_items = 25
 
 [smtp]
 host = 127.0.0.1
