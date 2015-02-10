@@ -32,7 +32,7 @@
       <thead>
         <tr data-bind="foreach: columns" style="cursor:pointer;">
           <!-- ko if: isSortable == true -->
-          <th data-bind="click:$parent.sortBy($data.rowText)">
+          <th data-bind="click: function() { $parent.sortBy($data.rowText); }">
             <span data-bind="text: headerText"></span>
             <span data-bind="css:$parent.sortByCSS($data.rowText)"></span>
           </th>
@@ -173,6 +173,7 @@
           ],
           pageSize: pagination_items_per_page
         });
+        this.gridViewModel.sortBy("username");
       };
       ko.applyBindings(new PagedGridModel(items));
   </script>

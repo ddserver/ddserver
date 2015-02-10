@@ -31,7 +31,7 @@
       <thead>
         <tr data-bind="foreach: columns" style="cursor:pointer;">
           <!-- ko if: isSortable == true -->
-          <th data-bind="click:$parent.sortBy($data.rowText)">
+          <th data-bind="click: function() { $parent.sortBy($data.rowText); }">
             <span data-bind="text: headerText"></span>
             <span data-bind="css:$parent.sortByCSS($data.rowText)"></span>
           </th>
@@ -55,7 +55,7 @@
           </td>
           <td data-bind="text: updated"></td>
           <td style="width: 120px; text-align: center;">
-            <a class="btn btn-danger tip" data-toggle="modal" data-bind="attr: { href: '#modal' + id }" title="Delete this suffix">Delete</a>
+            <a class="btn btn-danger tip" data-toggle="modal" data-bind="attr: { href: '#modal' + id }" title="Delete this hostname">Delete</a>
             <div class="modal fade" data-bind="attr: {id: 'modal' + id}">
               <div class="modal-dialog">
                 <div class="modal-content">
@@ -110,6 +110,7 @@
           ],
           pageSize: pagination_items_per_page
         });
+        this.gridViewModel.sortBy("hostname");
       };
       ko.applyBindings(new PagedGridModel(items));
   </script>
