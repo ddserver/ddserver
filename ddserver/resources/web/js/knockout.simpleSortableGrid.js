@@ -150,8 +150,10 @@
             ko.renderTemplate(gridTemplateName, viewModel, { templateEngine: templateEngine }, gridContainer, "replaceNode");
 
             // Render the page links
-            var pageLinksContainer = element.appendChild(document.createElement("DIV"));
-            ko.renderTemplate(pageLinksTemplateName, viewModel, { templateEngine: templateEngine }, pageLinksContainer, "replaceNode");
+            if(viewModel.maxPageIndex() > 0) {
+              var pageLinksContainer = element.appendChild(document.createElement("DIV"));
+              ko.renderTemplate(pageLinksTemplateName, viewModel, { templateEngine: templateEngine }, pageLinksContainer, "replaceNode");
+            }
         }
     };
 })();
