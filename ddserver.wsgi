@@ -21,13 +21,12 @@ from require import require, Export
 
 
 
-@require(web = 'ddserver.web:Web')
-def main(web):
-  # Set up web server and run it
-  web.run()
+# Set the import path by using magic
+import sys, os.path
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 
 
-if __name__ == '__main__':
-    main()
+# Export the WSGI application
+application = Export.load('ddserver.web:Middleware')()
 
