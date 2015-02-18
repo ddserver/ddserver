@@ -65,7 +65,8 @@ setuptools.setup(
     include_package_data = True,
 
     data_files = [
-        ('/etc/ddserver', ['ddserver/resources/doc/ddserver.conf.example']),
+        ('/etc/ddserver', ['ddserver/resources/doc/ddserver.conf.example',
+                           'ddserver/resources/doc/motd']),
         ('/etc/init.d', ['ddserver/resources/doc/debian.init.d/ddserver']),
         ('/usr/share/ddserver/static/css', ['ddserver/resources/web/css/bootstrap.min.css',
                                             'ddserver/resources/web/css/bootstrap-theme.min.css',
