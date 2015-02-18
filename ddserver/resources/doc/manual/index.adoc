@@ -7,6 +7,9 @@
 :toclevels: 3
 :numbered:
 
+:stylesdir: stylesheets
+:stylesheet: asciidoctor-default.css
+
 // Installation guide
 include::install.adoc[]
 include::admin.adoc[]
