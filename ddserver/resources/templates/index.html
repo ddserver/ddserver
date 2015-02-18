@@ -1,6 +1,16 @@
 {% extends "base.html" %}
 
 {% block content %}
+
+  {% if user %}
+    {% if motd %}
+    <div class="alert alert-block alert-warning">
+      <a class="close" data-dismiss="alert" href="#">×</a>
+        <strong>Note:</strong> {{motd|safe}}
+    </div>
+    {% endif %}
+  {% endif %}
+
   <div class="row">
     <div class="col-md-12"><h1>Welcome to ddserver</h1></div>
   </div>
@@ -75,13 +85,6 @@
       {% endif %}
 
     {% else %}
-
-    {% if motd %}
-      <div class="box motd">
-        <h3>News</h3>
-        <p>{{motd|safe}}</p>
-      </div>
-    {% endif %}
 
     <div class="box">
       <p>

@@ -154,15 +154,3 @@ td.noresults {
   margin-left: 5px;
   border-radius: 3px;
 }
-
-/*
- * message of the day (motd)
- */
-.motd h3 {
-  display: none;
-}
-
-.motd p {
-  white-space: pre-wrap;
-  font-weight: bold;
-}
