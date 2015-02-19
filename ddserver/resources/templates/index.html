@@ -1,6 +1,16 @@
 {% extends "base.html" %}
 
 {% block content %}
+
+  {% if user %}
+    {% if motd %}
+    <div class="alert alert-block alert-warning">
+      <a class="close" data-dismiss="alert" href="#">×</a>
+        <strong>Note:</strong> {{motd|safe}}
+    </div>
+    {% endif %}
+  {% endif %}
+
   <div class="row">
     <div class="col-md-12"><h1>Welcome to ddserver</h1></div>
   </div>
@@ -43,7 +53,6 @@
     </div>
 
     <div class="col-md-4">
-
     {% if not user %}
       <div class="box">
         <h3>Login</h3>
@@ -76,6 +85,7 @@
       {% endif %}
 
     {% else %}
+
     <div class="box">
       <p>
         Your current IP-Address:
