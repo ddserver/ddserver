@@ -103,6 +103,10 @@ td.noresults {
   box-shadow: 0px 3px 4px rgba(0, 0, 0, 0.4);
 }
 
+.navbar-header {
+  height: 44px;
+}
+
 .navbar li a {
   padding-top: 12px;
   padding-bottom: 12px;
