@@ -69,12 +69,12 @@
             <span data-bind="attr: { id: 'userHostEdit' + id }" style="display: none">
               <form class="form-horizontal" action="/admin/users/updateMaxhosts" method="post" data-bind="attr: { id: 'userHostEditForm' + id }">
               <input type="hidden" name="user_id" data-bind="value: id">
-                <div class="input-group">
+                <div class="input-group" style="width: 120px">
                   <!-- ko if: maxhosts == 'None' -->
-                    <input class="form-control tip" type="text" name="max_hosts" style="margin: 0" title="Use -1 for unlimited hostnames" value="{{config.dns.max_hosts}}">
+                    <input class="form-control tip" type="text" name="max_hosts" title="Use -1 for unlimited hostnames" value="{{config.dns.max_hosts}}">
                   <!-- /ko -->
                   <!-- ko ifnot: maxhosts == 'None' -->
-                    <input class="form-control tip" type="text" name="max_hosts" style="margin: 0" title="Use -1 for unlimited hostnames" data-bind="value: maxhosts">
+                    <input class="form-control tip" type="text" name="max_hosts" title="Use -1 for unlimited hostnames" data-bind="value: maxhosts">
                   <!-- /ko -->
                   <span class="input-group-addon" data-bind="click: function() { $('#userHostEditForm' + id).submit(); }" style="cursor: pointer"><i class="fa fa-fw fa-check"></i></span>
                 </div>
