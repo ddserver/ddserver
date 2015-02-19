@@ -46,7 +46,8 @@ setuptools.setup(
         'mysql-connector-python >= 2.0.0',
         'require >= 0.1.0',
         'requests >= 2.5.0',
-        'enum34 >= 1.0.0'
+        'enum34 >= 1.0.0',
+        'configparser >= 3.2'
     ],
 
     packages = setuptools.find_packages(),
