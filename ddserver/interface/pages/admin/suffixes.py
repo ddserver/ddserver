@@ -185,3 +185,57 @@ def post_hosts_delete(user,
   messages.success('Ok, done.')
 
   bottle.redirect('/admin/suffixes/list')
+
+
+
+@route('/admin/suffix/disableHost', method = 'POST')
+@authorized_admin()
+@validate('/admin/suffixes/list',
+          host_id = validation.Int(not_empty = True),
+          reason = validation.String(max = 1000))
+@require(db = 'ddserver.db:Database',
+         messages = 'ddserver.interface.message:MessageManager')
+def post_host_disable(user,
+                      data,
+                      db,
+                      messages):
+  """ Disable a hostname administratively.
+  """
+
+  with db.cursor() as cur:
+    cur.execute('''
+        UPDATE hosts
+           SET `abuse` = %(reason)s
+         WHERE `id` = %(host_id)s
+    ''', {'host_id': data.host_id,
+          'reason': data.reason.replace('\n', '').replace('\r', '')})
+
+  messages.success('Ok, done.')
+
+  bottle.redirect('/admin/suffixes/list')
+
+
+
+@route('/admin/suffix/enableHost', method = 'POST')
+@authorized_admin()
+@validate('/admin/suffixes/list',
+          host_id = validation.Int(not_empty = True))
+@require(db = 'ddserver.db:Database',
+         messages = 'ddserver.interface.message:MessageManager')
+def post_host_disable(user,
+                      data,
+                      db,
+                      messages):
+  """ Enable a hostname administratively.
+  """
+
+  with db.cursor() as cur:
+    cur.execute('''
+        UPDATE hosts
+           SET `abuse` = NULL
+         WHERE `id` = %(host_id)s
+    ''', {'host_id': data.host_id})
+
+  messages.success('Ok, done.')
+
+  bottle.redirect('/admin/suffixes/list')

@@ -43,8 +43,12 @@
       </thead>
       <tbody data-bind="foreach: itemsOnCurrentPage">
         <tr>
-          <td data-bind="text: hostname"></td>
+          <td>
+            <span data-bind="text: hostname"></span>
+          </td>
+
           <td><a href="#" class="tip" data-bind="text: username, attr: { href: '/admin/user/' + userid + '/hosts', title: 'Display this users hostnames' }"></a></td>
+
           <td>
             <!-- ko if: address != 'None' -->
               <span data-bind="text: address"></span>
@@ -53,10 +57,61 @@
               <em><span class="small">(No address assigned)</span></em>
             <!-- /ko -->
           </td>
+
           <td data-bind="text: updated"></td>
-          <td style="width: 120px; text-align: center;">
-            <a class="btn btn-danger tip" data-toggle="modal" data-bind="attr: { href: '#modal' + id }" title="Delete this hostname">Delete</a>
-            <div class="modal fade" data-bind="attr: {id: 'modal' + id}">
+
+          <td style="width: 90px">
+            <!-- ko if: abuse != 'None' -->
+            <form action="/admin/suffix/enableHost" method="post" style="display: inline-block">
+              <input type="hidden" name="host_id" data-bind="value: id">
+              <input type="submit" class="btn btn-danger tip" title="Click to enable this hostname" value="Disabled">
+            </form>
+            <!-- /ko -->
+            <!-- ko if: abuse == 'None' -->
+            <a class="btn btn-success tip" data-toggle="modal" data-bind="attr: { href: '#modal_abuse' + id }" title="Click to disable this hostname (i.e., for abusive reasons)">Enabled</a>
+            <!-- /ko -->
+            <div class="modal fade" data-bind="attr: {id: 'modal_abuse' + id}">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4>Disable hostname</h4>
+                  </div>
+                  <div class="modal-body">
+                    <span class="fa fa-fw fa-plug pull-left" style="font-size: 64px; margin: 30px 20px 0 0;"></span>
+                    <p>
+                      This function allows you to disable a hostname and display a notice to the owner,
+                      allowing him to fix any issues and re-enable the hostname.
+                      Please enter a reason for disabling the hostname below.
+                    </p>
+                    <p>
+                      Hostname: <b data-bind="text: hostname"></b><span class="origin" data-bind="text: '.' + zone"></span><br />
+                      Owner: <b data-bind="text: username"></b>
+                    </p>
+                  </div>
+                  <div class="modal-footer">
+                    <form role="form" action="/admin/suffix/disableHost" method="post">
+                      <input type="hidden" name="host_id" data-bind="value: id">
+                      <div class="form-group">
+                        <div class="input-group">
+                          <span class="input-group-addon"><i class="fa fa-fw fa-align-left"></i></span>
+                          <textarea class="form-control" rows="2" cols="20" id="inputReason" required="required" name="reason"></textarea>
+                        </div>
+                      </div>
+                      <div class="form-group">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary btn-danger">Disable hostname</button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </td>
+
+          <td style="width: 90px">
+            <a class="btn btn-danger tip" data-toggle="modal" data-bind="attr: { href: '#modal_delete' + id }" title="Delete this hostname">Delete</a>
+            <div class="modal fade" data-bind="attr: {id: 'modal_delete' + id}">
               <div class="modal-dialog">
                 <div class="modal-content">
                   <div class="modal-header">
@@ -64,7 +119,7 @@
                     <h4>Delete this hostname</h4>
                   </div>
                   <div class="modal-body">
-                    <span class="fa fa-fw fa-trash pull-left" style="font-size: 48px; margin: 20px 20px 0 0;"></span>
+                    <span class="fa fa-fw fa-trash-o pull-left" style="font-size: 60px; margin: 10px 20px 0 0;"></span>
                     <p>
                       Do you really want to delete this hostname?
                     </p>
@@ -94,7 +149,7 @@
   <script type="text/javascript">
       var items = [
       {% for host in hostlist %}
-          { id: {{host.id}}, hostname: "{{host.hostname}}", username: "{{host.username}}", userid: {{host.user_id}}, address: "{{host.address}}", updated: "{{host.updated}}", zone: "{{suffix.suffixname}}" },
+          { id: {{host.id}}, hostname: "{{host.hostname}}", username: "{{host.username}}", userid: {{host.user_id}}, address: "{{host.address}}", updated: "{{host.updated}}", zone: "{{suffix.suffixname}}", abuse: '{{host.abuse}}' },
         {% endfor %}
       ];
       var PagedGridModel = function (items) {
@@ -106,6 +161,7 @@
             { headerText: "User", rowText: "username", isSortable: true },
             { headerText: "Address", rowText: "address", isSortable: true },
             { headerText: "Updated", rowText: "updated", isSortable: true },
+            { headerText: "Status", rowText: "status", isSortable: true },
             { headerText: "Actions", rowText: "actions", isSortable: false }
           ],
           pageSize: pagination_items_per_page

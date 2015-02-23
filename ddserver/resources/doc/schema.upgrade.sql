@@ -16,6 +16,14 @@
 -- along with ddserver.  If not, see <http://www.gnu.org/licenses/>.
 
 
+--
+-- Upgrading from version 0.2.x
+--
+
+ALTER TABLE `hosts`
+  ADD `abuse` TEXT NULL ;
+
+
 
 --
 -- Upgrading from version 0.1.x
