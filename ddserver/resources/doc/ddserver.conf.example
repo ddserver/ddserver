@@ -1,49 +1,130 @@
+; The configuration file is an INI style file.
+; It must be stored as '/etc/ddserver/ddserver.conf' before ddserver is started.
+
+
 [db]
+; MySQL database connection configuration
+;
+; The connection must point to an MySQL server with has a database where the
+; DDL files (including ding updates) are applied.
+
+; The database host
 ;host = localhost
+
+; The database port
 ;port = 3306
+
+; The name of the database
 ;name = ddserver
+
+; The username used to connect to the database
 ;username = ddserver
+
+; The password used to connect to the database
 password = YourDatabasePassword
 
+
 [logging]
+; Configuration of the logging done by ddserver
+
+; Enable verbose logging
 ;verbose = False
+
+; Write logs to a file instead of standard output
 ;file = /var/log/ddserver.log
 
+
 [auth]
+; Authentication handling
+
+; The minimum length required for a valid password
 ;password_min_chars = 8
 
+
 [dns]
+; Configuration of the DNS records
+
+; The global maximum number of hosts allowed for each user to create
 ;max_hosts = 5
+
+; The TTL for the DNS records returned
 ;ttl = 60
+
+; A list of host names not allowed to create by the user separated by (any kind) of whitespace
 ;reserved =
 ;   www
 ;   mail
 ;   ftp
 ;   test
 
+
 [signup]
+; Signup configuration
+
+; Enable signup at all
 ;enabled = True
+
+; Limit account creation to certain email domains and restrict everything else by requiring admin review - if set to
+; 'any' all domains are allowed
 ;allowed_maildomains = any
+
+; Notify the administrator by mail about account registration
 ;notify_admin = True
 
+
 [wsgi]
+;
+
+;
 ;host = 0.0.0.0
+
+;
 ;port = 8080
+
+;
 ;debug = False
+
+;
 ;protocol = http://
+
+;
 ;basename = localhost:8080
+
+;
 ;static_files = /usr/share/ddserver/static
+
+;
 ;pagination_max_items = 25
 
+
 [smtp]
+; SMTP server connection used to send mails
+
+; The host of the mail server
 host = 127.0.0.1
+
+; The port of the mail server
 ;port = 25
 
+
 [contact]
+; Contact information used by the administrator
+
+; The name of the administrator
 name = Administrator
+
+; The mail address to send mails from
 email = admin@example.com
 
+
 [captcha]
+; recaptcha is used to verify if an account is created by a human(-like) being
+
+; Enable captcha during signup
 ;enabled = False
-;recaptcha_public_key = 
-;recaptcha_private_key = 
+
+; The public key gained from 'https://www.google.com/recaptcha/intro/index.html'
+;recaptcha_public_key =
+
+; The private key corresponding to the public key above
+;recaptcha_private_key =
