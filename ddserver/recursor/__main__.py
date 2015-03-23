@@ -87,6 +87,8 @@ def receiver(logger):
     if not line:
       break
 
+    logger.debug("recursor: Received line: %s", line)
+
     # Lex the line
     try:
       message = lexer(line)
@@ -115,6 +117,8 @@ def send(cls,
 
   # Format the response
   line = formatter(message)
+  
+  logger.debug('recursor: Responding line: %s', line)
 
   # Send line to standard output
   sys.stdout.write(line + '\n')
