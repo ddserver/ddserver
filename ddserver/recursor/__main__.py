@@ -88,11 +88,11 @@ def receiver(logger):
       break
 
     # Lex the line
-    message = lexer(line)
+    try:
+      message = lexer(line)
 
-    # Check if we got a message
-    if message is None:
-      logger.error('recursor: Unknown tag: %s', line)
+    except ValueError:
+      logger.exception('recursor: Failed to parse line: %s', line)
       continue
 
     logger.debug('recursor: Received message: %s', message)

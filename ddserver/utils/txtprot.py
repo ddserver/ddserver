@@ -86,6 +86,11 @@ class MessageDeclaration(object):
   def lex(self, load):
     ''' Lex the message. '''
 
+    # Rise an exception if the number of passed parameters does not match
+    if len(load) != len(self.__fields):
+        raise ValueError("Parameter count mismatch: got %d expected %d" % (len(load), len(self.__fields)))
+
+    # Create an instance of the result type using the passed values
     return self(**{field.name : field.lex(value)
                    for field, value
                    in itertools.izip(self.__fields,
@@ -133,13 +138,13 @@ class LexerDeclaration(object):
     # Split message in tag and values
     tag, values = message[0], message[1:]
 
-    # Find message declaration for tag and lex the values using this message
-    # declaration or return None if the tag is unknown
-    if tag in self.__messages:
-      return self.__messages[tag].lex(values)
+    # Raise an exception if the tag is not defined
+    if tag not in self.__messages:
+        raise ValueError("Unknown tag: %s" % (tag, ))
 
-    else:
-      return None
+    # Find message declaration for tag and lex the values using this message
+    # declaration
+    return self.__messages[tag].lex(values)
 
 
   def __getattr__(self, key):
