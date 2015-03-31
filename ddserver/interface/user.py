@@ -99,27 +99,13 @@ class UserManager(object):
 
       return False
 
-    # check whether the user has enabled yubikey otp
-    with db.cursor() as cur:
-      cur.execute('''
-          SELECT yubico_id, yubico_key
-          FROM users
-          WHERE username = %(username)s
-      ''', {'username': username})
-      tmpusr = cur.fetchone()
+    # check whether the user has enabled Yubikey OTP authentication.
+    # If so, verify the OTP
+    if not verify_yubikey_otp(username = username,
+                              yubikey_otp = yubikey_otp):
+      messages.error('An invalid OTP was provided.')
 
-    if tmpusr['yubico_id'] is not None:
-      client = Yubico(tmpusr['yubico_id'], tmpusr['yubico_key'])
-
-      try:
-        otp_status = client.verify(yubikey_otp)
-      except:
-        otp_status = False
-
-      if not otp_status:
-        messages.error('An invalid OTP was provided.')
-
-        return False
+      return False
 
     # login the user
     session.username = username
@@ -144,6 +130,7 @@ class UserManager(object):
     messages.success('Good bye.')
 
 
+
   @require(db = 'ddserver.db:Database')
   def generate_authcode(self, username, db):
     # Make a new auth code
@@ -166,6 +153,39 @@ class UserManager(object):
   def authorized(self, session):
     if session.username:
       return self[session.username]
+
+
+
+@require(db = 'ddserver.db:Database')
+def verify_yubikey_otp(db,
+                       username,
+                       yubikey_otp):
+  """ verify a users Yubikey OTP
+
+      @param username:    A ddserver user, which has Yubico OTP enabled
+      @param yubikey_otp: The OTP from the users Yubikey
+      @return:            True if verification is successfull, otherwise False
+  """
+
+  with db.cursor() as cur:
+    cur.execute('''
+        SELECT yubico_id, yubico_key
+        FROM users
+        WHERE username = %(username)s
+    ''', {'username': username})
+    user = cur.fetchone()
+
+  otp_status = False
+
+  if user['yubico_id'] is not None:
+    client = Yubico(user['yubico_id'], user['yubico_key'])
+
+    try:
+      otp_status = client.verify(yubikey_otp)
+    except:
+      pass
+
+  return otp_status
 
 
 

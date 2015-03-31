@@ -133,6 +133,8 @@
           </div>
           <div class="form-group">
             <label>2FA is enabled</label><br>
+            <p>Please test it, before you log out.</p>
+            <a href="#test2FA" class="btn btn-primary" data-toggle="modal">Test 2FA</a>
             <button type="submit" class="btn btn-primary">Disable</button>
           </div>
         </form>
@@ -194,4 +196,36 @@
     </div>
   </div>
 
+  <!-- test 2FA modal -->
+  <div class="modal fade" id="test2FA">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+          <h4 class="modal-title">Test Two Factor Authentication</h4>
+        </div>
+        <div class="modal-body">
+          <span class="fa fa-fw fa-tags pull-left" style="font-size: 60px; margin: 20px 20px 0 0;"></span>
+          <p>
+            Please verify that 2FA is working correctly. If this test is not successfull,
+            check your settings or disable 2FA before you logout.
+          </p>
+
+          <form role="form" action="/user/account/yubikey/test" method="post">
+            <div class="form-group">
+              <div class="input-group">
+                <span class="input-group-addon"><i class="fa fa-fw fa-tags"></i></span>
+                <input class="form-control" type="password" id="yubikey_otp" placeholder="Touch your Yubikey" name="yubikey_otp">
+              </div>
+            </div>
+          </form>
+
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-success btn-primary">Test</button>
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
 {% endblock %}
