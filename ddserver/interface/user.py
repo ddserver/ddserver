@@ -22,6 +22,8 @@ import bottle
 import functools
 import collections
 
+from yubico_client import Yubico
+
 from passlib.apps import custom_app_context as pwd
 
 from require import export, extend, require
@@ -33,6 +35,8 @@ class UserManager(object):
   User = collections.namedtuple('User', ['id',
                                          'username',
                                          'password',
+                                         'yubico_id',
+                                         'yubico_key',
                                          'email',
                                          'admin',
                                          'active',
@@ -65,33 +69,61 @@ class UserManager(object):
 
 
   @require(session = 'ddserver.interface.session:SessionManager',
-           messages = 'ddserver.interface.message:MessageManager')
+           messages = 'ddserver.interface.message:MessageManager',
+           db = 'ddserver.db:Database')
   def login(self,
             session,
             messages,
+            db,
             username,
-            password):
+            password,
+            yubikey_otp):
     ''' Tries to authenticate the session.
 
-        @param username: the name of the user to authenticate
-        @param password: the password for the user
+        @param username:    the name of the user to authenticate
+        @param password:    the password for the user
+        @param yubikey_otp: the one-time-password from a yubikey (may be empty)
     '''
 
     user = self[username]
 
+    # check username and password. cancel if invalid
     if not user or not pwd.verify(password, user.password):
       messages.error('The username or password you entered was incorrect.')
 
       return False
 
-    elif not user.active:
+    # chcek whether the account is active. cancel if not
+    if not user.active:
       messages.error('This account has not yet been activated.')
 
       return False
 
-    else:
-      session.username = username
-      session.save()
+    # check whether the user has enabled yubikey otp
+    with db.cursor() as cur:
+      cur.execute('''
+          SELECT yubico_id, yubico_key
+          FROM users
+          WHERE username = %(username)s
+      ''', {'username': username})
+      tmpusr = cur.fetchone()
+
+    if tmpusr['yubico_id'] is not None:
+      client = Yubico(tmpusr['yubico_id'], tmpusr['yubico_key'])
+
+      try:
+        otp_status = client.verify(yubikey_otp)
+      except:
+        otp_status = False
+
+      if not otp_status:
+        messages.error('An invalid OTP was provided.')
+
+        return False
+
+    # login the user
+    session.username = username
+    session.save()
 
     messages.success('Welcome, %s' % username)
 

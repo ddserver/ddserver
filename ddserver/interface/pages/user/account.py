@@ -131,3 +131,56 @@ def post_account_delete(user,
 
   bottle.redirect('/')
 
+
+
+@route('/user/account/yubikey/enable', method = 'POST')
+@authorized()
+@validate('/user/account',
+          yubico_id = validation.Int(),
+          yubico_key = validation.String())
+@require(db = 'ddserver.db:Database',
+         messages = 'ddserver.interface.message:MessageManager')
+def post_account_yubico_enable(user,
+                               data,
+                               db,
+                               messages):
+  """ Enable Yubikey OTP
+  """
+
+  with db.cursor() as cur:
+    cur.execute('''
+        UPDATE `users`
+        SET `yubico_id` = %(yubico_id)s,
+            `yubico_key` = %(yubico_key)s
+        WHERE `id` = %(id)s
+    ''', {'yubico_id' : data.yubico_id,
+          'yubico_key' : data.yubico_key,
+          'id': user.id})
+
+  messages.success('Ok, done.')
+
+  bottle.redirect('/user/account')
+
+
+
+@route('/user/account/yubikey/disable', method = 'POST')
+@authorized()
+@require(db = 'ddserver.db:Database',
+         messages = 'ddserver.interface.message:MessageManager')
+def post_account_yubico_disable(user,
+                                db,
+                                messages):
+  """ Disable Yubikey OTP
+  """
+
+  with db.cursor() as cur:
+    cur.execute('''
+        UPDATE `users`
+        SET `yubico_id` = NULL,
+            `yubico_key` = NULL
+        WHERE `id` = %(id)s
+    ''', {'id': user.id})
+
+  messages.success('Ok, done.')
+
+  bottle.redirect('/user/account')

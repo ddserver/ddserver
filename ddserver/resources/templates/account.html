@@ -7,31 +7,35 @@
 
   <div class="row">
     <div class="col-md-4">
+      <h3>Account information</h3>
+      <p class="text-justify">
+        This is your username and account creation date.<br>
+        If you do not want to use your account anymore, click the
+        "Delete account" botton. This will immediately remove all your hostnames
+        and user information from our system and can not be undone.
+      </p>
+    </div>
+
+    <div class="col-md-4">
       <h3>Update your personal data</h3>
       <p class="text-justify">
-        Your personal data. Please provide a valid email address to 
-        be able to receive important notifications and password recovery
-        emails in case you loose your password.
+        Please provide a valid email address, to receive important
+        notifications and password recovery emails.<br>
+        Your login password should consisting of upper- and lowercase
+        characters, as well as numbers or special characters. The minimum
+        password length is {{config.auth.password_min_chars}} characters.
       </p>
     </div>
 
     <div class="col-md-4">
-      <h3>Update your password</h3>
+      <h3>Two Factor Authentication</h3>
       <p class="text-justify">
-        Your password for logging in into this webinterface. Please use 
-        secure passwords, consisting of upper- and lowercase characters, 
-        as well as numbers or special characters. The minimum password 
-        length is {{config.auth.password_min_chars}} characters.
-      </p>
-    </div>
-
-    <div class="col-md-4">
-      <h3>Delete your account</h3>
-      <p class="text-justify">
-        If you do not want to use this service anymore, you can delete your
-        account including all your dynamic hostnames. Please note, that this 
-        will immediately remove all your hostnames and your user information 
-        from our system and can not be undone.
+        If you own a Yubikey, it is possible to configure Two Factor
+        Authentication (2FA) for your account, using the Yubico OTP
+        service. First, generate your client id and secret key on the
+        <a href="https://upgrade.yubico.com/getapikey/" target="_blank">Yubico website</a>,
+        then insert your Client-Id and API-Key below to activate 2FA
+        for your account.
       </p>
     </div>
   </div>
@@ -40,21 +44,31 @@
   <div class="row">
     <div class="col-md-4">
       <div class="box">
+        <div class="form-group">
+          <label for="inputUsername">Username</label>
+          <div class="input-group">
+            <span class="input-group-addon"><i class="fa fa-fw fa-user"></i></span>
+            <input class="form-control" type="text" id="inputUsername" placeholder="Username" readonly="readonly" value="{{data.username}}">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="inputCreated">Account created</label>
+          <div class="input-group">
+            <span class="input-group-addon"><i class="fa fa-fw fa-clock-o"></i></span>
+            <input class="form-control" type="text" id="inputCreated" placeholder="Account Created" readonly="readonly" value="{{data.created}}">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="inputCreated">Delete my account</label>
+          <p><a href="#confirmDelete" class="btn btn-primary btn-danger" data-toggle="modal">Delete account</a></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="box">
         <form role="form" action="/user/account" method="post">
-          <div class="form-group">
-            <label for="inputUsername">Username</label>
-            <div class="input-group">
-              <span class="input-group-addon"><i class="fa fa-fw fa-user"></i></span>
-              <input class="form-control" type="text" id="inputUsername" placeholder="Username" readonly="readonly" value="{{data.username}}">
-            </div>
-          </div>
-          <div class="form-group">
-            <label for="inputCreated">Account Created</label>
-            <div class="input-group">
-              <span class="input-group-addon"><i class="fa fa-fw fa-clock-o"></i></span>
-              <input class="form-control" type="text" id="inputCreated" placeholder="Account Created" readonly="readonly" value="{{data.created}}">
-            </div>
-          </div>
           <div class="form-group">
             <label for="inputEmail">E-Mail Address</label>
             <div class="input-group">
@@ -67,11 +81,6 @@
             <button type="reset" class="btn btn-default">Cancel</button>
           </div>
         </form>
-      </div>
-    </div>
-
-    <div class="col-md-4">
-      <div class="box">
         <form role="form" action="/user/account/password" method="post" id="pwdcontainer">
           <div class="form-group">
             <label for="inputPassword1">Password</label>
@@ -113,9 +122,44 @@
 
     <div class="col-md-4">
       <div class="box">
-        <p></p>
-        <p class="text-center"><a href="#confirmDelete" class="btn btn-primary btn-danger" data-toggle="modal">Delete my account</a></p>
+        {% if data.yubico_id %}
+        <form role="form" action="/user/account/yubikey/disable" method="post">
+          <div class="form-group">
+            <label for="yubicoClientIdRO">Client-Id</label>
+            <div class="input-group">
+              <span class="input-group-addon"><i class="fa fa-fw fa-tags"></i></span>
+              <input class="form-control" type="text" id="yubicoClientIdRO" placeholder="Username" readonly="readonly" value="{{data.yubico_id}}">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>2FA is enabled</label><br>
+            <button type="submit" class="btn btn-primary">Disable</button>
+          </div>
+        </form>
+        {% else %}
+        <form role="form" action="/user/account/yubikey/enable" method="post">
+          <div class="form-group">
+            <label for="inputYubicoId">Client-Id</label>
+            <div class="input-group">
+              <span class="input-group-addon"><i class="fa fa-fw fa-tags"></i></span>
+              <input class="form-control" type="text" id="inputYubicoId" name="yubico_id" required="required" placeholder="12345">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="inputYubicoKey">Secret Key</label>
+            <div class="input-group">
+              <span class="input-group-addon"><i class="fa fa-fw fa-key"></i></span>
+              <input class="form-control" type="password" id="inputYubicoKey" placeholder="optional" name="yubico_key">
+            </div>
+          </div>
+          <div class="form-group">
+            <button type="submit" class="btn btn-primary">Enable 2FA</button>
+            <button type="reset" class="btn btn-default">Cancel</button>
+          </div>
+        </form>
+        {% endif %}
       </div>
+
     </div>
   </div>
 

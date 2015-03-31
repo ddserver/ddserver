@@ -16,6 +16,14 @@
 -- along with ddserver.  If not, see <http://www.gnu.org/licenses/>.
 
 
+--
+-- Upgrading from version 0.2
+--
+
+ALTER TABLE `users`
+  ADD `yubico_id` INT NULL DEFAULT NULL AFTER `password` ,
+  ADD `yubico_key` VARCHAR( 32 ) NULL DEFAULT NULL AFTER `yubico_id` ;
+
 
 --
 -- Upgrading from version 0.1.x
