@@ -14,8 +14,9 @@
   <div class="row">
     {% if suffixes %}
     <div class="col-md-8">
+      <h4>Select a hostname</h4>
       <p>
-        Use the from to specify your hostnames. You can add
+        Use the from on the right to add your hostnames. You can have
         {% if user.maxhosts == -1 or user.admin == True %}
           unlimited
         {% else %}
@@ -27,12 +28,14 @@
       </p>
 
       {% if suffixes|count > 1 %}
+      <h4>Select a zone</h4>
       <p>
         From the dropdown menu, you can choose from a list of available 
         zones for your DNS name. 
       </p>
       {% endif %}
 
+      <h4>Set a password</h4>
       <p>
         Each hostname you add gets its individual password for updating.
         The minimum password length is {{config.auth.password_min_chars}} 
@@ -40,12 +43,26 @@
         have to use the same password for them.
       </p>
 
+      <h4>(Optional) Set an initial IPv4 address</h4>
       <p>
-        If you specify an initial IP address, your hostname will instantly
-        be available. If you leave the IP address field blank, you have to
-        update it using your homerouter or the ddclient program, before it
-        will respond to DNS queries.
+        If you specify an initial IPv4 address, your hostname will instantly
+        be available by this address. If you leave the IPv4 address field blank,
+        you have to send an update using your homerouter or the ddclient program,
+        before the hostname can be resolved using to DNS queries.
       </p>
+
+      <h4>(Optional) Set a static IPv6 address</h4>
+      <p>
+        You can provide a static IPv6 address for your hostname. The IPv6 address
+        can only be set using the Web-UI. Dynamic updates are not possible.
+      </p>
+
+      <h4>(Optional) Add a description</h4>
+      <p>
+        A description can be set to add personal notes. The description is only
+        visible in the ddserver Web-UI.
+      </p>
+      <h4>You are done</h4>
       <p>
         After adding a new hostname, you can modify it or display configuration
         examples by navigating to the <em><a href="/user/hosts/list">Your hostnames</a></em>
@@ -123,10 +140,10 @@
             });
           </script>
           <div class="form-group">
-            <label for="inputAddress">Initial Address <span>(optional) <i class="fa fa-fw fa-home tip" id="curIPbutton" title="Use your current IP address ({{current_ip}})"></i></span></label>
+            <label for="inputAddress">Initial IPv4-Address <span>(optional) <i class="fa fa-fw fa-home tip" id="curIPbutton" title="Use your current IP address ({{current_ip}})"></i></span></label>
             <div class="input-group">
               <span class="input-group-addon"><i class="fa fa-fw fa-info"></i></span>
-              <input class="form-control" type="text" id="inputAddress" placeholder="Initial address" name="address">
+              <input class="form-control" type="text" id="inputAddress" placeholder="Initial IPv4-Address" name="address">
             </div>
             <script type="text/javascript">
               $('#curIPbutton').click(function() {
@@ -134,6 +151,14 @@
               });
             </script>
           </div>
+          <div class="form-group">
+            <label for="inputAddress">Static IPv6-Address <span>(optional)</span></label>
+            <div class="input-group">
+              <span class="input-group-addon"><i class="fa fa-fw fa-info"></i></span>
+              <input class="form-control" type="text" id="inputAddress_v6" placeholder="IPv6-Address" name="address_v6">
+            </div>
+          </div>
+
           <div class="form-group">
             <label for="inputDescription">Description <span>(optional)</span></label>
             <div class="input-group">
