@@ -57,6 +57,7 @@ def get_hosts_display(user,
           `host`.`hostname` AS `hostname`,
           `suffix`.`name` AS `suffix`,
           `host`.`address` AS `address`,
+          `host`.`address_v6` AS `address_v6`,
           `host`.`updated` AS `updated`,
           `host`.`description` AS `description`
         FROM `hosts` AS `host`

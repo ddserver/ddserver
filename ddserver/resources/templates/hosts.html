@@ -56,6 +56,14 @@
               <em><span class="small">(No address assigned)</span></em>
             <!-- /ko -->
           </td>
+          <td>
+            <!-- ko if: address_v6 != 'None' -->
+              <span data-bind="text: address_v6"></span>
+            <!-- /ko -->
+            <!-- ko if: address_v6 == 'None' -->
+              <em><span class="small">(No address assigned)</span></em>
+            <!-- /ko -->
+          </td>
           <td data-bind="text: updated"></td>
           <td style="width: 200px; text-align: center;">
             <a class="btn btn-default tip" data-bind="attr: { href: '/user/host/' + id }" title="Display details and configuration examples">Details</a>
@@ -97,7 +105,7 @@
   <script type="text/javascript">
       var items = [
       {% for host in hosts %}
-          { id: {{host.id}}, hostname: "{{host.hostname}}", zone: "{{host.suffix}}", address: "{{host.address}}", updated: "{{host.updated}}", description: "{{host.description}}" },
+          { id: {{host.id}}, hostname: "{{host.hostname}}", zone: "{{host.suffix}}", address: "{{host.address}}", address_v6: "{{host.address_v6}}", updated: "{{host.updated}}", description: "{{host.description}}" },
         {% endfor %}
       ];
       var PagedGridModel = function (items) {
@@ -106,7 +114,8 @@
           data: this.items,
           columns: [
             { headerText: "Hostname", rowText: "hostname", isSortable: true },
-            { headerText: "Address", rowText: "address", isSortable: true },
+            { headerText: "IPv4 Address", rowText: "address", isSortable: true },
+            { headerText: "IPv6 Address", rowText: "address_v6", isSortable: true },
             { headerText: "Last update", rowText: "updated", isSortable: true },
             { headerText: "Actions", rowText: "actions", isSortable: false }
           ],
