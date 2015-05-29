@@ -53,6 +53,7 @@ def get_host_display(user,
           `host`.`hostname` AS `hostname`,
           `suffix`.`name` AS `suffix`,
           `host`.`address` AS `address`,
+          `host`.`address_v6` AS `address_v6`,
           `host`.`updated` AS `updated`,
           `host`.`description` AS `description`
         FROM `hosts` AS `host`
@@ -78,6 +79,7 @@ def get_host_display(user,
 @validate('/user/hosts/list',
           host_id = formencode.validators.Int(),
           address = validation.IPAddress(),
+          address_v6 = validation.IPv6Address(),
           description = validation.String(max = 255))
 @require(db = 'ddserver.db:Database',
          messages = 'ddserver.interface.message:MessageManager')
@@ -91,10 +93,13 @@ def post_host_update_address(user,
     cur.execute('''
       UPDATE `hosts`
         SET  `address` = %(address)s,
-             `description` = %(description)s
+             `address_v6` = %(address_v6)s,
+             `description` = %(description)s,
+             `updated` = CURRENT_TIMESTAMP
       WHERE  `id` = %(host_id)s
         AND  `user_id` = %(user_id)s
     ''', {'address': data.address,
+          'address_v6': data.address_v6,
           'description': data.description,
           'host_id': data.host_id,
           'user_id': user.id})
