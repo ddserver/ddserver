@@ -17,9 +17,9 @@
    height="300"
    viewBox="0 0 300 299.99999"
    sodipodi:docname="logo-icon.svg"
-   inkscape:export-filename="/home/fooker/Development/ddserver/ddserver/resources/logo/logo-icon.png"
-   inkscape:export-xdpi="19.200001"
-   inkscape:export-ydpi="19.200001">
+   inkscape:export-filename="/home/fooker/Development/ddserver/ddserver/resources/web/img/logo-icon.png"
+   inkscape:export-xdpi="9.6000004"
+   inkscape:export-ydpi="9.6000004">
   <metadata
      id="metadata4196">
     <rdf:RDF>
@@ -49,18 +49,18 @@
      showgrid="false"
      width="800px"
      inkscape:zoom="1.4142136"
-     inkscape:cx="-94.116021"
-     inkscape:cy="95.286748"
+     inkscape:cx="-175.57124"
+     inkscape:cy="73.120619"
      inkscape:window-x="0"
      inkscape:window-y="16"
      inkscape:window-maximized="0"
      inkscape:current-layer="svg4190" />
   <use
      xlink:href="logo.svg#logo"
-     height="300"
-     width="300"
-     y="1.9073486e-06"
-     x="1.3183219e-06"
+     transform="matrix(1.8374891,0,0,1.8374891,-125.62337,-114.67071)"
      id="image10"
-     transform="matrix(1.8690869,0,0,1.8690869,-130.36303,-119.25643)" />
+     x="1.3183219e-06"
+     y="1.9073486e-06"
+     width="300"
+     height="300" />
 </svg>

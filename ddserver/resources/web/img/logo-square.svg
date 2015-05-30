@@ -17,7 +17,7 @@
    height="260"
    viewBox="0 0 300 259.99999"
    sodipodi:docname="logo-square.svg"
-   inkscape:export-filename="/home/fooker/Development/ddserver/ddserver/resources/logo/logo-square.png"
+   inkscape:export-filename="/home/fooker/Development/ddserver/ddserver/resources/web/img/logo-square.png"
    inkscape:export-xdpi="120"
    inkscape:export-ydpi="120">
   <metadata
@@ -49,12 +49,12 @@
      showgrid="false"
      width="800px"
      inkscape:zoom="1.4142136"
-     inkscape:cx="-184.7707"
+     inkscape:cx="-60.673459"
      inkscape:cy="160.78906"
      inkscape:window-x="0"
      inkscape:window-y="16"
      inkscape:window-maximized="0"
-     inkscape:current-layer="svg4190"
+     inkscape:current-layer="g3340"
      showguides="true"
      inkscape:guide-bbox="true" />
   <g
@@ -65,20 +65,20 @@
        id="text4391"
        y="262.89597"
        x="148.9446"
-       style="font-style:normal;font-weight:normal;font-size:44.0521965px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#808080;fill-opacity:1;stroke:none;stroke-width:1.20000005;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       style="font-style:normal;font-weight:normal;font-size:44.0521965px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#999999;fill-opacity:1;stroke:#999999;stroke-width:2;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        xml:space="preserve"><tspan
          id="tspan4397"
-         style="font-style:normal;font-variant:normal;font-weight:300;font-stretch:normal;font-size:66.07829285px;font-family:'Hero Light';-inkscape-font-specification:'Hero Light, Light';text-align:center;text-anchor:middle;fill:#808080;stroke:none;stroke-width:1.20000005;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none"
+         style="font-style:normal;font-variant:normal;font-weight:300;font-stretch:normal;font-size:66.07829285px;font-family:'Hero Light';-inkscape-font-specification:'Hero Light, Light';text-align:center;text-anchor:middle;fill:#999999;stroke:#999999;stroke-width:2;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;fill-opacity:1;stroke-opacity:1"
          y="262.89597"
          x="148.9446"
          sodipodi:role="line">ddserver</tspan></text>
     <use
        xlink:href="logo.svg#logo"
-       transform="matrix(1.138133,0,0,1.138133,-19.915168,-16.081538)"
-       height="301.41422"
-       width="301.41422"
-       y="-28.707108"
+       id="image10"
        x="-0.70710754"
-       id="image10" />
+       y="-28.707108"
+       width="301.41422"
+       height="301.41422"
+       transform="matrix(1.138133,0,0,1.138133,-19.915168,-16.081538)" />
   </g>
 </svg>
