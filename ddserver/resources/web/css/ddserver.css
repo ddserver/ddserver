@@ -119,7 +119,11 @@ td.noresults {
 }
 
 .navbar-brand {
-  padding: 12px;
+  padding: 9px;
+}
+
+.navbar-brand img {
+  height: 24px;
 }
 
 .divider {
