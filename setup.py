@@ -86,6 +86,9 @@ setuptools.setup(
                                            'ddserver/resources/web/js/pwstrength.js',
                                            'ddserver/resources/web/js/pwstrength.options.js'
                                            ]),
+        ('/usr/share/ddserver/static/img', ['ddserver/resources/web/img/logo-icon.png',
+                                            'ddserver/resources/web/img/logo-long.png'
+                                            ]),
         ('/usr/share/doc/ddserver', ['ddserver/resources/doc/schema.sql',
                                      'ddserver/resources/doc/schema.upgrade.sql',
                                      'ddserver/resources/doc/ddserver.conf.example',

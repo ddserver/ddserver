@@ -19,6 +19,7 @@ along with ddserver. If not, see <http://www.gnu.org/licenses/>.
 
 import re
 import bottle
+import string
 
 import formencode
 
@@ -320,7 +321,7 @@ class ValidSuffix(FancyValidator):
 
 
 class UniqueSuffix(ValidSuffix):
-  ''' Check whether the entered entered is unique. '''
+  ''' Check whether the zone name entered is unique. '''
 
   messages = {
     'not_uniq': 'This zone already exists.'
@@ -347,3 +348,67 @@ class UniqueSuffix(ValidSuffix):
                                value,
                                state)
 
+class IPv6Address(FancyValidator):
+  """ Check whether the IPv6 address entered is valid.
+      Note: IPv4-Embedded IPv6 addresses are not supported at the moment
+  """
+
+  messages = {
+    'badFormat': 'Please enter a valid IPv6 address',
+    'doubleColon': "IPv6 address can only have a single '::'",
+    'IPv4Embedded': "Sorry, IPv4-Embedded IPv6 addresses are not supported at the moment",
+    'illegalSegment': "IPv6 segments must be hexadecimal values within range of 0-FFFF, (not %(segment)r)"
+  }
+
+  def validate_python(self,
+                      value,
+                      state):
+    try:
+        parts = value.split(':')
+
+        # An IPv6 address needs at least 2 colons (3 parts).
+        if len(parts) < 3:
+            raise ValueError
+
+        # If the address has an IPv4-style suffix, is it valid.
+        # This is not supported at the moment, as I do not want to write a test
+        if '.' in parts[-1]:
+          raise formencode.Invalid(self.message('IPv4Embedded', state), value, state)
+
+        # can't have leading or trailing singular colons
+        if (not parts[0] and parts[1]) or (not parts[-1] and parts[-2]):
+            raise ValueError
+
+        # Disregarding the endpoints, find if '::' with nothing in between.
+        # This indicates that a run of zeros has been skipped.
+        skip_index = None
+        for i in range(1, len(parts) - 1):
+            if not parts[i]:
+                if skip_index is not None:
+                    # Can't have more than one '::'
+                    raise formencode.Invalid(self.message('doubleColon', state), value, state)
+                skip_index = i
+
+        if skip_index is not None:
+            if len(parts) > 8 and parts[skip_index - 1] and parts[skip_index + 1]:
+                raise ValueError
+        else:
+            if len(parts) != 8:
+                raise ValueError
+
+        # Validate each hex value
+        hex_digits = frozenset(string.hexdigits)
+        for hex_val in parts:
+            if hex_val.startswith('0') and hex_val != '0':
+                if not self.leading_zeros:
+                    raise formencode.Invalid(
+                        self.message('leadingZeros', state), value, state)
+
+            hex_val = hex_val.lstrip('0')
+
+            if not hex_digits.issuperset(hex_val) or len(hex_val) > 4:
+                raise formencode.Invalid(
+                    self.message('illegalSegment', state, segment=hex_val), value, state)
+
+    except ValueError:
+        raise formencode.Invalid(self.message('badFormat', state), value, state)
