@@ -21,13 +21,8 @@
 --
 
 ALTER TABLE `hosts`
-  ADD `abuse` TEXT NULL ;
+  ADD `abuse` TEXT NULL DEFAULT NULL ;
 
-
-
---
--- Upgrading from version 0.2.x
---
 ALTER TABLE `hosts`
   ADD `address_v6` VARCHAR(39) NULL DEFAULT NULL ;
 
