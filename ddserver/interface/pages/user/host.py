@@ -55,7 +55,8 @@ def get_host_display(user,
           `host`.`address` AS `address`,
           `host`.`address_v6` AS `address_v6`,
           `host`.`updated` AS `updated`,
-          `host`.`description` AS `description`
+          `host`.`description` AS `description`,
+          `host`.`abuse` AS `abuse`
         FROM `hosts` AS `host`
         LEFT JOIN `suffixes` AS `suffix`
           ON ( `suffix`.`id` = `host`.`suffix_id` )
@@ -68,6 +69,10 @@ def get_host_display(user,
   if host is None:
     messages.error('Hostname not found or no access!')
     bottle.redirect('/user/hosts/list')
+
+  if host['abuse'] is not None:
+    messages.error("This hostname has been disabled by an administrator: %s" %
+                   host['abuse'])
 
   return templates['host.html'](host = host,
                                 current_ip = bottle.request.remote_addr)
