@@ -100,7 +100,7 @@ def post_host_update_address(user,
         AND  `user_id` = %(user_id)s
     ''', {'address': data.address,
           'address_v6': data.address_v6,
-          'description': data.description,
+          'description': data.description.replace('\r\n', ' '),
           'host_id': data.host_id,
           'user_id': user.id})
 

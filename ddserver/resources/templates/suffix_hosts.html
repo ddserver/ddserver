@@ -148,8 +148,8 @@
 
   <script type="text/javascript">
       var items = [
-      {% for host in hostlist %}
-          { id: {{host.id}}, hostname: "{{host.hostname}}", username: "{{host.username}}", userid: {{host.user_id}}, address: "{{host.address}}", updated: "{{host.updated}}", zone: "{{suffix.suffixname}}", abuse: '{{host.abuse}}' },
+      {% for host in hostlist -%}
+          { id: {{host.id}}, hostname: "{{host.hostname}}", username: "{{host.username}}", userid: {{host.user_id}}, address: "{{host.address}}", updated: "{{host.updated}}", zone: "{{suffix.suffixname}}", abuse: "{{host.abuse|replace('\r\n', '')}}" },
         {% endfor %}
       ];
       var PagedGridModel = function (items) {

@@ -208,7 +208,7 @@ def post_host_disable(user,
            SET `abuse` = %(reason)s
          WHERE `id` = %(host_id)s
     ''', {'host_id': data.host_id,
-          'reason': data.reason.replace('\n', '').replace('\r', '')})
+          'reason': data.reason.replace('\r\n', ' ')})
 
   messages.success('Ok, done.')
 

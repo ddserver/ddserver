@@ -44,10 +44,16 @@
             <span data-bind="text: hostname"></span><span class="origin" data-bind="text: '.' + zone"></span>
             <!-- ko if: description != 'None' -->
               <!-- ko if: description != '' -->
-                &nbsp; <span class="small"><i class=" fa fa-info tip" data-bind="attr: {title: description}"></i></span>
+                &nbsp; <span class="small"><i class=" fa fa-info-circle tip" data-bind="attr: {title: description}"></i></span>
+              <!-- /ko -->
+            <!-- /ko -->
+            <!-- ko if: abuse != 'None' -->
+              <!-- ko if: abuse != '' -->
+                &nbsp; <span class="small"><i class=" fa fa-exclamation-triangle tip" data-bind="attr: {title: abuse}"></i></span>
               <!-- /ko -->
             <!-- /ko -->
           </td>
+
           <td>
             <!-- ko if: address != 'None' -->
               <span data-bind="text: address"></span>
@@ -56,6 +62,7 @@
               <em><span class="small">(No address assigned)</span></em>
             <!-- /ko -->
           </td>
+
           <td>
             <!-- ko if: address_v6 != 'None' -->
               <span data-bind="text: address_v6"></span>
@@ -64,8 +71,10 @@
               <em><span class="small">(No address assigned)</span></em>
             <!-- /ko -->
           </td>
+
           <td data-bind="text: updated"></td>
-          <td style="width: 200px; text-align: center;">
+
+          <td style="width: 170px; text-align: center;">
             <a class="btn btn-default tip" data-bind="attr: { href: '/user/host/' + id }" title="Display details and configuration examples">Details</a>
             <a class="btn btn-danger tip" data-toggle="modal" data-bind="attr: { href: '#modal' + id }" title="Delete this hostname">Delete</a>
             <div class="modal fade" data-bind="attr: {id: 'modal' + id}">
@@ -105,7 +114,7 @@
   <script type="text/javascript">
       var items = [
       {% for host in hosts -%}
-          { id: {{host.id}}, hostname: "{{host.hostname}}", zone: "{{host.suffix}}", address: "{{host.address}}", updated: "{{host.updated}}", description: "{{host.description|replace("\r\n", " ")}}" },
+          { id: {{host.id}}, hostname: "{{host.hostname}}", zone: "{{host.suffix}}", address: "{{host.address}}", address_v6: "{{host.address_v6}}", updated: "{{host.updated}}", description: "{{host.description|replace('\r\n', '')}}", abuse: "{{host.abuse|replace('\r\n', '')}}" },
         {% endfor %}
       ];
       var PagedGridModel = function (items) {
