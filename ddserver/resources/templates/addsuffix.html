@@ -13,16 +13,33 @@
 
   <div class="row">
     <div class="col-md-8">
+      <h3>Add a new zone</h3>
       <p>
-        Add new zones, in which hostnames can be defined ($ORIGIN). When 
-        specifying a new hostname, the user can choose in which zone it should be.
-        By adding a zone <i>example.org</i>, a user can create a hostname like
-        <i>myhost.example.org</i>.
+        Using the form on the right, you can add a new DNS zone, within which
+        users are allowed to register hostnames. If you have multiple zones configured,
+        a user may choose within which zone a hostname should be added.
+
+        By adding the zone <i>example.org</i>, users may create hostnames like
+        <i>myhost</i>.example.org.
+      </p>
+
+      <h3>Prerequisites</h3>
+      <p>
+        To be able to resolve hostnames in the new zone, the PowerDNS server connected with
+        ddserver must be configured to be authoritative for the zone you add here. Please refer
+        to the <a target="_blank" href="https://docs.ddserver.org">ddserver documentation</a>
+        for more information on zone delegation.
+      </p>
+
+      <h3>Important notes</h3>
+      <p>
+        Be aware that users are allowed to add any subdomain (i.e. <i>mail</i>) to the zone.
+        Please refer to the <a target="_blank" href="https://docs.ddserver.org">ddserver documentation</a>
+        to get information on how to restrict specific hostnames from being registered.
       </p>
       <p>
-        Be aware, that no duplicates are allowed! Specifying a zone here means,
-        users are allowed to add any RFC-compilant subdomain (i.e. <i>mail</i>) to 
-        it. None of the subdomains may appear in your regular powerdns database! 
+        Further, be aware that no duplicate FQDNs are allowed, which means that none of the hostnames
+        in this zone configured in ddserver may appear in any other of your PowerDNS backends.
       </p>
     </div>
 
