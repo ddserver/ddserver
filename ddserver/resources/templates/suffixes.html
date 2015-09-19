@@ -16,8 +16,8 @@
       {% if suffixes %}
         <div data-bind='simpleSortableGrid: gridViewModel, simpleSortableGridTemplate: "gridTemplate"'></div>
       {% else %}
-        <p class="text-danger text-center">
-          No zones defined so far.
+        <p class="text-center">
+          No zones configured. Please <a href="/admin/suffixes/add">add a zone</a> to start with.
         </p>
       {% endif %}
     </div>

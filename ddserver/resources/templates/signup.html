@@ -8,29 +8,25 @@
   <div class="row">
     <div class="col-md-7">
       <p>
-        <strong>ddserver</strong> allows you to add hostnames whose IP address
-        can be updated dynamically using the <a href="http://www.noip.com/integrate">dyndns2 protocol</a>.
-        To use ddserver you have to register for an account using the form on
-        the right.
+        To create your ddserver account, please use the form on the right to specify
+        a username and provide your email address.
+        {%- if config.captcha.enabled %}
+        Further, please click the human-check checkbox, which is needed to prevent
+        automatic user registration.
+        {%- endif %}
+        Finish your registration by clicking the Signup button and check your inbox
+        for your personal activation code.
       </p>
+
+      {%- if config.signup.allowed_maildomains != 'any' %}
       <p>
-        Please specify a username and an email address, where we can send you an
-        activation email to.
-        {% if config.captcha.enabled %}
-        Fill out the captcha, which is needed to prevent automatic registration
-        by spammers.
-        {% endif %}
-        Finally, click the Signup-button and check your inbox.
+        Please note: Depending on the email address you provide, an activation email
+        will be sent instantly, or after verification by an administrator.
       </p>
+      {%- endif %}
       <p>
-        Depending on the system settings and the email address you are using
-        to register for an account, you will receive an email instantly or after
-        an administrator accepts your registration. The email will contain further
-        information as well as an activation code.
-      </p>
-      <p>
-        If you have any trouble with the signup process or you do not receive
-        your activation email in reasonable time, please contact us.
+        If you have any trouble with the signup process or you do not receive an
+        activation email within a reasonable period of time, please contact us.
       </p>
       <p>
         <a href="mailto:{{config.contact.email}}">{{config.contact.name}} &lt;{{config.contact.email}}&gt;</a>
@@ -55,19 +51,18 @@
             </div>
           </div>
 
-          {% if config.captcha.enabled %}
+          {%- if config.captcha.enabled %}
           <div class="form-group">
             <label>Human check</label>
             <div id="recaptcha_widget">
               <div class="input-group">
-                <span class="input-group-addon"><i class="fa fa-fw fa-eye"></i></span>
                 <div class="g-recaptcha" data-sitekey="{{config.captcha.recaptcha_public_key}}"></div>
               </div>
               <script src='https://www.google.com/recaptcha/api.js'></script>
-              <noscript>Please enable JavaScript to sign up.</noscript>
+              <noscript>Please enable JavaScript to allow the captcha to load.</noscript>
             </div>
           </div>
-          {% endif %}
+          {% endif -%}
 
           <div class="form-group">
             <button type="submit" class="btn btn-success btn-primary">Signup</button>

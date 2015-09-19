@@ -61,7 +61,8 @@ class Database(object):
                                            user = config.db.username,
                                            password = config.db.password,
                                            database = config.db.name,
-                                           charset = 'utf8')
+                                           charset = 'utf8',
+                                           buffered=True)
       setattr(self.thread_local, 'connection', connection)
 
     else:

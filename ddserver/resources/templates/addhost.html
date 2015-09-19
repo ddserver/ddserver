@@ -14,7 +14,7 @@
   <div class="row">
     {% if suffixes %}
     <div class="col-md-8">
-      <h4>Select a hostname</h4>
+      <h3>Add a new hostname</h3>
       <p>
         Use the from on the right to add your hostnames. You can have
         {% if user.maxhosts == -1 or user.admin == True %}
@@ -28,45 +28,45 @@
       </p>
 
       {% if suffixes|count > 1 %}
-      <h4>Select a zone</h4>
+      <h3>Select a zone</h3>
       <p>
         From the dropdown menu, you can choose from a list of available 
         zones for your DNS name. 
       </p>
       {% endif %}
 
-      <h4>Set a password</h4>
+      <h3>Set a password</h3>
       <p>
-        Each hostname you add gets its individual password for updating.
-        The minimum password length is {{config.auth.password_min_chars}} 
-        characters. If you want to update multiple hostnames at once, you
-        have to use the same password for them.
+        Each hostname gets its individual password used to update its IPv4 address.
+        The minimum password length is {{config.auth.password_min_chars}} characters.
+        If you want to update multiple hostnames at once, you have to use the same
+        password for each of them.
       </p>
 
-      <h4>(Optional) Set an initial IPv4 address</h4>
+      <h3>(Optional) Set an initial IPv4 address</h3>
       <p>
-        If you specify an initial IPv4 address, your hostname will instantly
-        be available by this address. If you leave the IPv4 address field blank,
-        you have to send an update using your homerouter or the ddclient program,
+        If you specify an initial IPv4 address, your hostname will instantly be
+        available by this address. If you leave the IPv4 address field blank, you
+        will have to send an update using your homerouter or the ddclient program,
         before the hostname can be resolved using to DNS queries.
       </p>
 
-      <h4>(Optional) Set a static IPv6 address</h4>
+      <h3>(Optional) Set a static IPv6 address</h3>
       <p>
-        You can provide a static IPv6 address for your hostname. The IPv6 address
-        can only be set using the Web-UI. Dynamic updates are not possible.
+        You can provide a static IPv6 address for your hostname. The IPv6 address can
+        only be set using the Web-UI. Dynamic updates are not possible at the moment.
       </p>
 
-      <h4>(Optional) Add a description</h4>
+      <h3>(Optional) Add a description</h3>
       <p>
-        A description can be set to add personal notes. The description is only
-        visible in the ddserver Web-UI.
+        A description can be set to add personal notes. The description is only visible
+        in the ddserver Web-UI.
       </p>
-      <h4>You are done</h4>
+      <h3>You are done</h3>
       <p>
-        After adding a new hostname, you can modify it or display configuration
+        As soon as the hostname has been added, you can modify it or display configuration
         examples by navigating to the <em><a href="/user/hosts/list">Your hostnames</a></em>
-        tab and click the <em>Details</em> button.
+        tab and click the <em>Details</em> button for your hostname.
       </p>
     </div>
 
@@ -190,8 +190,9 @@
     {% else %}
 
     <div class="col-md-12">
-      <p class="text-danger text-center">
-        There are no zones configured so far. Please try again later.
+      <p class="text-center">
+        At the moment, there are no zones configured to add hostnames to.
+        Please try again later or contact the administrator to get more information.
       </p>
     </div>
 
