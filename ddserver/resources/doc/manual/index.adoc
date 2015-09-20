@@ -11,6 +11,7 @@
 :stylesheet: asciidoctor-default.css
 
 // Installation guide
+include::intro.adoc[]
 include::install.adoc[]
 include::admin.adoc[]
 include::user.adoc[]
