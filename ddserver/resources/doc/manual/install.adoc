@@ -1,0 +1,98 @@
+
+// Installation manual
+== Installation
+
+The following sections describe the installation of ddserver, including the ddserver-interface, ddserver-updater and the ddserver-recursor.
+
+For testing, a vagrant box is available which will install and start the ddserver-interface and ddserver-updater in a CentOS vm.
+See link:https://github.com/ddserver[https://github.com/ddserver].
+
+=== Prerequisites
+
+Before you start, you need to fulfill some prerequisites.
+
+As ddserver is written in python, the first step is to install python version 2.7. Further, the MySQL server and the PowerDNS server are needed to store DNS information and to answer DNS requests.
+
+Also, some packages need to be installed on your system, before you will be able to compile the needed packages.
+Those include the python and mysql-client header files, which are available in separate packages on some GNU/Linux distributions.
+
+If you are using Debian GNU/Linux or Ubuntu, please install the following packages:
+
+[source, bash]
+----
+libmysqlclient-dev 
+python-dev
+python-setuptools
+----
+
+If you are using CentOS please install the following packages:
+
+[source, bash]
+----
+mysql-devel
+python-devel
+python-setuptools
+----
+
+=== Getting the Source
+
+Currently, ddserver is available from link:https://github.com/ddserver/ddserver[GitHub] only.
+To get the source please use git to clone the ddserver repository.
+
+[source, bash]
+----
+git clone https://github.com/ddserver/ddserver.git
+----
+
+=== Installing ddserver
+
+Change to the source directory and use 'python-setuptools' to install ddserver
+
+[source, bash]
+----
+cd ddserver
+python setup.py install
+----
+
+After this steps, ddserver installed to the following locations:
+
+- <CurrentDirectory>/build contains the installed python packages
+- /etc/ddserver contains the configuration file
+- /etc/init.d/ddserver is a debian init-script for controlling ddserver
+- /usr/share/doc/ddserver contains the database schema and some readme files
+- /usr/share/ddserver contains static files like CSS, JavaScript, eMail-Templates, ..
+- /usr/local/bin contains the ddserver executables
+
+=== Installing the database
+
+ddserver uses a MySQL backend to store DNS information.
+To install the ddserver database schema, first create a database and a database user used for ddserver.
+
+[source, mysql]
+----
+mysql -u root -p
+
+mysql> CREATE DATABASE ddserver;
+mysql> CREATE USER 'ddserver'@'localhost' IDENTIFIED BY 'YourSecurePassword';
+mysql> GRANT USAGE ON *.* TO 'ddserver'@'localhost' IDENTIFIED BY 'YourSecurePassword' WITH MAX_QUERIES_PER_HOUR 0 MAX_CONNECTIONS_PER_HOUR 0 MAX_UPDATES_PER_HOUR 0 MAX_USER_CONNECTIONS 0;
+mysql> GRANT SELECT, INSERT, UPDATE, DELETE ON `ddserver`.* TO 'ddserver'@'localhost';
+----
+
+Now you can install the ddserver database schema by usng the following command.
+
+[source, bash]
+----
+mysql -u root -p ddserver < /usr/share/doc/ddserver/schema.sql
+----
+
+Congratz, you installed ddserver!
+
+TIP: When installing the default database schema, an initial user will be installed to log into the WebUI.
+
+The default
+[source, bash]
+----
+login is: admin:admin
+----
+
+//EOF
