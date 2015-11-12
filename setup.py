@@ -83,6 +83,8 @@ setuptools.setup(
         ('/usr/share/ddserver/static/js', ['ddserver/resources/web/js/bootstrap.min.js',
                                            'ddserver/resources/web/js/Chart.min.js',
                                            'ddserver/resources/web/js/jquery.min.js',
+                                           'ddserver/resources/web/js/knockout.js',
+                                           'ddserver/resources/web/js/knockout.simpleSortableGrid.js',
                                            'ddserver/resources/web/js/pwstrength.js',
                                            'ddserver/resources/web/js/pwstrength.options.js'
                                            ]),
