@@ -133,7 +133,7 @@
           </div>
           <div class="form-group">
             <label>2FA is enabled</label><br>
-            <p>Please test it, before you log out.</p>
+            <p>Please test your yubikey, before you log out!</p>
             <a href="#test2FA" class="btn btn-primary" data-toggle="modal">Test 2FA</a>
             <button type="submit" class="btn btn-primary">Disable</button>
           </div>
@@ -209,6 +209,10 @@
           <p>
             Please verify that 2FA is working correctly. If this test is not successfull,
             check your settings or disable 2FA before you logout.
+          </p>
+          <p>
+            Note: After you generate a new client-id, it may take up to five minutes until
+            all validation servers know about it.
           </p>
 
           <form role="form" action="/user/account/yubikey/test" method="post">
