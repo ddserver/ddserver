@@ -101,11 +101,12 @@ class UserManager(object):
 
     # check whether the user has enabled Yubikey OTP authentication.
     # If so, verify the OTP
-    if not verify_yubikey_otp(username = username,
-                              yubikey_otp = yubikey_otp):
-      messages.error('An invalid OTP was provided.')
+    if user.yubico_id is not None:
+      if not verify_yubikey_otp(username = username,
+                                yubikey_otp = yubikey_otp):
+        messages.error('An invalid OTP was provided.')
 
-      return False
+        return False
 
     # login the user
     session.username = username
@@ -178,9 +179,9 @@ def verify_yubikey_otp(db,
   otp_status = False
 
   if user['yubico_id'] is not None:
-    client = Yubico(user['yubico_id'], user['yubico_key'])
 
     try:
+      client = Yubico(user['yubico_id'], user['yubico_key'])
       otp_status = client.verify(yubikey_otp)
     except:
       pass

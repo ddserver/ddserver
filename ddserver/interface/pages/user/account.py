@@ -204,6 +204,6 @@ def post_account_yubico_test(user,
   if result:
     messages.success('Congratulation, your Yubikey works.')
   else:
-    messages.success('Error validating your Yubikey OTP.')
+    messages.error('Error validating your Yubikey OTP.')
 
   bottle.redirect('/user/account')
