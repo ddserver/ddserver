@@ -28,6 +28,8 @@ CREATE TABLE `users` (
   `id`          INT            NOT NULL AUTO_INCREMENT PRIMARY KEY,
   `username`    VARCHAR(255)   NOT NULL UNIQUE,
   `password`    VARCHAR(255)   NULL DEFAULT NULL,
+  `yubico_id`   INT            NULL DEFAULT NULL,
+  `yubico_key`  VARCHAR(32)    NULL DEFAULT NULL,
   `email`       VARCHAR(255)   NOT NULL,
   `admin`       BOOLEAN        NOT NULL DEFAULT FALSE,
   `active`      BOOLEAN        NOT NULL DEFAULT FALSE,
