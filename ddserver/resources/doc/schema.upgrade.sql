@@ -26,6 +26,14 @@ ALTER TABLE `users`
 
 
 --
+-- Upgrading from version 0.2.x
+--
+ALTER TABLE `hosts`
+  ADD `address_v6` VARCHAR(39) NULL DEFAULT NULL ;
+
+
+
+--
 -- Upgrading from version 0.1.x
 --
 

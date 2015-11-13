@@ -59,6 +59,7 @@ CREATE TABLE `hosts` (
   `suffix_id`   INT             NOT NULL,
   `hostname`    VARCHAR(255)    NOT NULL,
   `address`     VARCHAR(15)     NULL DEFAULT NULL,
+  `address_v6`  VARCHAR(39)     NULL DEFAULT NULL,
   `description` VARCHAR(255)    NULL DEFAULT NULL,
   `password`    VARCHAR(255)    NOT NULL,
   `updated`     TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,

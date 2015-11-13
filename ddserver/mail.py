@@ -43,12 +43,12 @@ def config_email(config_decl):
       conv = str)
 
   with config_decl.declare('wsgi') as s:
-    s('protocol',
+    s('preferred_protocol',
       conv = str,
-      default = 'http://')
+      default = 'http')
 
   with config_decl.declare('wsgi') as s:
-    s('basename',
+    s('servername',
       conv = str,
       default = 'localhost:8080')
 

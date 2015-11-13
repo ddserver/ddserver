@@ -23,58 +23,47 @@
             <input class="form-control" type="text" id="inputHostname" name="hostname" value="{{host.hostname}}.{{host.suffix}}" readonly="readonly">
           </div>
         </div>
-        <div class="form-group">
-          <label for="inputCurAddr">Current IP-Address</label>
-          <div class="input-group">
-            <span class="input-group-addon"><i class="fa fa-fw fa-info"></i></span>
-            <input class="form-control" type="text" id="inputCurAddr" name="curAddress" value="{{host.address}}" readonly="readonly">
-          </div>
-        </div>
-        <div class="form-group">
-          <label for="inputCurDescription">Description</label>
-          <div class="input-group">
-            <span class="input-group-addon"><i class="fa fa-fw fa-align-left"></i></span>
-            <textarea class="form-control" rows="2" cols="20" id="inputCurDescription" name="curDescription" readonly="readonly">{% if host.description != None %}{{host.description}}{% endif %}</textarea>
-          </div>
-        </div>
-      </div>
 
-      <h3>Update IP address or description</h3>
-      <p>
-        You can manually set a new IP address for your hostname or update its description.
-      </p>
-      <div class="box">
-        <form role="form" action="/user/host/updateAddress" method="post">
-          <input type="hidden" name="host_id" value="{{host.id}}">
-          <div class="form-group">
-            <label for="inputAddress">Set new IP-Address <span><i class="fa fa-home tip" id="curIPbutton" title="Use your current IP address ({{current_ip}})"></i></span></label>
-            <div class="input-group">
-              <span class="input-group-addon"><i class="fa fa-fw fa-info"></i></span>
-              <input class="form-control" type="text" id="inputAddress" placeholder="IP-Address" name="address">
+        <div class="form-group">
+          <form role="form" action="/user/host/updateAddress" method="post">
+            <input type="hidden" name="host_id" value="{{host.id}}">
+            <div class="form-group">
+              <label for="inputAddress">Dynamic IPv4-Address <span><i class="fa fa-home tip" id="curIPbutton" title="Use your current IP address ({{current_ip}})"></i></span></label>
+              <div class="input-group">
+                <span class="input-group-addon"><i class="fa fa-fw fa-info"></i></span>
+                <input class="form-control" type="text" id="inputAddress" {% if host.address != None %}value="{{host.address}}"{% endif %} placeholder="IPv4-Address" name="address">
+              </div>
+              <script type="text/javascript">
+                $('#curIPbutton').click(function() {
+                  $('#inputAddress').val("{{current_ip}}")
+                });
+              </script>
             </div>
-            <script type="text/javascript">
-              $('#curIPbutton').click(function() {
-                $('#inputAddress').val("{{current_ip}}")
-              });
-            </script>
-          </div>
-          <div class="form-group">
-            <label for="inputDescription">Description <span>(optional)</span></label>
-            <div class="input-group">
-              <span class="input-group-addon"><i class="fa fa-fw fa-align-left"></i></span>
-              <textarea class="form-control" rows="2" cols="20" id="inputDescription" placeholder="Description" name="description"></textarea>
+            <div class="form-group">
+              <label for="inputAddress">Static IPv6-Address</label>
+              <div class="input-group">
+                <span class="input-group-addon"><i class="fa fa-fw fa-info"></i></span>
+                <input class="form-control" type="text" id="inputAddress_v6" {% if host.address_v6 != None %}value="{{host.address_v6}}"{% endif %} placeholder="IPv6-Address" name="address_v6">
+              </div>
             </div>
-          </div>
-          <div class="form-group">
-            <button type="submit" class="btn btn-success btn-primary">Update</button>
-            <button type="reset" class="btn btn-default">Cancel</button>
-          </div>
-        </form>
+            <div class="form-group">
+              <label for="inputDescription">Description <span>(optional)</span></label>
+              <div class="input-group">
+                <span class="input-group-addon"><i class="fa fa-fw fa-align-left"></i></span>
+                <textarea class="form-control" rows="2" cols="20" id="inputDescription" placeholder="Description" name="description">{% if host.description != None %}{{host.description}}{% endif %}</textarea>
+              </div>
+            </div>
+            <div class="form-group">
+              <button type="submit" class="btn btn-success btn-primary">Update</button>
+              <button type="reset" class="btn btn-default">Cancel</button>
+            </div>
+          </form>
+        </div>
       </div>
 
       <h3>Update host password</h3>
       <p>
-        Set a new password for updating this hostname.
+        Set a new password to update this hostnames dynamic IP address.
       </p>
       <div class="box">
         <form role="form" action="/user/host/updatePassword" method="post" id="pwdcontainer">
@@ -92,7 +81,7 @@
 
                 for( var i=0; i < 12; i++ )
                   password += possible.charAt(Math.floor(Math.random() * possible.length));
-                
+
                 $('#hostPassword').get(0).type = 'text';
                 $('#hostPassword').val(password);
 
@@ -169,7 +158,7 @@
                 of your hostname:
               </p>
               <pre>
-{{config.wsgi.protocol}}{{session.username}}:<abbr class="tip" title="The password you specified for updating the hostname (not the password you use to login into this WebUI)">YourHostPassword</abbr>@{{config.wsgi.basename}}/nic/update?hostname={{host.hostname}}.{{host.suffix}}&amp;myip=<abbr class="tip" title="The IP address you want to set">IP-Address</abbr>
+{{config.wsgi.preferred_protocol}}://{{session.username}}:<abbr class="tip" title="The password you specified for updating the hostname (not the password you use to login into this WebUI)">YourHostPassword</abbr>@{{config.wsgi.servername}}/nic/update?hostname={{host.hostname}}.{{host.suffix}}&amp;myip=<abbr class="tip" title="The IP address you want to set">IP-Address</abbr>
               </pre>
               <p>
                 Note: Many recent browsers won't allow you to specify HTTP basic authentication parameters
@@ -179,7 +168,7 @@
                 To overcome this limitation, you may specify authentication parameters as follows:
               </p>
               <pre>
-{{config.wsgi.protocol}}{{config.wsgi.basename}}/nic/update?hostname={{host.hostname}}.{{host.suffix}}&amp;myip=<abbr class="tip" title="The IP address you want to set">IP-Address</abbr>&amp;username={{session.username}}&amp;password=<abbr class="tip" title="The password you specified for updating the hostname (not the password you use to login into this WebUI)">YourHostPassword</abbr>
+{{config.wsgi.preferred_protocol}}://{{config.wsgi.servername}}/nic/update?hostname={{host.hostname}}.{{host.suffix}}&amp;myip=<abbr class="tip" title="The IP address you want to set">IP-Address</abbr>&amp;username={{session.username}}&amp;password=<abbr class="tip" title="The password you specified for updating the hostname (not the password you use to login into this WebUI)">YourHostPassword</abbr>
               </pre>
             </div>
           </div>
@@ -248,7 +237,7 @@
                 </tr>
                 <tr>
                   <td>Custom update-URL</td>
-                  <td>{{config.wsgi.protocol}}[USERNAME]:[PASSWORD]@{{config.wsgi.basename}}/nic/update?hostname=[DOMAIN]&amp;myip=[IP]</td>
+                  <td>{{config.wsgi.preferred_protocol}}://[USERNAME]:[PASSWORD]@{{config.wsgi.servername}}/nic/update?hostname=[DOMAIN]&amp;myip=[IP]</td>
                 </tr>
                 <tr>
                   <td>Hostname</td>
@@ -268,7 +257,7 @@
                 </tr>
                 <tr>
                   <td>URL</td>
-                  <td>{{config.wsgi.protocol}}{{config.wsgi.basename}}/nic/ip</td>
+                  <td>{{config.wsgi.preferred_protocol}}://{{config.wsgi.servername}}/nic/ip</td>
                 </tr>
               </table>
 
@@ -287,22 +276,22 @@
 config service 'myddns'
         option enabled '1'
         option interface 'wan'
-        option update_url '{{config.wsgi.protocol}}[USERNAME]:[PASSWORD]@{{config.wsgi.basename}}/nic/update?hostname=[DOMAIN]&amp;myip=[IP]'
+        option update_url '{{config.wsgi.preferred_protocol}}://[USERNAME]:[PASSWORD]@{{config.wsgi.servername}}/nic/update?hostname=[DOMAIN]&amp;myip=[IP]'
         option domain '{{host.hostname}}.{{host.suffix}}'
         option username '{{session.username}}'
         option password '<abbr class="tip" title="The password you specified for updating the hostname (not the password you use to login into this WebUI)">YourHostPassword</abbr>'
         option ip_source 'web'
-        option ip_url '{{config.wsgi.protocol}}{{config.wsgi.basename}}/nic/ip'
+        option ip_url '{{config.wsgi.preferred_protocol}}://{{config.wsgi.servername}}/nic/ip'
         option check_unit 'hours'
         option check_interval '1'
         option retry_interval '60'
         option retry_unit 'seconds'
         option force_interval '24'
-        option force_unit 'hours'{% if config.wsgi.protocol == 'https://' %}
+        option force_unit 'hours'{% if config.wsgi.preferred_protocol == 'https' %}
         option use_https 1
         option cacert /etc/ssl/certs{% endif %}</pre>
 
-              {% if config.wsgi.protocol == 'https://' %}
+              {% if config.wsgi.preferred_protocol == 'https' %}
               <h4>Notes on using SSL (https://)</h4>
               <p>
                 In order for ddns-scripts to perform DNS updates over https (SSL),
@@ -351,7 +340,7 @@ config service 'myddns'
                 </tr>
                 <tr>
                   <td>URL</td>
-                  <td>{{config.wsgi.protocol}}{{session.username}}:<abbr class="tip" title="The password you specified for updating the hostname (not the password you use to login into this WebUI)">YourHostPassword</abbr>@{{config.wsgi.basename}}/nic/update?hostname={{host.hostname}}.{{host.suffix}}&amp;myip=@IP</td>
+                  <td>{{config.wsgi.preferred_protocol}}://{{session.username}}:<abbr class="tip" title="The password you specified for updating the hostname (not the password you use to login into this WebUI)">YourHostPassword</abbr>@{{config.wsgi.servername}}/nic/update?hostname={{host.hostname}}.{{host.suffix}}&amp;myip=@IP</td>
                 </tr>
               </table>
             </div>
@@ -389,7 +378,7 @@ config service 'myddns'
                 </tr>
                 <tr>
                   <td>Update-URL</td>
-                  <td>{{config.wsgi.protocol}}{{config.wsgi.basename}}/nic/update?hostname=&lt;domain&gt;&amp;myip=&lt;ipaddr&gt;</td>
+                  <td>{{config.wsgi.preferred_protocol}}://{{config.wsgi.servername}}/nic/update?hostname=&lt;domain&gt;&amp;myip=&lt;ipaddr&gt;</td>
                 </tr>
                 <tr>
                   <td>Domainname</td>
@@ -433,12 +422,12 @@ daemon=300
 syslog=yes
 mail=root
 mail-failure=root
-{% if config.wsgi.protocol == 'https://' %}ssl=yes{% else %}ssl=no{% endif %}
-use=web, web={{config.wsgi.protocol}}{{config.wsgi.basename}}/nic/ip
+{% if config.wsgi.preferred_protocol == 'https' %}ssl=yes{% else %}ssl=no{% endif %}
+use=web, web={{config.wsgi.preferred_protocol}}://{{config.wsgi.servername}}/nic/ip
 
 # == Update server
 protocol=noip, \
-server={{config.wsgi.basename}}, \
+server={{config.wsgi.servername}}, \
 login={{session.username}}, \
 password=<abbr class="tip" title="The password you specified for updating the hostname (not the password you use to login into this WebUI)">YourHostnamePassword</abbr> \
 {{host.hostname}}.{{host.suffix}}
@@ -465,7 +454,7 @@ password=<abbr class="tip" title="The password you specified for updating the ho
               <p>
                 An example usage would be:
               </p>
-              <pre>wget -q --auth-no-challenge {% if config.wsgi.protocol == 'https://' %}--no-check-certificate {% endif %}'{{config.wsgi.protocol}}{{session.username}}:<abbr class="tip" title="The password you specified for updating the hostname (not the password you use to login into this WebUI)">YourHostPassword</abbr>@{{config.wsgi.basename}}/nic/update?hostname={{host.hostname}}.{{host.suffix}}&amp;myip=<abbr class="tip" title="The IP address you want to set">IP-Address</abbr>' -O -</pre>
+              <pre>wget -q --auth-no-challenge {% if config.wsgi.preferred_protocol == 'https' %}--no-check-certificate {% endif %}'{{config.wsgi.preferred_protocol}}{{session.username}}:<abbr class="tip" title="The password you specified for updating the hostname (not the password you use to login into this WebUI)">YourHostPassword</abbr>@{{config.wsgi.servername}}/nic/update?hostname={{host.hostname}}.{{host.suffix}}&amp;myip=<abbr class="tip" title="The IP address you want to set">IP-Address</abbr>' -O -</pre>
               <p>
                 You can automate updates using the cron daemon. Just put the above
                 command into an executable bash script as follows
@@ -473,8 +462,8 @@ password=<abbr class="tip" title="The password you specified for updating the ho
               <pre>
 #!/bin/bash
 
-IP=$(wget -q {% if config.wsgi.protocol == 'https://' %}--no-check-certificate {% endif %}'{{config.wsgi.protocol}}{{config.wsgi.basename}}/nic/ip' -O -)
-wget -q --auth-no-challenge {% if config.wsgi.protocol == 'https://' %}--no-check-certificate {% endif %}"{{config.wsgi.protocol}}{{session.username}}:<abbr class="tip" title="The password you specified for updating the hostname (not the password you use to login into this WebUI)">YourHostPassword</abbr>@{{config.wsgi.basename}}/nic/update?hostname={{host.hostname}}.{{host.suffix}}&amp;myip=${IP}" -O -</pre>
+IP=$(wget -q {% if config.wsgi.preferred_protocol == 'https' %}--no-check-certificate {% endif %}'{{config.wsgi.preferred_protocol}}://{{config.wsgi.servername}}/nic/ip' -O -)
+wget -q --auth-no-challenge {% if config.wsgi.preferred_protocol == 'https' %}--no-check-certificate {% endif %}"{{config.wsgi.preferred_protocol}}://{{session.username}}:<abbr class="tip" title="The password you specified for updating the hostname (not the password you use to login into this WebUI)">YourHostPassword</abbr>@{{config.wsgi.servername}}/nic/update?hostname={{host.hostname}}.{{host.suffix}}&amp;myip=${IP}" -O -</pre>
               <p>
                 Now, run the script periodically (every hour) using the following cron configuration statement.
               </p>

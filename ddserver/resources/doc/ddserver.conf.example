@@ -30,8 +30,8 @@ password = YourDatabasePassword
 ;host = 0.0.0.0
 ;port = 8080
 ;debug = False
-;protocol = http://
-;basename = localhost:8080
+;preferred_protocol = http
+;servername = localhost:8080
 ;static_files = /usr/share/ddserver/static
 ;pagination_max_items = 25
 
