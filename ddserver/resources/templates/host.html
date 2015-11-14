@@ -24,14 +24,13 @@
           </div>
           <div class="input-group">
             <div class="checkbox">
-              <label for="inputHostname">
+              <label for="inputWildcard">
                 <input type="checkbox" id="inputWildcard" name="wildcard" {% if host.wildcard %}checked="checked"{% endif %} disabled="disabled">
                 Enable Wildcard Record
               </label>
             </div>
           </div>
         </div>
-
         <div class="form-group">
           <form role="form" action="/user/host/updateAddress" method="post">
             <input type="hidden" name="host_id" value="{{host.id}}">
