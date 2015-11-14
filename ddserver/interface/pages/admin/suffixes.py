@@ -222,10 +222,10 @@ def post_host_disable(user,
           host_id = validation.Int(not_empty = True))
 @require(db = 'ddserver.db:Database',
          messages = 'ddserver.interface.message:MessageManager')
-def post_host_disable(user,
-                      data,
-                      db,
-                      messages):
+def post_host_enable(user,
+                     data,
+                     db,
+                     messages):
   """ Enable a hostname administratively.
   """
 
