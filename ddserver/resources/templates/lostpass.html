@@ -13,14 +13,14 @@
         minutes you will be able to access your account again.
       </p>
       <p>
-        Please enter your ddserver username
-        {% if config.captcha.enabled %}
-        as well as the captcha, which is needed to prevent automatic password
-        resets by spammers
-        {% endif %}
-        and hit the <em>Send</em> button. We will instantly send you an email
-        to the email address you have set in your account settings. The email
-        will contain further information as well as a password reset code.
+        To start the password recovery process, please enter your ddserver username
+        {%- if config.captcha.enabled %}
+        and click the human-check checkbox (which is needed to prevent your
+        account from automatic password resets)
+        {%- endif %}.
+        After you hit the <em>Send</em> button, we will send you an email to
+        the email address specified in your account settings. It will contain
+        further information as well as a password reset code.
       </p>
       <p>
         If you have any trouble with the password recovery process or you do not
@@ -47,11 +47,10 @@
             <label>Human check</label>
             <div id="recaptcha_widget">
               <div class="input-group">
-                <span class="input-group-addon"><i class="fa fa-fw fa-eye"></i></span>
                 <div class="g-recaptcha" data-sitekey="{{config.captcha.recaptcha_public_key}}"></div>
               </div>
               <script src='https://www.google.com/recaptcha/api.js'></script>
-              <noscript>Please enable JavaScript to sign up.</noscript>
+              <noscript>Please enable JavaScript to allow the captcha to load.</noscript>
             </div>
           </div>
           {% endif %}

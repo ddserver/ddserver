@@ -3,16 +3,22 @@
 <html lang="en">
 <head>
   <title>ddserver - A dynamic DNS service</title>
+  <link rel="icon" type="image/png" href="/static/img/logo-icon.png" />
+
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="cache-control" content="no-cache">
   <meta http-equiv="pragma" content="no-cache">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="ddserver is a dynamic DNS service">
+  <meta name="keywords" content="ddserver,dynamic,DNS,dyndns,update,ip">
 
   <script type="text/javascript" src="/static/js/jquery.min.js"></script>
   <script type="text/javascript" src="/static/js/bootstrap.min.js"></script>
   <script type="text/javascript" src="/static/js/Chart.min.js"></script>
   <script type="text/javascript" src="/static/js/pwstrength.js"></script>
   <script type="text/javascript" src="/static/js/pwstrength.options.js"></script>
+  <script type="text/javascript" src="/static/js/knockout.js"></script>
+  <script type="text/javascript" src="/static/js/knockout.simpleSortableGrid.js"></script>
 
   <link rel="stylesheet" type="text/css" href="/static/css/bootstrap.min.css">
   <link rel="stylesheet" type="text/css" href="/static/css/bootstrap-theme.min.css">
@@ -23,6 +29,8 @@
     $(function () {
         $('.tip').tooltip();
     });
+
+    pagination_items_per_page = {{config.wsgi.pagination_max_items}};
   </script>
 </head>
 
@@ -36,7 +44,7 @@
           <span class="icon-bar"></span>
           <span class="icon-bar"></span>
         </button>
-        <a class="navbar-brand" href="/">ddserver</a>
+        <a class="navbar-brand" href="/"><img class="img-responsive" src="/static/img/logo-long.png"></a>
       </div>
 
       <div class="collapse navbar-collapse navbar-inverse " id="mainmenu">
@@ -59,6 +67,13 @@
   </header>
 
   <div class="container main">
+    <noscript>
+      <div class="alert alert-block alert-warning">
+        <a class="close" data-dismiss="alert" href="#">×</a>
+        Please enable JavaScript to use this application.
+      </div>
+    </noscript>
+
     {% for message in messages.popall() %}
       <div class="alert alert-block alert-{{message.level.value}}">
         <a class="close" data-dismiss="alert" href="#">×</a>

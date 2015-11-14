@@ -2,25 +2,26 @@
 
 {% block content %}
   <div class="row">
-    <div class="col-md-12"><h1>Manage zones</h1></div>
+    <div class="col-md-12"><h1>Users hostnames</h1></div>
   </div>
-
-  <ul class="nav nav-tabs">
-    <li><a href="/admin/suffixes/add">Add zone</a></li>
-    <li><a href="/admin/suffixes/list">Configured zones</a></li>
-    <li class="active"><a href="/admin/suffix/{{suffix.suffixid}}">Zone content</a></li>
-  </ul>
-  <br>
 
   <div class="row">
     <div class="col-md-12">
-      <h3>Zone: {{suffix.suffixname}}</h3>
+      <ul class="nav nav-tabs">
+        <li><a href="/admin/users/all">All Users</a></li>
+        <li><a href="/admin/users/inactive">Awaiting Activation</a></li>
+        <li><a href="/admin/users/admins">Administrators</a></li>
+        <li><a href="/admin/users/add">Add new user</a></li>
+        <li class="active"><a href="#">Users hostnames</a></li>
+      </ul>
+      <br>
 
-      {% if hostlist %}
+      {% if hosts %}
+        <h3>User: {{hosts.0.username}}</h3>
         <div data-bind='simpleSortableGrid: gridViewModel, simpleSortableGridTemplate: "gridTemplate"'></div>
       {% else %}
-        <p class="text-danger text-center">
-          No hostnames defined so far.
+        <p class="text-center">
+          No hostnames to display.
         </p>
       {% endif %}
     </div>
@@ -31,7 +32,7 @@
       <thead>
         <tr data-bind="foreach: columns" style="cursor:pointer;">
           <!-- ko if: isSortable == true -->
-          <th data-bind="click: function() { $parent.sortBy($data.rowText); }">
+          <th data-bind="click:$parent.sortBy($data.rowText)">
             <span data-bind="text: headerText"></span>
             <span data-bind="css:$parent.sortByCSS($data.rowText)"></span>
           </th>
@@ -44,11 +45,13 @@
       <tbody data-bind="foreach: itemsOnCurrentPage">
         <tr>
           <td>
-            <span data-bind="text: hostname"></span>
+            <span data-bind="text: hostname"></span><a class="tip origin" data-bind="text: '.' + zone, attr: { href: '/admin/suffix/' + zone_id, title: 'Display all hosts in this zone' }"></a>
+            <!-- ko if: description != 'None' -->
+              <!-- ko if: description != '' -->
+                &nbsp; <span class="small"><i class="fa fa-info tip" data-bind="attr: {title: description}"></i></span>
+              <!-- /ko -->
+            <!-- /ko -->
           </td>
-
-          <td><a href="#" class="tip" data-bind="text: username, attr: { href: '/admin/user/' + userid + '/hosts', title: 'Display this users hostnames' }"></a></td>
-
           <td>
             <!-- ko if: address != 'None' -->
               <span data-bind="text: address"></span>
@@ -57,7 +60,6 @@
               <em><span class="small">(No address assigned)</span></em>
             <!-- /ko -->
           </td>
-
           <td data-bind="text: updated"></td>
 
           <td style="width: 90px">
@@ -110,8 +112,8 @@
           </td>
 
           <td style="width: 90px">
-            <a class="btn btn-danger tip" data-toggle="modal" data-bind="attr: { href: '#modal_delete' + id }" title="Delete this hostname">Delete</a>
-            <div class="modal fade" data-bind="attr: {id: 'modal_delete' + id}">
+            <a class="btn btn-danger tip" data-toggle="modal" data-bind="attr: { href: '#modal' + id }" title="Delete this zone">Delete</a>
+            <div class="modal fade" data-bind="attr: {id: 'modal' + id}">
               <div class="modal-dialog">
                 <div class="modal-content">
                   <div class="modal-header">
@@ -119,7 +121,7 @@
                     <h4>Delete this hostname</h4>
                   </div>
                   <div class="modal-body">
-                    <span class="fa fa-fw fa-trash-o pull-left" style="font-size: 60px; margin: 10px 20px 0 0;"></span>
+                    <span class="fa fa-fw fa-trash pull-left" style="font-size: 48px; margin: 20px 20px 0 0;"></span>
                     <p>
                       Do you really want to delete this hostname?
                     </p>
@@ -148,8 +150,8 @@
 
   <script type="text/javascript">
       var items = [
-      {% for host in hostlist -%}
-          { id: {{host.id}}, hostname: "{{host.hostname}}", username: "{{host.username}}", userid: {{host.user_id}}, address: "{{host.address}}", updated: "{{host.updated}}", zone: "{{suffix.suffixname}}", abuse: "{{host.abuse|replace('\r\n', '')}}" },
+      {% for host in hosts %}
+          { id: {{host.id}}, hostname: "{{host.hostname}}", username: "{{host.username}}", zone: "{{host.suffix}}", zone_id: {{host.suffix_id}}, address: "{{host.address}}", updated: "{{host.updated}}", description: "{{host.description|replace('\r\n', '')}}", abuse: "{{host.abuse|replace('\r\n', '')}}" },
         {% endfor %}
       ];
       var PagedGridModel = function (items) {
@@ -158,15 +160,13 @@
           data: this.items,
           columns: [
             { headerText: "Hostname", rowText: "hostname", isSortable: true },
-            { headerText: "User", rowText: "username", isSortable: true },
             { headerText: "Address", rowText: "address", isSortable: true },
-            { headerText: "Updated", rowText: "updated", isSortable: true },
+            { headerText: "Last update", rowText: "updated", isSortable: true },
             { headerText: "Status", rowText: "status", isSortable: true },
             { headerText: "Actions", rowText: "actions", isSortable: false }
           ],
           pageSize: pagination_items_per_page
         });
-        this.gridViewModel.sortBy("hostname");
       };
       ko.applyBindings(new PagedGridModel(items));
   </script>

@@ -45,7 +45,10 @@ setuptools.setup(
         'passlib >= 1.6',
         'mysql-connector-python >= 2.0.0',
         'require >= 0.1.0',
-        'requests >= 2.5.0'
+        'requests >= 2.5.0',
+        'enum34 >= 1.0.0',
+        'configparser >= 3.2',
+        'yubico-client >= 1.9'
     ],
 
     packages = setuptools.find_packages(),
@@ -64,7 +67,8 @@ setuptools.setup(
     include_package_data = True,
 
     data_files = [
-        ('/etc/ddserver', ['ddserver/resources/doc/ddserver.conf.example']),
+        ('/etc/ddserver', ['ddserver/resources/doc/ddserver.conf.example',
+                           'ddserver/resources/doc/motd']),
         ('/etc/init.d', ['ddserver/resources/doc/debian.init.d/ddserver']),
         ('/usr/share/ddserver/static/css', ['ddserver/resources/web/css/bootstrap.min.css',
                                             'ddserver/resources/web/css/bootstrap-theme.min.css',
@@ -80,12 +84,16 @@ setuptools.setup(
         ('/usr/share/ddserver/static/js', ['ddserver/resources/web/js/bootstrap.min.js',
                                            'ddserver/resources/web/js/Chart.min.js',
                                            'ddserver/resources/web/js/jquery.min.js',
+                                           'ddserver/resources/web/js/knockout.js',
+                                           'ddserver/resources/web/js/knockout.simpleSortableGrid.js',
                                            'ddserver/resources/web/js/pwstrength.js',
                                            'ddserver/resources/web/js/pwstrength.options.js'
                                            ]),
-        ('/usr/share/doc/ddserver', ['ddserver/resources/doc/schema.001.sql',
-                                     'ddserver/resources/doc/schema.002.sql',
-                                     'ddserver/resources/doc/schema.003.sql',
+        ('/usr/share/ddserver/static/img', ['ddserver/resources/web/img/logo-icon.png',
+                                            'ddserver/resources/web/img/logo-long.png'
+                                            ]),
+        ('/usr/share/doc/ddserver', ['ddserver/resources/doc/schema.sql',
+                                     'ddserver/resources/doc/schema.upgrade.sql',
                                      'ddserver/resources/doc/ddserver.conf.example',
                                      'ddserver/resources/doc/ddclient.conf.example',
                                      'README.md', 'INSTALL.md', 'VERSION', 'LICENSE',

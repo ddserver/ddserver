@@ -1,6 +1,16 @@
 {% extends "base.html" %}
 
 {% block content %}
+
+  {% if user %}
+    {% if motd %}
+    <div class="alert alert-block alert-warning">
+      <a class="close" data-dismiss="alert" href="#">×</a>
+        <strong>Note:</strong> {{motd|safe}}
+    </div>
+    {% endif %}
+  {% endif %}
+
   <div class="row">
     <div class="col-md-12"><h1>Welcome to ddserver</h1></div>
   </div>
@@ -11,24 +21,25 @@
         <strong>ddserver</strong> is a server-side application for dynamic DNS management.
       </p>
       <p>
-        It allows you to specify hostnames (subdomains) inside a dynamic DNS zone, and to 
-        update the IP address of those hostnames using a dynamic update protocol
-        (<a href="http://www.noip.com/integrate">dyndns2 protocol</a>). This enables you
-        to access hosts with dynamic IP addresses by a static domain name, even if its IP
-        address changes. As updates of the IP address are performed using the dyndns2 update
-        protocol, most DSL home-routers are able to send updates of the IP address. Also,
-        there is a tool called <a href="http://sourceforge.net/p/ddclient/wiki/Home/">ddclient</a>,
-        which can be used to send updates from any *NIX-based operating system.
+        It allows you to specify hostnames (subdomains) inside a DNS zone, and to
+        update the IPv4 address of these hostnames dynamically by using a
+        <a target="_blank" href="http://www.noip.com/integrate">simple update protocol</a>
+        over HTTP(S). This enables you to access hosts with changing IPv4 addresses by a
+        static domain name. As updates of the IP address are performed using an open update
+        protocol, most DSL home-routers are able to send IP address updates. Also, there is
+        a tool called <a target="_blank" href="http://sourceforge.net/p/ddclient/wiki/Home/">ddclient</a>,
+        which can be used to send updates from any *NIX-based operating system. Additionally,
+        a static IPv6 address can be assigned for each hostname.
       </p>
 
       <h3>Documentation and Support</h3>
       <p>
-        For further documentation, please refer to the ddserver project homepage at
-        <a href="http://ddserver.0x80.io">http://ddserver.0x80.io</a>.
+        For further documentation, please refer to
+        <a target="_blank" href="http://docs.ddserver.org">http://docs.ddserver.org</a>.
       </p>
       <p>
-        Please report bugs or suggest features to help us to improve ddserver.<br>
-        <a href="https://github.com/ddserver/ddserver/issues">https://github.com/ddserver/ddserver/issues</a>.
+        Please report bugs or suggest new features to help us improve ddserver.<br>
+        <a target="_blank" href="https://github.com/ddserver/ddserver/issues">https://github.com/ddserver/ddserver/issues</a>.
       </p>
 
       <h3>License</h3>
@@ -37,13 +48,12 @@
         the terms of the GNU Affero General Public License as published by the
         Free Software Foundation, either version 3 of the License, or (at your
         option) any later version.
-        See <a href="http://www.gnu.org/licenses/agpl-3.0.html">http://www.gnu.org/licenses/agpl-3.0.html</a>
+        See <a target="_blank" href="http://www.gnu.org/licenses/agpl-3.0.html">http://www.gnu.org/licenses/agpl-3.0.html</a>
         for the full text of the license.
       </p>
     </div>
 
     <div class="col-md-4">
-
     {% if not user %}
       <div class="box">
         <h3>Login</h3>
@@ -61,6 +71,12 @@
             </div>
           </div>
           <div class="form-group">
+            <div class="input-group">
+              <span class="input-group-addon"><i class="fa fa-fw fa-tags"></i></span>
+              <input class="form-control" type="password" id="yubikey_otp" placeholder="Yubikey (optional)" name="yubikey_otp">
+            </div>
+          </div>
+          <div class="form-group">
             <button type="submit" class="btn btn-success btn-primary">Login</button>&nbsp;
             <span class="small"><a href="/lostpass">Lost your password?</a></span>
           </div>
@@ -69,13 +85,13 @@
 
       {% if config.signup.enabled %}
       <div class="box">
-        <h3>Signup</h3>
-        <p class="text-center">Want to use dynamic DNS? Signup now!</p>
+        <p class="text-center">Do you want to use ddservers dynamic DNS service yourself? Signup now, it's free!</p>
         <p class="text-center"><a class="btn btn-primary" href="/signup">Create an account</a></p>
       </div>
       {% endif %}
 
     {% else %}
+
     <div class="box">
       <p>
         Your current IP-Address:

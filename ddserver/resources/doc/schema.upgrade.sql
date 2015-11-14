@@ -1,4 +1,4 @@
--- Copyright 2014 Sven Reissmann <sven@0x80.io>
+-- Copyright 2015 Sven Reissmann <sven@0x80.io>
 --
 -- This file is part of ddserver.
 --
@@ -15,6 +15,23 @@
 -- You should have received a copy of the GNU Affero General Public License
 -- along with ddserver.  If not, see <http://www.gnu.org/licenses/>.
 
+
+--
+-- Upgrading from version 0.2.x
+--
+
+ALTER TABLE `users`
+  ADD `yubico_id` INT NULL DEFAULT NULL AFTER `password` ,
+  ADD `yubico_key` VARCHAR( 32 ) NULL DEFAULT NULL AFTER `yubico_id` ;
+
+ALTER TABLE `hosts`
+  ADD `abuse` TEXT NULL DEFAULT NULL ;
+
+ALTER TABLE `hosts`
+  ADD `address_v6` VARCHAR(39) NULL DEFAULT NULL ;
+
+ALTER TABLE `hosts`
+  ADD `wildcard` BOOL NOT NULL DEFAULT FALSE ;
 
 
 --

@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
+
   <div class="row">
     <div class="col-md-12"><h1>User management</h1></div>
   </div>
@@ -16,94 +17,115 @@
       <br>
 
       {% if users %}
-      <table class="table table-striped table-hover">
-        <tr>
-          <th>Username</th>
-          <th>Email</th>
-          <th>Created</th>
-          <th style="width: 150px">Max Hostnames</th>
-          <th style="width: 160px"colspan="2">Actions</th>
-        </tr>
+        <div data-bind='simpleSortableGrid: gridViewModel, simpleSortableGridTemplate: "gridTemplate"'></div>
+      {% else %}
+        <p class="text-center">
+          There are no pending activations.
+        </p>
+      {% endif %}
+    </div>
+  </div>
 
-        {% for u in users %}
+
+  <script type="text/html" id="gridTemplate">
+    <table class="table table-striped table-hover">
+      <thead>
+        <tr data-bind="foreach: columns" style="cursor:pointer;">
+          <!-- ko if: isSortable == true -->
+          <th data-bind="click: function() { $parent.sortBy($data.rowText); }">
+            <span data-bind="text: headerText"></span>
+            <span data-bind="css:$parent.sortByCSS($data.rowText)"></span>
+          </th>
+          <!-- /ko -->
+          <!-- ko ifnot: isSortable == true-->
+          <th><span data-bind="text: headerText"></span></th>
+          <!-- /ko -->
+        </tr>
+      </thead>
+      <tbody data-bind="foreach: itemsOnCurrentPage">
         <tr>
-          <td>{{u.username}}</td>
-          <td>{{u.email}}</td>
-          <td>{{u.created}}</td>
+          <td><a href="#" class="tip" data-bind="text: username, attr: { href: '/admin/user/' + id + '/hosts', title: 'Display this users hostnames' }"></a></td>
+          <td data-bind="text: email"></td>
+          <td data-bind="text: created"></td>
           <td>
-            <span id="userHostDisplay{{u.id}}">
-              {% if u.maxhosts == -1 %}
+            <span data-bind="attr: { id: 'userHostDisplay' + id }">
+              <!-- ko if: maxhosts == '-1' -->
                 <i>unlimited</i>
-              {% else %}
-                {% if u.maxhosts == None %}<i>default ({{config.dns.max_hosts}})</i>{% else %}{{u.maxhosts}}{% endif %}
-              {% endif %}
+              <!-- /ko -->
+              <!-- ko ifnot: maxhosts == '-1' -->
+                <!-- ko if: maxhosts == 'None' -->
+                  <i>default ({{config.dns.max_hosts}})</i>
+                <!-- /ko -->
+                <!-- ko ifnot: maxhosts == 'None' -->
+                  <span data-bind="text: maxhosts"></span>
+                <!-- /ko -->
+              <!-- /ko -->
               <span class="pull-right">
-                <i class="fa fa-fw fa-edit tip" id="userHostEditButton{{u.id}}" title="Change maximum number of hostnames" style="cursor: default"></i>
-                <i class="fa fa-fw fa-refresh tip" id="userHostResetButton{{u.id}}" title="Reset maximum number of hostnames" style="cursor: default"></i>
+                <i class="fa fa-fw fa-edit tip" data-bind="click: function() { $('#userHostDisplay' + id).hide(); $('#userHostEdit' + id).show(); }" title="Change maximum number of hostnames" style="cursor: default"></i>
+                <i class="fa fa-fw fa-refresh tip" data-bind="click: function() { $('#userHostResetForm' + id).submit(); }" title="Reset maximum number of hostnames" style="cursor: default"></i>
               </span>
             </span>
 
-            <span id="userHostEdit{{u.id}}" style="display: none">
-              <form class="form-horizontal" action="/admin/users/updateMaxhosts" method="post" id="userHostEditForm{{u.id}}">
-              <input type="hidden" name="user_id" value="{{u.id}}">
-                <div class="input-group">
-                  <input class="form-control tip" type="text" name="max_hosts" style="margin: 0" title="Use -1 for unlimited hostnames" value="{% if u.maxhosts != -1 %}{% if u.maxhosts == None %}{{config.dns.max_hosts}}{% else %}{{u.maxhosts}}{% endif %}{% endif %}">
-                  <span class="input-group-addon" id="userHostSubmitButton{{u.id}}" style="cursor: pointer"><i class="fa fa-fw fa-check"></i></span>
+            <span data-bind="attr: { id: 'userHostEdit' + id }" style="display: none">
+              <form class="form-horizontal" action="/admin/users/updateMaxhosts" method="post" data-bind="attr: { id: 'userHostEditForm' + id }">
+              <input type="hidden" name="user_id" data-bind="value: id">
+                <div class="input-group" style="width: 120px">
+                  <!-- ko if: maxhosts == 'None' -->
+                    <input class="form-control tip" type="text" name="max_hosts" title="Use -1 for unlimited hostnames" value="{{config.dns.max_hosts}}">
+                  <!-- /ko -->
+                  <!-- ko ifnot: maxhosts == 'None' -->
+                    <input class="form-control tip" type="text" name="max_hosts" title="Use -1 for unlimited hostnames" data-bind="value: maxhosts">
+                  <!-- /ko -->
+                  <span class="input-group-addon" data-bind="click: function() { $('#userHostEditForm' + id).submit(); }" style="cursor: pointer"><i class="fa fa-fw fa-check"></i></span>
                 </div>
-                <script type="text/javascript">
-                  $('#userHostSubmitButton{{u.id}}').click(function(){
-                    $('#userHostEditForm{{u.id}}').submit();
-                  });
-                </script>
               </form>
             </span>
 
-            <form class="form-horizontal" action="/admin/users/updateMaxhosts" id="userHostResetForm{{u.id}}" method="post">
-              <input type="hidden" name="user_id" value="{{u.id}}">
+            <form class="form-horizontal" action="/admin/users/updateMaxhosts" data-bind="attr: { id: 'userHostResetForm' + id }" method="post">
+              <input type="hidden" name="user_id" data-bind="value: id">
               <input type="hidden" name="max_hosts" value="-2">
             </form>
-
-            <script type="text/javascript">
-                $('#userHostResetButton{{u.id}}').click(function() {
-                  $('#userHostResetForm{{u.id}}').submit();
-                });
-                $('#userHostEditButton{{u.id}}').click(function() {
-                  $('#userHostDisplay{{u.id}}').hide();
-                  $('#userHostEdit{{u.id}}').show();
-                });
-            </script>
           </td>
           <td style="width:90px">
-          {% if u.active == 1 %}
-            {% if u.admin == 0 %}
+          <!-- ko if: active == 1 -->
+            <!-- ko if: admin == 0 -->
             <form action="/admin/users/mkadmin" method="post">
-              <input type="hidden" name="user_id" value="{{u.id}}">
+              <input type="hidden" name="user_id" data-bind="value: id">
               <input type="submit" class="btn btn-default tip" value="&nbsp;User&nbsp;" style="width: 90px;" title="Klick to add Admin privileges">
             </form>
-            {% else %}
+            <!-- /ko -->
+            <!-- ko ifnot: admin == 0 -->
             <form action="/admin/users/rmadmin" method="post">
-              <input type="hidden" name="user_id" value="{{u.id}}">
-              {% if u.id == u.id %}
+              <input type="hidden" name="user_id" data-bind="value: id">
+              <!-- ko if: id == {{user.id}} -->
               <input type="button" class="btn btn-default active tip" value="Admin" style="width: 90px;" title="You can not remove your own Admin privileges">
-              {% else %}
+              <!-- /ko -->
+              <!-- ko ifnot: id == {{user.id}} -->
               <input type="submit" class="btn btn-default active tip" value="Admin" style="width: 90px;" title="Klick to remove Admin privileges">
-              {% endif %}
+              <!-- /ko -->
             </form>
-            {% endif %}
-          {% else %}
+            <!-- /ko -->
+          <!-- /ko -->
+          <!-- ko ifnot: active == 1 -->
             <form action="/admin/users/activate" method="post">
-              <input type="hidden" name="username" value="{{u.username}}">
-              {% if u.authcode == None %}
+              <input type="hidden" name="username" data-bind="value: username">
+              <!-- ko if: authcode == 'None' -->
               <input type="submit" class="btn btn-success tip" value="Activate" style="width: 90px;" title="Klick to send activation email">
-              {% else %}
+              <!-- /ko -->
+              <!-- ko ifnot: authcode == 'None' -->
               <input type="button" class="btn btn-success active tip" value="Pending.." style="width: 90px;" title="Waiting for the user to complete email activation">
-              {% endif %}
+              <!-- /ko -->
             </form>
-          {% endif %}
+          <!-- /ko -->
           </td>
           <td style="width: 90px; border-left: 0px">
-            <a href="#modal{{u.id}}" data-toggle="modal" class="btn btn-danger tip" title="Delete this user">Delete</a>
-            <div class="modal fade" id="modal{{u.id}}">
+            <!-- ko if: id == {{user.id}} -->
+              <a data-bind="attr: { href: '#modal' + id }" class="btn btn-danger tip" title="You cannot delete yourself">Delete</a>
+            <!-- /ko -->
+            <!-- ko ifnot: id == {{user.id}} -->
+              <a data-bind="attr: { href: '#modal' + id }" data-toggle="modal" class="btn btn-danger tip" title="Delete this user">Delete</a>
+            <!-- /ko -->
+            <div class="modal fade" data-bind="attr: { id: 'modal' + id }">
               <div class="modal-dialog">
                 <div class="modal-content">
                   <div class="modal-header">
@@ -116,12 +138,12 @@
                       Do you really want to delete this user?
                     </p>
                     <p>
-                      Username: <b>{{u.username}}</b>
+                      Username: <b data-bind="text: username"></b>
                     </p>
                   </div>
                   <div class="modal-footer">
                     <form role="form" action="/admin/users/delete" method="post">
-                      <input type="hidden" name="user_id" value="{{u.id}}">
+                      <input type="hidden" name="user_id" data-bind="value: id">
                       <div class="form-group">
                         <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
                         <button type="submit" class="btn btn-primary btn-danger">Delete</button>
@@ -133,19 +155,32 @@
             </div>
           </td>
         </tr>
+      </tbody>
+    </table>
+  </script>
+
+  <script type="text/javascript">
+      var items = [
+      {% for user in users %}
+          { id: {{user.id}}, username: "{{user.username}}", email: "{{user.email}}", created: "{{user.created}}", maxhosts: "{{user.maxhosts}}", active: "{{user.active}}", admin: "{{user.admin}}", authcode: "{{user.authcode}}" },
         {% endfor %}
-
-      </table>
-
-      {% else %}
-
-      <p class="text-danger text-center">
-        No users to display.
-      </p>
-
-      {% endif %}
-
-    </div>
-  </div>
-
+      ];
+      var PagedGridModel = function (items) {
+        this.items = ko.observableArray(items);
+        this.gridViewModel = new ko.simpleSortableGrid.viewModel({
+          data: this.items,
+          columns: [
+            { headerText: "Username", rowText: "username", isSortable: true },
+            { headerText: "Email", rowText: "email", isSortable: true },
+            { headerText: "Created", rowText: "created", isSortable: true },
+            { headerText: "Max hostnames", rowText: "maxhosts", isSortable: true },
+            { headerText: "Actions", rowText: "actions", isSortable: false },
+            { headerText: "", rowText: "", isSortable: false }
+          ],
+          pageSize: pagination_items_per_page
+        });
+        this.gridViewModel.sortBy("username");
+      };
+      ko.applyBindings(new PagedGridModel(items));
+  </script>
 {% endblock %}

@@ -1,3 +1,18 @@
+0.3
+===
+
+New features:
+
+* Added a ddserver logo
+* Added support for python 3.3
+* Use the public require library insted of the out-dated buildin one
+* Added support for Yubikey OTP authentication
+* Allow administrators to disable hostnames (i.e., on abuse)
+
+Fixes:
+
+* Fixed wrong comparison when modifying own admin privileges
+
 0.2
 ===
 

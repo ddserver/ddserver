@@ -53,9 +53,11 @@ def get_host_display(user,
           `host`.`hostname` AS `hostname`,
           `suffix`.`name` AS `suffix`,
           `host`.`address` AS `address`,
+          `host`.`address_v6` AS `address_v6`,
           `host`.`wildcard` AS `wildcard`,
           `host`.`updated` AS `updated`,
-          `host`.`description` AS `description`
+          `host`.`description` AS `description`,
+          `host`.`abuse` AS `abuse`
         FROM `hosts` AS `host`
         LEFT JOIN `suffixes` AS `suffix`
           ON ( `suffix`.`id` = `host`.`suffix_id` )
@@ -69,6 +71,10 @@ def get_host_display(user,
     messages.error('Hostname not found or no access!')
     bottle.redirect('/user/hosts/list')
 
+  if host['abuse'] is not None:
+    messages.error("This hostname has been disabled by an administrator: %s" %
+                   host['abuse'])
+
   return templates['host.html'](host = host,
                                 current_ip = bottle.request.remote_addr)
 
@@ -79,6 +85,7 @@ def get_host_display(user,
 @validate('/user/hosts/list',
           host_id = formencode.validators.Int(),
           address = validation.IPAddress(),
+          address_v6 = validation.IPv6Address(),
           description = validation.String(max = 255))
 @require(db = 'ddserver.db:Database',
          messages = 'ddserver.interface.message:MessageManager')
@@ -92,11 +99,14 @@ def post_host_update_address(user,
     cur.execute('''
       UPDATE `hosts`
         SET  `address` = %(address)s,
-             `description` = %(description)s
+             `address_v6` = %(address_v6)s,
+             `description` = %(description)s,
+             `updated` = CURRENT_TIMESTAMP
       WHERE  `id` = %(host_id)s
         AND  `user_id` = %(user_id)s
     ''', {'address': data.address,
-          'description': data.description,
+          'address_v6': data.address_v6,
+          'description': data.description.replace('\r\n', ' '),
           'host_id': data.host_id,
           'user_id': user.id})
 

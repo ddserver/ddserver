@@ -7,6 +7,8 @@
 
   <div class="row">
     <div class="col-md-8">
+
+      {% if username and authcode %}
       <p>
         Hi {{username}},
       </p>
@@ -27,6 +29,19 @@
         signup process by clicking the button on the right. This will
         remove all your personal information from our system.
       </p>
+
+      {% else %}
+
+      <p>
+        Hi stranger,
+      </p>
+      <p>
+        you have called ddservers account activation system without providing enough
+        information to complete the process. Please verify that you have used the exact
+        link received by email to open this page.
+      </p>
+      {% endif %}
+
       <p>
         If you have any trouble with the signup process, please contact us.
       </p>
@@ -35,6 +50,7 @@
       </p>
     </div>
 
+    {% if username and authcode %}
     <div class="col-md-4">
       <div class="box">
         <h3>Complete registration</h3>
@@ -54,7 +70,7 @@
             </div>
           </div>
           <div class="form-group">
-            <label for="inputPassword2">Password strength</label>
+            <label>Password strength</label>
             <span class="pwstrength_viewport_progress"></span>
           </div>
           <script type="text/javascript">
@@ -79,6 +95,8 @@
         </form>
       </div>
     </div>
+    {% endif %}
+
   </div>
 
 {% endblock %}

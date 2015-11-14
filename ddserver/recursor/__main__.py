@@ -169,7 +169,9 @@ def answer_a(query,
           ON ( `suffix`.`id` = `host`.`suffix_id` )
         WHERE
           `host`.`address` IS NOT NULL
-            AND
+          AND 
+          `host`.`abuse` IS NULL
+          AND
           (
             %(name)s = CONCAT(`host`.`hostname`, '.', `suffix`.`name`)
               OR
@@ -191,6 +193,38 @@ def answer_a(query,
                            content=host['address'])
 
 
+@require(db='ddserver.db:Database',
+         config='ddserver.config:Config')
+def answer_aaaa(query,
+                db,
+                config):
+  """ Handle AAAA records
+  """
+
+  with db.cursor() as cur:
+    cur.execute('''
+        SELECT
+          `host`.`hostname` AS `hostname`,
+          `suffix`.`name` AS `suffix`,
+          `host`.`address_v6` AS `address_v6`
+        FROM `hosts` AS `host`
+        LEFT JOIN `suffixes` AS `suffix`
+          ON ( `suffix`.`id` = `host`.`suffix_id` )
+        WHERE `host`.`address_v6` IS NOT NULL
+          AND `host`.`abuse` IS NULL
+          AND CONCAT(`host`.`hostname`, '.', `suffix`.`name`) = %(name)s
+    ''', {'name': query.qname})
+    host = cur.fetchone()
+
+    if host:
+      send(formatter.DATA, qname=query.qname,
+                           qclass=query.qclass,
+                           qtype='AAAA',
+                           ttl=config.dns.ttl,
+                           id=query.id,
+                           content=host['address_v6'])
+
+
 def answer(query):
   """ Determine query type and respond to it
   """
@@ -200,6 +234,9 @@ def answer(query):
 
   if query.qtype == 'A' or query.qtype == 'ANY':
     answer_a(query)
+
+  if query.qtype == 'AAAA' or query.qtype == 'ANY':
+    answer_aaaa(query)
 
   else:
     # Ignore all other queries

@@ -8,34 +8,45 @@
 
   <div class="row">
     <div class="col-md-8">
+
+      {% if username and authcode %}
       <p>
         Hi {{username}},
       </p>
       <p>
-        welcome to <strong>ddserver</strong>, a service that allows you to add
-        hostnames whose IP address can be updated dynamically using the
-        <a href="http://www.noip.com/integrate">dyndns2 protocol</a>.
+        you have requested a password reset for your ddserver user account. To
+        finish the password recovery process, you need to set a new password using
+        the form on the right. Please use secure passwords, consisting of upper-
+        and lowercase characters, as well as numbers or special characters. The
+        minimum password length is {{config.auth.password_min_chars}} characters.
       </p>
       <p>
-        You requested a password reset for your ddserver account. To finish the
-        password reset process, you need to set a new password using the form
-        on the right. Please use secure passwords, consisting of upper- and lowercase
-        characters, as well as numbers or special characters. The minimum
-        password length is {{config.auth.password_min_chars}} characters.
-      </p>
-      <p>
-        If you did not request a password reset for your ddserver account, 
-        you may cancel the password reset process by clicking the button
+        If you did not request a password reset for your ddserver user account,
+        you may cancel the password recovery process by clicking the button
         on the right. 
       </p>
+
+      {% else %}
+
       <p>
-        If you have any trouble with the password recovery process, please contact us.
+        Hi stranger,
+      </p>
+      <p>
+        you have called ddservers password recovery system without providing enough
+        information to complete the process. Please verify that you have used the exact
+        link you received by email to open this page.
+      </p>
+      {% endif %}
+
+      <p>
+        If you have trouble with the password recovery process, please contact us.
       </p>
       <p>
         <a href="mailto:{{config.contact.email}}">{{config.contact.name}} &lt;{{config.contact.email}}&gt;</a>
       </p>
     </div>
 
+    {% if username and authcode %}
     <div class="col-md-4">
       <div class="box">
         <h3>Set a new password</h3>
@@ -80,6 +91,8 @@
         </form>
       </div>
     </div>
+    {% endif %}
+
   </div>
 
 {% endblock %}
