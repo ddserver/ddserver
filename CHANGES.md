@@ -7,6 +7,7 @@ New features:
 * Added support for python 3.3
 * Use the public require library insted of the out-dated buildin one
 * Added support for Yubikey OTP authentication
+* Allow administrators to disable hostnames (i.e., on abuse)
 
 Fixes:
 

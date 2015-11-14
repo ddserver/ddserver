@@ -63,6 +63,7 @@ CREATE TABLE `hosts` (
   `description` VARCHAR(255)    NULL DEFAULT NULL,
   `password`    VARCHAR(255)    NOT NULL,
   `updated`     TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `abuse`       TEXT            NULL DEFAULT NULL,
 
   FOREIGN KEY (`user_id`)       REFERENCES `users` (`id`) ON DELETE CASCADE ,
   FOREIGN KEY (`suffix_id`)     REFERENCES `suffixes` (`id`) ON DELETE CASCADE ,
