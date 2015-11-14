@@ -13,7 +13,6 @@
 
   <div class="row">
     <div class="col-md-12">
-
         {% if hosts %}
           <div data-bind='simpleSortableGrid: gridViewModel, simpleSortableGridTemplate: "gridTemplate"'></div>
         {% else %}
@@ -42,7 +41,11 @@
       <tbody data-bind="foreach: itemsOnCurrentPage">
         <tr>
           <td>
-            <span data-bind="text: hostname"></span><span class="origin" data-bind="text: '.' + zone"></span>
+            <!-- ko if: wildcard == 1 -->
+            <span class="origin">*.</span>
+            <!-- /ko -->
+            <span data-bind="text: hostname"></span>
+            <span class="origin" data-bind="text: '.' + zone"></span>
             <!-- ko if: description != 'None' -->
               <!-- ko if: description != '' -->
                 &nbsp; <span class="small"><i class=" fa fa-info-circle tip" data-bind="attr: {title: description}"></i></span>
@@ -91,7 +94,7 @@
                       Do you really want to delete this hostname?
                     </p>
                     <p>
-                      Hostname: <b data-bind="text: hostname"></b><span class="origin" data-bind="text: '.' + zone"></span></b>
+                      Hostname: <b data-bind="text: hostname"></b><span class="origin" data-bind="text: '.' + zone"></span>
                     </p>
                   </div>
                   <div class="modal-footer">
@@ -115,7 +118,7 @@
   <script type="text/javascript">
       var items = [
       {% for host in hosts -%}
-          { id: {{host.id}}, hostname: "{{host.hostname}}", zone: "{{host.suffix}}", address: "{{host.address}}", address_v6: "{{host.address_v6}}", updated: "{{host.updated}}", description: "{{host.description|replace('\r\n', '')}}", abuse: "{{host.abuse|replace('\r\n', '')}}" },
+          { id: {{host.id}}, hostname: "{{host.hostname}}", zone: "{{host.suffix}}", address: "{{host.address}}", address_v6: "{{host.address_v6}}", wildcard: "{{host.wildcard}}", updated: "{{host.updated}}", description: "{{host.description|replace('\r\n', '')}}", abuse: "{{host.abuse|replace('\r\n', '')}}" },
         {% endfor %}
       ];
       var PagedGridModel = function (items) {
