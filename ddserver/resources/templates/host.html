@@ -23,11 +23,10 @@
             <input class="form-control" type="text" id="inputHostname" name="hostname" value="{{host.hostname}}.{{host.suffix}}" readonly="readonly">
           </div>
           <div class="input-group">
-            <div class="checkbox">
-              <label for="inputWildcard">
-                <input type="checkbox" id="inputWildcard" name="wildcard" {% if host.wildcard %}checked="checked"{% endif %} disabled="disabled">
-                Enable Wildcard Record
-              </label>
+            <span class="input-group-addon" style="visibility:hidden"></span>
+            <div class="checkbox checkbox-primary">
+              <input type="checkbox" id="inputWildcard" name="wildcard" {% if host.wildcard %}checked="checked"{% endif %} disabled="disabled">
+              <label for="inputWildcard">Enable Wildcard Record</label>
             </div>
           </div>
         </div>
