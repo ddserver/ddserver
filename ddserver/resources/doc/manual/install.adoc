@@ -9,9 +9,9 @@ See link:https://github.com/ddserver[https://github.com/ddserver].
 
 === Prerequisites
 
-Before you start, you need to fulfill some prerequisites.
-
-As ddserver is written in python, the first step is to install python version 2.7. Further, the MySQL server and the PowerDNS server are needed to store DNS information and to answer DNS requests.
+ddserver is written in Python and tested with versions 2.7 and 3.4 of the python programming language. The installation
+currently is based on python setuptools. A MySQL database server is needed to allow ddserver to store user, zone and
+hostname information. Finally, the PowerDNS server is required to answer DNS requests.
 
 Also, some packages need to be installed on your system, before you will be able to compile the needed packages.
 Those include the python and mysql-client header files, which are available in separate packages on some GNU/Linux distributions.
@@ -54,14 +54,31 @@ cd ddserver
 python setup.py install
 ----
 
-After this steps, ddserver installed to the following locations:
+TIP: You need to do this with administrative privileges (i.e., as user root), to allow pythons setuptools to install
+the ddserver package and configuration files.
 
-- <CurrentDirectory>/build contains the installed python packages
-- /etc/ddserver contains the configuration file
-- /etc/init.d/ddserver is a debian init-script for controlling ddserver
-- /usr/share/doc/ddserver contains the database schema and some readme files
-- /usr/share/ddserver contains static files like CSS, JavaScript, eMail-Templates, ..
-- /usr/local/bin contains the ddserver executables
+After this steps is completed, ddserver has been installed to the following locations:
+
+[cols="2*"]
+|===
+|<CurrentDirectory>/build
+|contains the installed python packages
+
+|/etc/ddserver
+|contains the configuration files
+
+|/etc/init.d/ddserver
+|is a Debian/CentOS init-script for controlling ddserver
+
+|/usr/share/doc/ddserver
+|contains the database schema, example configuration files, and further documentation
+
+|/usr/share/ddserver
+|contains static files like CSS, JavaScript, eMail-Templates, ..
+
+|/usr/local/bin
+|contains the ddserver executables
+|===
 
 === Installing the database
 

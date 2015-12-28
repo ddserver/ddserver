@@ -3,46 +3,180 @@
 == User manual
 
 The following sections give a brief overview of the usage of the ddserver WebUI.
-Default account
 
-While installing the ddserver database schema, an administrator user is created with the following credentials:
+=== Initial login
+
+When the ddserver database schema gets installed, an administrator user is created with the following credentials:
 
 - Username: admin
 - Password: admin
 
-=== User registration
 
-Depending on your configuration, account creation may be enabled or disabled.
-If it is enabled, new user accounts can be created/requested using the signup form.
+=== User management
 
-If account creation is enabled in your configuration file, you can specify a comma-separated list of email-domains (or use the keyword any) to allow users to complete the account registration without the need to be accepted by an administrator.
-The default setting of this configuration parameter is to allow any user to complete the registration process by email-activation.
+Depending on your environment and use-case, you may want to control user accounts yourself or allow new users to register.
+Further, if you provide ddserver to a group of trusted users (i.e., users that register with a specific email domain),
+you may want the process to be fully automatic, while other users need to be accepted manually.
+ddserver supports a number of different ways for user management to fit these requirements.
 
-If a user registers using an email address that is not specified in the list of allowed_maildomains, an administrator has to accept the new user, before an activation email is sent, allowing the user to finish registration.
+==== Manual user management
 
-=== Adding a dynamic zone (suffix)
+To control new user accounts manually, just disable registration using the following configuration parameter:
 
-Each zone you want to make available by your ddserver installation, needs to be handled by the PowerDNS server, your ddserver-recursor is connected to.
-That means, you have to configure zone-delegation of the desired zone to your PowerDNS server(s).
+----
+[signup]
+enabled = False
+----
 
-If you want to use example.com as your dynamic zone
+With this configuration, new user accounts can only be created by an administrator using the ddserver Web-UI.
+Navigate to ''Accounts &rarr; Add new user'', to create a new account.
+An activation email will be sent to the new users email address, allowing him to activate the account and
+ase a login password.
 
-- Configure your PowerDNS server(s) to be authoritative
-- Add example.com to the available suffixes in the ddserver WebUI
+==== Semi-automatic registration
 
-TIP: Each zone available in ddserver, users are allowed to add any hostname (subdomain) to (including stuff like www or mail). You can prevent hostnames to be added by just pre-adding them in your admin account.
+To allow new users to register accounts, just enable registration using the following configuration parameter:
 
-WARNING: You can not have duplicate zone records, i.e. by specifying a subdomain in the PowerDNS gmysql backend and ddserver at the same time.
+----
+[signup]
+enabled = True
+allowed_maildomains =
+----
+
+With this configuration, new user accounts can be created/requested using the signup form.
+However, by leaving the allowed_maildomains parameter empty, any newly created account has to be accepted by an
+administrator, before an activation email is sent, which allows to activate the account and set a login password.
+
+==== Automatic registration
+
+To allow automatic account registration for users that are registering with a specific email domain (i.e., the domain
+of your hackerspace), just provide a space-separated list of allowed domains as follows:
+
+----
+[signup]
+enabled = True
+allowed_maildomains = example.org hackerspace.example.com
+----
+
+With this configuration, new user accounts can be created/requested using the signup form.
+If a user registers using an email address that matches one of the allowed email domains, an activation email is sent
+immediately, which allows the user to activate the account.
+Otherwise, an administrator has to accept the registration, before an activation email is sent.
+
+TIP: You can use the keyword ''any'' to allow any email domain to register and activate an account immediately.
+
+==== Getting notified about new users
+
+By default, the administrator configured in the contact section will receive an email, whenever a new user account gets
+registered. To disable this behaviour, just add the following configuration to the signup section.
+
+----
+[signup]
+notify_admin = False
+----
+
+
+=== Zone management
+
+This section describes the concept of a dynamic DNS zone in ddserver. Hostnames can be added to one or more zones by
+the users of ddserver.
+
+==== Prerequisites
+
+To allow users to register dynamic hostnames, you need to provide at least one domain name (zone) that your DNS server
+ is administrative for. That means, you have to configure zone-delegation of the desired zone to your PowerDNS
+ server(s), which is normally done at your domains registrar.
+
+If you plan to run your DNS server inside the zone it is administrative for (i.e., use ns.example.org to serve the domain
+ example.org), you will have to configure so called Glue Resource Records, before you can use it.
+
+As an example, if you like to use example.org as your dynamic zone
+ - Configure your PowerDNS server(s) to be authoritative for example.org
+ - (Optional) Configure glue resource records
+ - Add example.com to ddserver
+
+TIP: In the current implementation state of ddserver, any user that has an account to your ddserver installation will
+ be able to register any hostname (subdomain) in your zone. To prevent this (i.e., to reserve names like www or mail),
+ you can specify a blacklist of reserved hostnames using the configuration file.
+
+WARNING: You need to take care that the same hostname is not present in different PowerDNS backends. As an example, if
+ you are using the PowerDNS SQL backend to serve SOA and MX records, and ddserver for your A and AAAA records, you need
+ to take care, that no single A or AAAA record is present in both backends.
+
+==== Adding a dynamic zone
+
+To add a dynamic zone, navigate to _Zones &rarr; Add zone_ and enter the name of your zone (i.e., example.org).
+The zone will show in the list of configured zones and can be used immediately.
+
+==== Managing zones and content
+
+To display all configured zones, navigate to _Zones &rarr; Configured zones_.
+You get presented a list of all zones, which have been added to ddserver. The column _Hostnames_ shows the number of
+hostnames (subdomains) that are in use in the zone. If you click on the name of a zone, you are presented with a list
+of all hostnames, that have been configured within the zone.
+
+==== Deleting a zone
+
+To delete a dynamic zone, navigate to _Zones &rarr; Configured zones_ and click on the button delete, at the right
+side of the list. A warning is presented, which informs you about the number of hostnames within the zone. Click the
+button _Delete zone_ to remove the zone from ddserver.
+
+TIP: Deleting a zone from ddserver will also delete all hostnames within the zone.
+
+
+=== Managing hostnames
+
+This section describes the concept of hostnames in ddserver. Hostnames can be added to any zone available in ddserver.
+Each hostname gets an individual password used to update its IPv4 address, as well as an optional description. Further,
+a static IPv6 address can be assigned manually to each hostname.
 
 === Adding a hostname
 
-After at least one dynamic zone is available, users can start adding hostnames.
-The number of hostnames each user can add depends on your configuration (default = 5).
+As soon as at least one dynamic zone is available in ddserver, any user may start to add hostnames to it.
+To create a new hostname, users navigate to _Hostnames &rarr; Add hostname_ and fill in the form they get presented.
 
-A hostname can consist of a maximum of 63 alphanumeric characters.
-The special characters - (minus) and . (period) are allowed, however they can not be the first character of a hostname.
+At least, a hostname and a password for sending updates of the hostnames' IPv4 address are needed.
+All other parameters, which are covered below, are optional.
 
-Each hostname is assigned a password, that is used to update the IP address of the hostname.
-If you want to update multiple hostnames at once (which is a specified usecase of the no-ip protocol), you have to assign the same password to these hostnames.
+[cols="2*"]
+|===
+|Hostname
+|Your dynamic DNS name. If only one zone is available, it gets selected automatically. A hostname may consist of a
+maximum of 63 alphanumeric characters. The special characters - (minus) is allowed as well.
+
+|Enable wildcard record
+|If this option gets activated, the IPv4 and IPv6 address for your hostname are also returned for queries to a subdomain
+of your hostname (i.e., if you enable this for the hostname me.example.org, it will also work for something.me.example.org)
+
+|Zone
+|If there are multiple zones available, you may select in which one to use.
+
+|Password
+|This password is used to send dynamic updates for the hostname. Each hostname may get its individual password for security
+reasons. If you want to send updates for multiple hostnames at once (which is a specified usecase of the no-ip protocol),
+these hostnames must have the same password.
+
+|Initial IPv4 address
+|This allows you to set an initial IPv4 address, so the hostname can be used immediately, without the need to wait for
+the first dynamic update. You may also specify a static IPv4 address here, by just not sending updates at all.
+
+|Static IPv6 address
+|This allows you to specify a static IPv6 address for the hostname.
+
+|Description
+|This allows you to add a description to your hostname, which is only shown in the Web-UI
+|===
+
+
+The maximum number of hostnames a user is allowed to add depends on your configuration. By default, each user is allowed
+ to add up to five hostnames. This can be changed using the following configuration parameter.
+
+----
+[dns]
+max_hosts = 5
+----
+
+TIP: Independently of the configuration file default, you may set the maximum number of hosts individually on a per-user
+basis, using the Web-UI. For more information, have a look at section <<User management>>.
 
 //EOF
