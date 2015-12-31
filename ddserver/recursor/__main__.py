@@ -120,5 +120,9 @@ class DdserverHandler(pdns.remotebackend.Handler):
             self.answer_aaaa(args['qname'])
 
 
-if __name__ == '__main__':
+def main():
     pdns.remotebackend.PipeConnector(DdserverHandler).run()
+
+
+if __name__ == '__main__':
+    main()
