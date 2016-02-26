@@ -47,7 +47,8 @@ setuptools.setup(
         'require >= 0.1.0',
         'requests >= 2.5.0',
         'enum34 >= 1.0.0',
-        'configparser >= 3.2'
+        'configparser >= 3.2',
+        'yubico-client >= 1.9'
     ],
 
     packages = setuptools.find_packages(),

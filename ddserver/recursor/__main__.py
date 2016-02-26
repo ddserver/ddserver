@@ -168,6 +168,7 @@ def answer_a(query,
         LEFT JOIN `suffixes` AS `suffix`
           ON ( `suffix`.`id` = `host`.`suffix_id` )
         WHERE `host`.`address` IS NOT NULL
+          AND `host`.`abuse` IS NULL
           AND CONCAT(`host`.`hostname`, '.', `suffix`.`name`) = %(name)s
     ''', {'name': query.qname})
     host = cur.fetchone()
@@ -199,6 +200,7 @@ def answer_aaaa(query,
         LEFT JOIN `suffixes` AS `suffix`
           ON ( `suffix`.`id` = `host`.`suffix_id` )
         WHERE `host`.`address_v6` IS NOT NULL
+          AND `host`.`abuse` IS NULL
           AND CONCAT(`host`.`hostname`, '.', `suffix`.`name`) = %(name)s
     ''', {'name': query.qname})
     host = cur.fetchone()

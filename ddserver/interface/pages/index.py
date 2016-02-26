@@ -63,7 +63,8 @@ def get_index(db,
   if session.username:
     motd = None
     if os.path.isfile('/etc/ddserver/motd'):
-      motd = open('/etc/ddserver/motd').read()
+      with open('/etc/ddserver/motd') as f:
+        motd = f.read()
 
     (users, zones, hosts, userhosts) = get_statistics()
 

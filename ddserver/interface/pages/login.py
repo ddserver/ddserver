@@ -33,14 +33,16 @@ from ddserver.interface.validation import validate
 @route('/login', method = 'POST')
 @validate('/',
           username = validation.ValidUsername(min = 1, max = 255),
-          password = validation.String())
+          password = validation.String(),
+          yubikey_otp = validation.String())
 @require(users = 'ddserver.interface.user:UserManager')
 def post_login(data,
                users):
   ''' Handles user authentication. '''
 
   users.login(username = data.username,
-              password = data.password)
+              password = data.password,
+              yubikey_otp = data.yubikey_otp)
 
   bottle.redirect('/')
 
