@@ -98,7 +98,8 @@ setuptools.setup(
                                      'README.md', 'INSTALL.md', 'VERSION', 'LICENSE',
                                      'CHANGES.md', 'UPGRADING.md']),
         ('/usr/share/doc/ddserver/centos.init.d', ['ddserver/resources/doc/centos.init.d/ddserver']),
-        ('/usr/share/doc/ddserver/debian.init.d', ['ddserver/resources/doc/debian.init.d/ddserver'])
+        ('/usr/share/doc/ddserver/debian.init.d', ['ddserver/resources/doc/debian.init.d/ddserver']),
+        ('/usr/share/doc/ddserver/systemd', ['ddserver/resources/doc/systemd/ddserver.service'])
     ],
 
     entry_points = {
