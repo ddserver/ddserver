@@ -54,6 +54,7 @@ def get_host_display(user,
           `suffix`.`name` AS `suffix`,
           `host`.`address` AS `address`,
           `host`.`address_v6` AS `address_v6`,
+          `host`.`wildcard` AS `wildcard`,
           `host`.`updated` AS `updated`,
           `host`.`description` AS `description`,
           `host`.`abuse` AS `abuse`

@@ -1,4 +1,4 @@
--- Copyright 2014 Sven Reissmann <sven@0x80.io>
+-- Copyright 2015 Sven Reissmann <sven@0x80.io>
 --
 -- This file is part of ddserver.
 --
@@ -30,6 +30,8 @@ ALTER TABLE `hosts`
 ALTER TABLE `hosts`
   ADD `address_v6` VARCHAR(39) NULL DEFAULT NULL ;
 
+ALTER TABLE `hosts`
+  ADD `wildcard` BOOL NOT NULL DEFAULT FALSE ;
 
 
 --

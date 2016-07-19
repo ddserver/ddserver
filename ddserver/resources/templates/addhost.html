@@ -79,6 +79,14 @@
               <span class="input-group-addon"><i class="fa fa-fw fa-desktop"></i></span>
               <input class="form-control" type="text" id="inputHostname" placeholder="Hostname" name="hostname" required="required">
             </div>
+
+            <div class="input-group">
+              <span class="input-group-addon" style="visibility:hidden"></span>
+              <div class="checkbox checkbox-primary">
+                <input type="checkbox" id="inputWildcard" name="wildcard">
+                <label for="inputWildcard">Enable Wildcard Record</label>
+              </div>
+            </div>
           </div>
 
           {% if suffixes|count > 1 %}

@@ -1,4 +1,4 @@
--- Copyright 2013 Dustin Frisch <fooker@lab.sh>
+-- Copyright 2015 Sven Reissmann <sven@0x80.io>
 -- 
 -- This file is part of ddserver.
 -- 
@@ -64,6 +64,7 @@ CREATE TABLE `hosts` (
   `password`    VARCHAR(255)    NOT NULL,
   `updated`     TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `abuse`       TEXT            NULL DEFAULT NULL,
+  `wildcard`    BOOL            NOT NULL DEFAULT FALSE,
 
   FOREIGN KEY (`user_id`)       REFERENCES `users` (`id`) ON DELETE CASCADE ,
   FOREIGN KEY (`suffix_id`)     REFERENCES `suffixes` (`id`) ON DELETE CASCADE ,
