@@ -1,5 +1,5 @@
 """
-Copyright 2013 Dustin Frisch <fooker@lab.sh>
+Copyright 2015 Sven Reissmann <sven@0x80.io>
 
 This file is part of ddserver.
 
