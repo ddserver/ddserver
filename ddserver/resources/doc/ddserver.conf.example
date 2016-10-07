@@ -13,6 +13,7 @@ password = YourDatabasePassword
 ;password_min_chars = 8
 
 [dns]
+;answer_soa = False
 ;max_hosts = 5
 ;ttl = 60
 ;reserved =

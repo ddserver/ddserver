@@ -48,7 +48,8 @@ setuptools.setup(
         'requests >= 2.5.0',
         'enum34 >= 1.0.0',
         'configparser >= 3.2',
-        'yubico-client >= 1.9'
+        'yubico-client >= 1.9',
+        'Pdns-Remotebackend >= 0.6'
     ],
 
     packages = setuptools.find_packages(),
