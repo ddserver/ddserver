@@ -16,9 +16,9 @@
 -- along with ddserver.  If not, see <http://www.gnu.org/licenses/>.
 
 
-DROP TABLE IF EXISTS `users`;
-DROP TABLE IF EXISTS `suffixes`;
 DROP TABLE IF EXISTS `hosts`;
+DROP TABLE IF EXISTS `suffixes`;
+DROP TABLE IF EXISTS `users`;
 
 
 --
