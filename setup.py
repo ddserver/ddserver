@@ -67,43 +67,6 @@ setuptools.setup(
     },
     include_package_data = True,
 
-    data_files = [
-        ('/etc/ddserver', ['ddserver/resources/doc/ddserver.conf.example',
-                           'ddserver/resources/doc/motd']),
-        ('/etc/init.d', ['ddserver/resources/doc/debian.init.d/ddserver']),
-        ('/usr/share/ddserver/static/css', ['ddserver/resources/web/css/bootstrap.min.css',
-                                            'ddserver/resources/web/css/bootstrap-theme.min.css',
-                                            'ddserver/resources/web/css/font-awesome.min.css',
-                                            'ddserver/resources/web/css/ddserver.css'
-                                            ]),
-        ('/usr/share/ddserver/static/fonts', ['ddserver/resources/web/fonts/FontAwesome.otf',
-                                              'ddserver/resources/web/fonts/fontawesome-webfont.eot',
-                                              'ddserver/resources/web/fonts/fontawesome-webfont.svg',
-                                              'ddserver/resources/web/fonts/fontawesome-webfont.ttf',
-                                              'ddserver/resources/web/fonts/fontawesome-webfont.woff'
-                                              ]),
-        ('/usr/share/ddserver/static/js', ['ddserver/resources/web/js/bootstrap.min.js',
-                                           'ddserver/resources/web/js/Chart.min.js',
-                                           'ddserver/resources/web/js/jquery.min.js',
-                                           'ddserver/resources/web/js/knockout.js',
-                                           'ddserver/resources/web/js/knockout.simpleSortableGrid.js',
-                                           'ddserver/resources/web/js/pwstrength.js',
-                                           'ddserver/resources/web/js/pwstrength.options.js'
-                                           ]),
-        ('/usr/share/ddserver/static/img', ['ddserver/resources/web/img/logo-icon.png',
-                                            'ddserver/resources/web/img/logo-long.png'
-                                            ]),
-        ('/usr/share/doc/ddserver', ['ddserver/resources/doc/schema.sql',
-                                     'ddserver/resources/doc/schema.upgrade.sql',
-                                     'ddserver/resources/doc/ddserver.conf.example',
-                                     'ddserver/resources/doc/ddclient.conf.example',
-                                     'README.md', 'INSTALL.md', 'VERSION', 'LICENSE',
-                                     'CHANGES.md', 'UPGRADING.md']),
-        ('/usr/share/doc/ddserver/centos.init.d', ['ddserver/resources/doc/centos.init.d/ddserver']),
-        ('/usr/share/doc/ddserver/debian.init.d', ['ddserver/resources/doc/debian.init.d/ddserver']),
-        ('/usr/share/doc/ddserver/systemd', ['ddserver/resources/doc/systemd/ddserver.service'])
-    ],
-
     entry_points = {
         'console_scripts': [
             'ddserver-interface = ddserver.interface.__main__:main',
