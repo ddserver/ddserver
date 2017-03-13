@@ -21,7 +21,7 @@ import bottle
 
 import beaker.middleware
 
-from ddserver.utils.deps import export, extend, require
+from require import export, extend, require
 
 
 

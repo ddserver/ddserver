@@ -25,7 +25,7 @@ from ddserver.web import route
 
 from ddserver.interface.user import authorized
 
-from ddserver.utils.deps import require, extend
+from require import require, extend
 
 
 
