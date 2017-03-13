@@ -17,12 +17,19 @@ You should have received a copy of the GNU Affero General Public License
 along with ddserver. If not, see <http://www.gnu.org/licenses/>.
 '''
 
-import ConfigParser as configparser
+import configparser as configparser
 
 import collections
 import contextlib
 
-from ddserver.utils.deps import export
+from require import export
+
+
+
+def parse_bool(value):
+    """ Helper function to parse boolean config values.
+    """
+    return value.lower() in ['y', 'yes', 't', 'true', 1, 'on']
 
 
 
@@ -130,7 +137,7 @@ def Config(config_decl):
   config_file.read('/etc/ddserver/ddserver.conf')
 
   # Parse all sections
-  for section_name, options in config_decl.declarations.iteritems():
+  for section_name, options in config_decl.declarations.items():
     # Ensure a namespace object for the section exists
     if section_name in ns:
       nss = ns[section_name]
@@ -139,7 +146,7 @@ def Config(config_decl):
       nss = ns[section_name] = Namespace()
 
     # Parse the options in the section
-    for option_name, option in options.iteritems():
+    for option_name, option in options.items():
       if config_file.has_option(section_name, option_name):
         # Load the raw value from the config file
         raw_value = config_file.get(section_name, option_name)

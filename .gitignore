@@ -6,5 +6,6 @@
 /.project
 /.pydevproject
 /.idea
+/*.iml
 
 *.pyc

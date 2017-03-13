@@ -18,8 +18,11 @@ along with ddserver. If not, see <http://www.gnu.org/licenses/>.
 '''
 
 import bottle
+import requests
 
-from ddserver.utils.deps import extend, require
+from require import extend, require
+
+from ddserver.config import parse_bool
 
 
 
@@ -27,7 +30,7 @@ from ddserver.utils.deps import extend, require
 def config_captcha(config_decl):
   with config_decl.declare('captcha') as s:
     s('enabled',
-      conv = bool,
+      conv = parse_bool,
       default = False)
     s('recaptcha_public_key',
       conv = str,
@@ -57,21 +60,22 @@ def captcha_check(__on_error__):
                 *args,
                 **kwargs):
       if config.captcha.enabled:
-        from recaptcha.client import captcha
+        response = bottle.request.POST.pop('g-recaptcha-response', None)
 
-        challenge = bottle.request.POST.pop('recaptcha_challenge_field', None)
-        response = bottle.request.POST.pop('recaptcha_response_field', None)
-
-        if challenge is None or response is None:
+        if response is None:
           messages.error('Captcha values are missing')
           bottle.redirect('/')
 
-        result = captcha.submit(challenge,
-                                response,
-                                config.captcha.recaptcha_private_key,
-                                bottle.request.remote_addr)
+        request = requests.get('https://www.google.com/recaptcha/api/siteverify',
+                               params = {
+                                   'secret': config.captcha.recaptcha_private_key,
+                                   'response': response,
+                                   'remoteip': bottle.request.remote_addr
+                               })
 
-        if not result.is_valid:
+        response = request.json()
+
+        if not response['success']:
           messages.error('Captcha invalid')
           bottle.redirect(__on_error__)
 
