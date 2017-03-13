@@ -20,8 +20,6 @@ along with ddserver. If not, see <http://www.gnu.org/licenses/>.
 import re
 import bottle
 
-from recaptcha.client import captcha
-
 import formencode
 
 from formencode.validators import (FancyValidator,
@@ -31,7 +29,7 @@ from formencode.validators import (FancyValidator,
                                    String,  # @UnusedImport: for exporting
                                    Int)  # @UnusedImport: for exporting
 
-from ddserver.utils.deps import require, extend
+from require import require, extend
 
 
 
@@ -78,8 +76,8 @@ def validate(__on_error__ = '/',
              data = Values(data),
              **kwargs)
 
-      except formencode.Invalid, e:
-        for msg in e.error_dict.itervalues():
+      except formencode.Invalid as e:
+        for msg in e.error_dict.values():
           messages.error(msg)
 
       bottle.redirect(__on_error__)
