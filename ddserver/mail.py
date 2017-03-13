@@ -21,7 +21,7 @@ along with ddserver. If not, see <http://www.gnu.org/licenses/>.
 import jinja2
 import smtplib
 
-from ddserver.utils.deps import export, extend, require
+from require import export, extend, require
 
 
 

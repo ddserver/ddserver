@@ -24,7 +24,8 @@ import formencode
 
 from passlib.apps import custom_app_context as pwd
 
-from ddserver.utils.deps import require
+from require import require
+
 from ddserver.web import route
 
 
@@ -205,6 +206,10 @@ def get_update(logger):
     hostnames = hostnames.split(',')
     address = bottle.request.query.get('myip', None)
     offline = bottle.request.query.get('offline', 'NO') == 'YES'
+
+    # If no IP was provided in the request, use the one from the request
+    if not address:
+        address = bottle.request.remote_addr
 
     # Fetch the the credentials from HTTP header
     if bottle.request.auth:

@@ -19,7 +19,8 @@ along with ddserver. If not, see <http://www.gnu.org/licenses/>.
 
 import sys
 
-from ddserver.utils.deps import require, extend
+from require import require, extend
+
 from ddserver.utils.txtprot import (LexerDeclaration,
                                     FormatterDeclaration,
                                     MessageDeclaration,
