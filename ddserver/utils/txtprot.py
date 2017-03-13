@@ -88,8 +88,8 @@ class MessageDeclaration(object):
 
     return self(**{field.name : field.lex(value)
                    for field, value
-                   in itertools.izip(self.__fields,
-                                     load)})
+                   in zip(self.__fields,
+                          load)})
 
 
   def format(self, message):
@@ -98,8 +98,8 @@ class MessageDeclaration(object):
     # Format the values in the message skipping the first value as it is the tag
     return [field.format(value)
             for field, value
-            in itertools.izip(self.__fields,
-                              message[1:])]
+            in zip(self.__fields,
+                   message[1:])]
 
 
   def __call__(self, *args, **kwargs):

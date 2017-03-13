@@ -17,7 +17,7 @@ You should have received a copy of the GNU Affero General Public License
 along with ddserver. If not, see <http://www.gnu.org/licenses/>.
 '''
 
-from ddserver.utils.deps import require
+from require import require
 
 import ddserver.interface.pages.index  # @UnusedImport: for web application
 import ddserver.interface.pages.signup  # @UnusedImport: for web application

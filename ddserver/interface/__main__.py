@@ -27,7 +27,7 @@ import ddserver.interface.pages.user.host  # @UnusedImport: for web application
 import ddserver.interface.pages.admin.users  # @UnusedImport: for web application
 import ddserver.interface.pages.admin.suffixes  # @UnusedImport: for web application
 
-from ddserver.utils.deps import require
+from require import require
 
 
 

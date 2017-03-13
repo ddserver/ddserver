@@ -19,7 +19,8 @@ along with ddserver. If not, see <http://www.gnu.org/licenses/>.
 
 import sys
 
-from ddserver.utils.deps import require, extend
+from require import require, extend
+
 from ddserver.utils.txtprot import (LexerDeclaration,
                                     FormatterDeclaration,
                                     MessageDeclaration,
@@ -166,8 +167,18 @@ def answer_a(query,
         FROM `hosts` AS `host`
         LEFT JOIN `suffixes` AS `suffix`
           ON ( `suffix`.`id` = `host`.`suffix_id` )
-        WHERE `host`.`address` IS NOT NULL
-          AND CONCAT(`host`.`hostname`, '.', `suffix`.`name`) = %(name)s
+        WHERE
+          `host`.`address` IS NOT NULL
+            AND
+          (
+            %(name)s = CONCAT(`host`.`hostname`, '.', `suffix`.`name`)
+              OR
+            (
+              `host`.`wildcard`
+                AND
+              %(name)s LIKE CONCAT('%.', `host`.`hostname`, '.', `suffix`.`name`)
+            )
+          )
     ''', {'name': query.qname})
     host = cur.fetchone()
 

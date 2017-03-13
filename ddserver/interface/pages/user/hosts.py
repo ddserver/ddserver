@@ -19,9 +19,9 @@ along with ddserver. If not, see <http://www.gnu.org/licenses/>.
 
 import bottle
 
-from ddserver.web import route
+from require import extend, require
 
-from ddserver.utils.deps import extend, require
+from ddserver.web import route
 
 from ddserver.interface.user import authorized
 
@@ -40,7 +40,6 @@ def config_auth(config_decl):
        default = 5)
 
 
-
 @route('/user/hosts/list', method = 'GET')
 @authorized()
 @require(db = 'ddserver.db:Database',
@@ -56,6 +55,7 @@ def get_hosts_display(user,
         SELECT
           `host`.`id` AS `id`,
           `host`.`hostname` AS `hostname`,
+          `host`.`wildcard` AS `wildcard`,
           `suffix`.`name` AS `suffix`,
           `host`.`address` AS `address`,
           `host`.`updated` AS `updated`,
@@ -74,11 +74,9 @@ def get_hosts_display(user,
 @route('/user/hosts/add', method = 'GET')
 @authorized()
 @require(db = 'ddserver.db:Database',
-         config = 'ddserver.config:Config',
          templates = 'ddserver.interface.template:TemplateManager')
 def get_hosts_add(user,
                   db,
-                  config,
                   templates):
   ''' Display a form for adding new hostnames '''
 
@@ -99,6 +97,7 @@ def get_hosts_add(user,
 @authorized()
 @validate('/user/hosts/add',
           hostname = validation.ValidHostname(),
+          wildcard=validation.Bool(not_empty = True),
           suffix = validation.Int(not_empty = True),
           address = validation.IPAddress(),
           description = validation.String(max = 255),
@@ -118,33 +117,37 @@ def post_hosts_add(user,
 
   # We do net check passed suffix, as mysql will tell us later on
 
-  encrypted_password = pwd.encrypt(data.password)
-
   with db.cursor() as cur:
+    # Users can have an individual hostname limit, unlimited hostnames (-1)
+    # or have no limit set in the db to use the default from the config
     cur.execute('''
-      SELECT *
+      SELECT COUNT(*) AS count
       FROM `hosts`
       WHERE `user_id` = %(user_id)s
     ''', {'user_id': user.id})
 
-    # users can have an individual hostname limit, unlimited hostnames (-1)
-    # or have no limit set in the db to use the default from the config
-    if ((user.maxhosts is None and cur.rowcount >= int(config.dns.max_hosts)) or
-        (user.maxhosts is not None and
-         (int(cur.rowcount >= user.maxhosts) and int(user.maxhosts) is not -1))):
+    count = cur.fetchone()
+    if not ((user.maxhosts is None and (count['count'] < config.dns.max_hosts)) or
+            (user.maxhosts is not None and (count['count'] < user.maxhosts)) or
+            (user.maxhosts == -1)):
       messages.error('Maximum number of hosts reached')
-      bottle.redirect('/user/hosts/list')
+      bottle.redirect('/user/hosts/add')
+
+    # Encrypt the host password for for storage
+    encrypted_password = pwd.encrypt(data.password)
 
     cur.execute('''
       INSERT
       INTO `hosts`
       SET `hostname` = %(hostname)s,
+          `wildcard` = %(wildcard)s,
           `address` = %(address)s,
           `description` = %(description)s,
           `password` = %(password)s,
           `user_id` = %(user_id)s,
           `suffix_id` = %(suffix_id)s
     ''', {'hostname': data.hostname,
+          'wildcard': data.wildcard,
           'address': data.address,
           'description': data.description,
           'password': encrypted_password,

@@ -17,7 +17,7 @@ You should have received a copy of the GNU Affero General Public License
 along with ddserver. If not, see <http://www.gnu.org/licenses/>.
 '''
 
-from ddserver.utils.deps import export, extend, require
+from require import export, extend, require
 
 import functools
 import jinja2
@@ -48,7 +48,7 @@ class TemplateManager(object):
     # Return the render function of the template
     return functools.partial(template.render, **{name : func()
                                                  for name, func
-                                                 in self.__globals.iteritems()})
+                                                 in self.__globals.items()})
 
 
   @property

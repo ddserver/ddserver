@@ -19,9 +19,9 @@ along with ddserver. If not, see <http://www.gnu.org/licenses/>.
 
 import bottle
 
-from ddserver.web import route
+from require import extend, require
 
-from ddserver.utils.deps import extend, require
+from ddserver.web import route
 
 from ddserver.interface.user import authorized
 
@@ -53,6 +53,7 @@ def get_host_display(user,
           `host`.`hostname` AS `hostname`,
           `suffix`.`name` AS `suffix`,
           `host`.`address` AS `address`,
+          `host`.`wildcard` AS `wildcard`,
           `host`.`updated` AS `updated`,
           `host`.`description` AS `description`
         FROM `hosts` AS `host`
@@ -80,12 +81,10 @@ def get_host_display(user,
           address = validation.IPAddress(),
           description = validation.String(max = 255))
 @require(db = 'ddserver.db:Database',
-         config = 'ddserver.config:Config',
          messages = 'ddserver.interface.message:MessageManager')
 def post_host_update_address(user,
                              data,
                              db,
-                             config,
                              messages):
   ''' Update the IP address and/or description of a hostname. '''
 

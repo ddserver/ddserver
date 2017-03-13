@@ -38,14 +38,14 @@ setuptools.setup(
     keywords = 'ddserver ddns dns nsupdate',
 
     install_requires = [
-        'enum >= 0.4',
         'beaker >= 1.6',
         'bottle >= 0.11',
         'jinja2 >= 2.6',
-        'formencode >= 1.2',
+        'formencode >= 1.3.0a1',
         'passlib >= 1.6',
-        'recaptcha-client >= 1.0',
-        'MySQL-python >= 1.2.0'
+        'mysql-connector-python >= 2.0.0',
+        'require >= 0.1.0',
+        'requests >= 2.5.0'
     ],
 
     packages = setuptools.find_packages(),
@@ -83,8 +83,9 @@ setuptools.setup(
                                            'ddserver/resources/web/js/pwstrength.js',
                                            'ddserver/resources/web/js/pwstrength.options.js'
                                            ]),
-        ('/usr/share/doc/ddserver', ['ddserver/resources/doc/schema.sql',
-                                     'ddserver/resources/doc/schema.upgrade.sql',
+        ('/usr/share/doc/ddserver', ['ddserver/resources/doc/schema.001.sql',
+                                     'ddserver/resources/doc/schema.002.sql',
+                                     'ddserver/resources/doc/schema.003.sql',
                                      'ddserver/resources/doc/ddserver.conf.example',
                                      'ddserver/resources/doc/ddclient.conf.example',
                                      'README.md', 'INSTALL.md', 'VERSION', 'LICENSE',

@@ -22,6 +22,14 @@
             <span class="input-group-addon"><i class="fa fa-fw fa-desktop"></i></span>
             <input class="form-control" type="text" id="inputHostname" name="hostname" value="{{host.hostname}}.{{host.suffix}}" readonly="readonly">
           </div>
+          <div class="input-group">
+            <div class="checkbox">
+              <label for="inputHostname">
+                <input type="checkbox" id="inputWildcard" name="wildcard" {% if host.wildcard %}checked="checked"{% endif %} disabled="disabled">
+                Enable Wildcard Record
+              </label>
+            </div>
+          </div>
         </div>
         <div class="form-group">
           <label for="inputCurAddr">Current IP-Address</label>

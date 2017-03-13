@@ -26,6 +26,7 @@
           {% for host in hosts %}
           <tr>
             <td>
+              {% if host.wildcard %}<span class="origin">*.</span>{% endif %}
               {{host.hostname}}<span class="origin">.{{host.suffix}}</span>
               {% if host.description != None and host.description != "" %} &nbsp; <span class="small"><i class=" fa fa-info tip" title="{{host.description}}"></i></span>{% endif %}
             </td>
