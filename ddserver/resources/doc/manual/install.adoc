@@ -2,19 +2,24 @@
 // Installation manual
 == Installation
 
-The following sections describe the installation of ddserver, including the ddserver-interface, ddserver-updater and the ddserver-recursor.
+The following sections describe the installation of ddserver, including
+the ddserver-interface, ddserver-updater and the ddserver-recursor.
 
-For testing, a vagrant box is available which will install and start the ddserver-interface and ddserver-updater in a CentOS vm.
+For testing, a vagrant box is available which will install and start the
+ddserver-interface and ddserver-updater in a CentOS virtual machine.
 See link:https://github.com/ddserver[https://github.com/ddserver].
 
 === Prerequisites
 
-ddserver is written in Python and tested with versions 2.7 and 3.4 of the python programming language. The installation
-currently is based on python setuptools. A MySQL database server is needed to allow ddserver to store user, zone and
-hostname information. Finally, the PowerDNS server is required to answer DNS requests.
+ddserver is written in Python and was tested with versions 2.7 and 3.4 of
+the python programming language. The installation process is based on python
+setuptools. A MySQL database server is needed to allow ddserver to store
+user, zone and hostname information. Finally, the PowerDNS server is required
+to answer DNS requests.
 
-Also, some packages need to be installed on your system, before you will be able to compile the needed packages.
-Those include the python and mysql-client header files, which are available in separate packages on some GNU/Linux distributions.
+Also, some packages need to be installed on your system, before you will be
+able to compile the needed packages. These include the python and mysql-client
+header files, which are available in separate packages on some GNU/Linux distributions.
 
 If you are using Debian GNU/Linux or Ubuntu, please install the following packages:
 
@@ -36,26 +41,55 @@ python-setuptools
 
 === Getting the Source
 
-Currently, ddserver is available from link:https://github.com/ddserver/ddserver[GitHub] only.
+ddserver is available from link:https://github.com/ddserver/ddserver[GitHub].
+Releases can be downloaded from there, but using git to clone the current
+state of the project is the preferred way. The master branch will always
+point to the latest stable version of ddserver.
+
 To get the source please use git to clone the ddserver repository.
 
 [source, bash]
 ----
+cd /tmp
 git clone https://github.com/ddserver/ddserver.git
 ----
 
-=== Installing ddserver
+== Creating a virtual environment
 
-Change to the source directory and use 'python-setuptools' to install ddserver
+The preferred way of installing ddserver is by using a python virtual
+environment. This keeps your system clean and avoids conflicting packages.
+To start, first create a directory of your choice (in the example, I'm using
+/opt/ddserver), and then create a virtual environment in that directory.
 
 [source, bash]
 ----
-cd ddserver
-python setup.py install
+mkdir /opt/ddserver
+cd /opt/ddserver
+virtualenv .
 ----
 
-TIP: You need to do this with administrative privileges (i.e., as user root), to allow pythons setuptools to install
-the ddserver package and configuration files.
+The virtual environment is now created and can be activated by issuing the
+following commands.
+
+[source, bash]
+----
+cd /opt/ddserver
+source ./bin/activate
+----
+
+You can recognize that you are inside of your virtual environment by your
+PROMPT being prefixed with (ddserver).
+
+=== Installing ddserver
+
+Change to the directory where you cloned ddserver to and use
+'python-setuptools' to install ddserver
+
+[source, bash]
+----
+cd /tmp/ddserver
+python setup.py install
+----
 
 After this steps is completed, ddserver has been installed to the following locations:
 
