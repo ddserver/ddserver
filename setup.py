@@ -43,7 +43,7 @@ setuptools.setup(
         'jinja2 >= 2.6',
         'formencode >= 1.3.0a1',
         'passlib >= 1.6',
-        'mysql-connector-python >= 2.0.0',
+        'mysql-connector >= 2.0.0',
         'require >= 0.1.0',
         'requests >= 2.5.0',
         'enum34 >= 1.0.0',
