@@ -21,21 +21,13 @@ Also, some packages need to be installed on your system, before you will be
 able to compile the needed packages. These include the python and mysql-client
 header files, which are available in separate packages on some GNU/Linux distributions.
 
-If you are using Debian GNU/Linux or Ubuntu, please install the following packages:
+If you are using Debian GNU/Linux or Ubuntu, please install the following packages.
+For other distributions, find the corresponding packages to install.
 
 [source, bash]
 ----
 libmysqlclient-dev 
 python-dev
-python-setuptools
-----
-
-If you are using CentOS please install the following packages:
-
-[source, bash]
-----
-mysql-devel
-python-devel
 python-setuptools
 ----
 
@@ -54,7 +46,7 @@ cd /tmp
 git clone https://github.com/ddserver/ddserver.git
 ----
 
-== Creating a virtual environment
+=== Creating a virtual environment
 
 The preferred way of installing ddserver is by using a python virtual
 environment. This keeps your system clean and avoids conflicting packages.
@@ -91,33 +83,28 @@ cd /tmp/ddserver
 python setup.py install
 ----
 
-After this steps is completed, ddserver has been installed to the following locations:
+After this steps is completed, ddserver has been installed. All ddserver
+related files have been installed to the virtual environment. There are
+some important locations inside your virtual environment.
 
 [cols="2*"]
 |===
-|<CurrentDirectory>/build
-|contains the installed python packages
+|/opt/ddserver/bin
+|the ddserver executables
 
-|/etc/ddserver
-|contains the configuration files
+|/opt/ddserver/lib/python*/site-packages/ddserver-*.egg/ddserver
+|the ddserver python packages
 
-|/etc/init.d/ddserver
-|is a Debian/CentOS init-script for controlling ddserver
+|/opt/ddserver/lib/python*/site-packages/ddserver-*.egg/doc
+|the ddserver documentation, example configuration and database layout
 
-|/usr/share/doc/ddserver
-|contains the database schema, example configuration files, and further documentation
-
-|/usr/share/ddserver
-|contains static files like CSS, JavaScript, eMail-Templates, ..
-
-|/usr/local/bin
-|contains the ddserver executables
 |===
 
 === Installing the database
 
-ddserver uses a MySQL backend to store DNS information.
-To install the ddserver database schema, first create a database and a database user used for ddserver.
+ddserver uses a MySQL database backend to store information about user
+accounts, zones, hostnames, etc. To install the ddserver database schema,
+first create a database and a database user for ddserver.
 
 [source, mysql]
 ----
@@ -129,21 +116,36 @@ mysql> GRANT USAGE ON *.* TO 'ddserver'@'localhost' IDENTIFIED BY 'YourSecurePas
 mysql> GRANT SELECT, INSERT, UPDATE, DELETE ON `ddserver`.* TO 'ddserver'@'localhost';
 ----
 
-Now you can install the ddserver database schema by usng the following command.
+After the database was created, you can install the ddserver database
+schema by usng the following command.
 
 [source, bash]
 ----
-mysql -u root -p ddserver < /usr/share/doc/ddserver/schema.sql
+mysql -u root -p ddserver < /opt/ddserver/lib/python*/site-packages/ddserver-*.egg/doc/db/schema.sql
+----
+
+=== Installing the configuration file
+
+By default, ddserver will try to load its configuration file from
+/etc/ddserver/ddserver.conf. You should now copy the example configuration
+file to this location.
+
+[source, bash]
+----
+mkdir /etc/ddserver
+cp /opt/ddserver/lib/python*/site-packages/ddserver-*.egg/doc/conf/ddserver.conf.example /etc/ddserver/ddserver.conf
+cp /opt/ddserver/lib/python*/site-packages/ddserver-*.egg/doc/conf/motd /etc/ddserver/
 ----
 
 Congratz, you installed ddserver!
 
-TIP: When installing the default database schema, an initial user will be installed to log into the WebUI.
+TIP: When installing the default database schema, an initial user will be installed to login to the WebUI.
 
-The default
+The default login is
 [source, bash]
 ----
-login is: admin:admin
+username: admin
+password: admin
 ----
 
 //EOF

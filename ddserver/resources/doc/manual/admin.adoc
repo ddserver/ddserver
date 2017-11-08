@@ -1,48 +1,80 @@
 
 // Administrator manual
-== Running the ddserver WebUI and updater
+== Running ddserver
 
-Although, ddserver comes with a separate WebUI (ddserver-interface) and updater (ddserver-updater), the easiest way to run ddserver is by using ddserver-bundle, which starts both, the WebUI and the updater.
+As mentioned above, ddserver comes with multiple separate parts. The WebUI
+(ddserver-interface) provides users and administrators with a GUI to manage
+zones and hostnames. The updater (ddserver-updater) is listening for IP
+address updates, while the recursor (ddserver-recursor) runs as a powerdns
+backend to server domain names. An additional executable (ddserver-bundle)
+is available to run both, the WebUI and the updater.
 
-You can start the ddserver-bundle by using the init-script or by starting the ddserver-bundle executable on the command line
+While the parts can run individually, i.e. if you want to separate the
+updater from the WebUI running it on another server, in the latest version,
+running ddserver-bundle as a WSGI application is preferred.
+
+
+=== Running ddserver WebUI and updater
+
+==== Preferred: Run as WSGI application
+
+Depending on the webserver you use, you may need to install a wsgi-module.
+For the Apache webserver on Debian GNU/Linux, this can be done by issuing
+the following command.
 
 [source, bash]
 ----
-/etc/init.d/ddserver start
+apt-get install libapache2-mod-wsgi
 ----
 
-or
+An example configuration file for the apache webserver can be found in the
+docs folder of ddserver.
 
 [source, bash]
 ----
-ddserver-bundle
+/opt/ddserver/lib/python*/site-packages/ddserver-*.egg/doc/wsgi/
 ----
 
-Now, open your webbrowser and navigate to your configured URL (default: link:http://localhost:8080).
+Now restart your webserver, open your webbrowser and navigate to the URL you
+configured in the configuration file (default: link:http://localhost:8080).
+
+
+==== Alternative: Run ddserver in foreground
+
+You can just start ddserver in foreground by issuing the following command.
+
+[source, bash]
+----
+/opt/ddserver/bin/ddserver-bundle
+----
+
+Now open your webbrowser and navigate to the URL you configured in the
+configuration file (default: link:http://localhost:8080).
+
 
 === Running the ddserver-recursor
 
-The ddserver-recursor is needed by PorweDNS to retrieve DNS records from the ddserver database.
-It gets called using the pdns-pipe-backend.
+The ddserver-recursor is needed by PorweDNS to retrieve DNS records from
+the ddserver database. It gets called using the pdns-remote-backend.
 
-If you did not already install the PowerDNS pipe backend, you should do this now.
-On Debian GNU/Linux you can do this by typing
-
-[source, bash]
-----
-apt-get install pdns-backend-pipe
-----
-
-Now, edit your PowerDNS configuration file and add the following to connect ddserver to PowerDNS
+If you did not already install the PowerDNS remote backend, you should
+do this now. On Debian GNU/Linux you can do this by typing
 
 [source, bash]
 ----
-launch=pipe
-pipe-command=/usr/local/bin/ddserver-recursor
+apt-get install pdns-backend-remote
+----
+
+Now, edit your PowerDNS configuration file and add the following to connect
+ddserver as a backend to PowerDNS
+
+[source, bash]
+----
+launch=+remote
+remote-connection-string=pipe:command=/opt/ddserver/bin/ddserver-recursor
 ----
 
 IMPORTANT: The user, you are running powerdns as needs write privileges to the ddserver logfile '/var/log/ddserver.log'
 
-TIP: If you are already running powerdns using another backend (i.e. the gmysql backend), you can just append the pipe packend to your launch-configuration. (i.e. 'launch=gmysql,pipe').
 
 //EOF
