@@ -46,7 +46,7 @@ def get_users(user,
       where = 'WHERE `admin` = 1'
 
   elif mode == 'inactive':
-      where = 'WHERE `active` = NULL'
+      where = 'WHERE `active` = 0'
 
   else:
       where = 'WHERE 1 = 1'
