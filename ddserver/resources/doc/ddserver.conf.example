@@ -1,3 +1,17 @@
+; This is the main configuration file for ddserver, a server-side
+; application for dynamic DNS management.
+;
+; This file is in INI format, it is structured by [sections]. Each
+; section can have multiple key=value pairs. Comments start with ;
+;
+
+
+; This section configures the database connection
+; -----------------------------------------------
+;
+; The settings should be self-explaining. A database server/port,
+; the database name to use, as well as login data for the database.
+;
 [db]
 ;host = localhost
 ;port = 3306
@@ -5,28 +19,110 @@
 ;username = ddserver
 password = YourDatabasePassword
 
+
+; The logging configuration
+; -------------------------
+;
+; Enable or disable additional verbosity, and specify the log file.
+; Note: The user ddserver runs as needs write access to the log file
+;
 [logging]
 ;verbose = False
 ;file = /var/log/ddserver.log
 
+
+; User authentication parameters
+; ------------------------------
+;
+; password_min_chars
+: The minimum number of characters for a users password.
+;
 [auth]
 ;password_min_chars = 8
 
+
+; DNS specific configuration
+; --------------------------
+;
+; answer_soa
+: Answer SOA queries. This should normally be done by another backend,
+; together with resource records like NS, or MX. However, if you do not
+; use another backend, ddserver can answer instead, using these values:
+; "ns.<domain>. hostmaster.<domain>. 2015999901 43200 7200 604800 43200"
+;
+; max_hosts
+; The default number of hostnames, a single user can create. This can be
+; changed in the WebUI for individual users.
+;
+; ttl
+; The TTL for DNS records we serve.
+;
+; reserved
+; A list of hostnames (separated by newline) that users are not allowed
+; to register (i.e., mx, www).
+;
 [dns]
 ;answer_soa = False
-;max_hosts = 5
 ;ttl = 60
+;max_hosts = 5
 ;reserved =
 ;   www
 ;   mail
 ;   ftp
 ;   test
 
+
+; This section controls who is allowed to create accounts
+; -------------------------------------------------------
+;
+; enabled
+: Enable or disable account registration.
+;
+; allowed_maildomains
+; When account registration is enabled, this parameter specifies a list
+; of domain names that new users are allowed to register an account from.
+; Use "any" to allow any domain, or a comma separated list to allow only
+; some domains. This is thought to allow registration only for specific
+; users (i.e., members of your hackerspace).
+;
+; notify_admin
+; Send an informative email to the admin user (the one specified in the
+; contact section), whenever a new user account is created.
+;
 [signup]
 ;enabled = True
 ;allowed_maildomains = any
 ;notify_admin = True
 
+
+; Configuration for the WebUI
+; ---------------------------
+;
+; host
+; The interface to listen for connections. Only used when running ddserver
+; with the standalone webserver, instead of your webservers WSGI module.
+
+; port
+; The TCP port to listen for connections. Only used when running ddserver
+; with the standalone webserver, instead of your webservers WSGI module.
+;
+; debug
+; Enable webserver debugging.
+;
+; preferred_protocol
+; The preferred protocol (http or https). This is used when generating
+; links or router configuration examples.
+;
+; servername
+; The fully-qualified domain name, ddserver is running on. This is used
+; when generating links or router configuration examples.
+;
+; static_files
+; The absolute location, where static files are located.
+;
+; pagination_max_items
+; The number of lines to show per page in list views.
+;
 [wsgi]
 ;host = 0.0.0.0
 ;port = 8080
@@ -36,14 +132,50 @@ password = YourDatabasePassword
 ;static_files = /usr/share/ddserver/static
 ;pagination_max_items = 25
 
+
+; E-Mail server configuration
+; ---------------------------
+;
+; host
+; The email server name or IP address
+;
+; port
+; The email servers SMTP port
+;
 [smtp]
 host = 127.0.0.1
 ;port = 25
 
+
+; Contact information
+; -------------------
+;
+; name
+; The name of the administrator that will be displayed in the WebUI, as
+; well as in email messages.
+;
+; email
+; The email address of the administrator that will be displayed in the
+; WebUI, as well as in email messages.
+;
 [contact]
 name = Administrator
 email = admin@example.com
 
+
+; ReCAPTHA configuration
+; ----------------------
+;
+; enabled
+; Use Googles ReCAPTCHA service for the registration and password reset
+; pages to prevent attacks
+;
+; recaptcha_public_key
+; Your ReCAPTCHA public key (see https://www.google.com/recaptcha).
+;
+; recaptcha_private_key
+; Your ReCAPTCHA private key (see https://www.google.com/recaptcha).
+;
 [captcha]
 ;enabled = False
 ;recaptcha_public_key = 
