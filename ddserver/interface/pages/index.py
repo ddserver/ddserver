@@ -21,11 +21,11 @@ import os
 
 import bottle
 
-from ddserver.web import route
-
-from ddserver.interface.user import authorized
-
 from require import require, extend
+
+from ddserver.web import route
+from ddserver.interface.user import authorized
+import ddserver.resources
 
 
 
@@ -34,7 +34,7 @@ def config_wsgi(config_decl):
   with config_decl.declare('wsgi') as s:
     s('static_files',
       conv = str,
-      default = '/usr/share/ddserver/static')
+      default = os.path.dirname(ddserver.resources.__file__) + '/web')
 
 
 
