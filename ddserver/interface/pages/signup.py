@@ -165,25 +165,38 @@ def post_signup(data,
 
 
 @route('/signup/activate', method = 'GET')
-@require(templates = 'ddserver.interface.template:TemplateManager')
-def get_signup_activate(templates):
-  ''' Displays the activation form. '''
+@require(templates = 'ddserver.interface.template:TemplateManager',
+         session = 'ddserver.interface.session:SessionManager')
+def get_signup_activate(templates,
+                        session):
+  """ Display the activation form.
+  """
 
-  return templates['activate.html'](username = bottle.request.query.username,
-                                    authcode = bottle.request.query.authcode)
+  # save the username and authcode to allow reload of the
+  # activation page on errors (i.e. short password)
+  if bottle.request.query.authcode:
+    session.authcode = bottle.request.query.authcode
+    session.username = bottle.request.query.username
+    session.save()
+
+  return templates['activate.html'](username = session.username,
+                                    authcode = session.authcode)
 
 
 
 @route('/signup/activate', method = 'POST')
 @authorized_by_code()
-@validate(password = validation.SecurePassword(min = 8),
+@validate('/signup/activate',
+          password = validation.SecurePassword(min = 8),
           password_confirm = validation.String(),
           chained_validators = [validation.FieldsMatch('password', 'password_confirm')])
 @require(db = 'ddserver.db:Database',
+         session = 'ddserver.interface.session:SessionManager',
          messages = 'ddserver.interface.message:MessageManager')
 def post_signup_activate(user,
                          data,
                          db,
+                         session,
                          messages):
   ''' Activates an account. '''
 
@@ -198,6 +211,12 @@ def post_signup_activate(user,
         WHERE `id` = %(user_id)s
     ''', {'password': encrypted_password,
           'user_id': user.id})
+
+  # clear session vars, used to allow error-redirect
+  # to the activation page (see get_signup_activate())
+  session.authcode = None
+  session.username = None
+  session.save()
 
   messages.success('Your account is active now. Please login.')
 
