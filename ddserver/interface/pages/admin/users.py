@@ -280,7 +280,7 @@ def post_user_rmadmin(user,
 
   messages.success('Ok, done.')
 
-  bottle.redirect('/admin/users/admin')
+  bottle.redirect('/admin/users/all')
 
 
 
