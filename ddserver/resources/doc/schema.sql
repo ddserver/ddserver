@@ -16,9 +16,9 @@
 -- along with ddserver.  If not, see <http://www.gnu.org/licenses/>.
 
 
-DROP TABLE IF EXISTS `users`;
-DROP TABLE IF EXISTS `suffixes`;
 DROP TABLE IF EXISTS `hosts`;
+DROP TABLE IF EXISTS `suffixes`;
+DROP TABLE IF EXISTS `users`;
 
 
 --
@@ -28,6 +28,8 @@ CREATE TABLE `users` (
   `id`          INT            NOT NULL AUTO_INCREMENT PRIMARY KEY,
   `username`    VARCHAR(255)   NOT NULL UNIQUE,
   `password`    VARCHAR(255)   NULL DEFAULT NULL,
+  `yubico_id`   INT            NULL DEFAULT NULL,
+  `yubico_key`  VARCHAR(32)    NULL DEFAULT NULL,
   `email`       VARCHAR(255)   NOT NULL,
   `admin`       BOOLEAN        NOT NULL DEFAULT FALSE,
   `active`      BOOLEAN        NOT NULL DEFAULT FALSE,
@@ -61,6 +63,7 @@ CREATE TABLE `hosts` (
   `description` VARCHAR(255)    NULL DEFAULT NULL,
   `password`    VARCHAR(255)    NOT NULL,
   `updated`     TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `abuse`       TEXT            NULL DEFAULT NULL,
 
   FOREIGN KEY (`user_id`)       REFERENCES `users` (`id`) ON DELETE CASCADE ,
   FOREIGN KEY (`suffix_id`)     REFERENCES `suffixes` (`id`) ON DELETE CASCADE ,

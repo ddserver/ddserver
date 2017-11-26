@@ -1,5 +1,5 @@
 """
-Copyright 2013 Dustin Frisch<fooker@lab.sh>
+Copyright 2015 Sven Reissmann <sven@0x80.io>
 
 This file is part of ddserver.
 
@@ -17,265 +17,112 @@ You should have received a copy of the GNU Affero General Public License
 along with ddserver. If not, see <http://www.gnu.org/licenses/>.
 """
 
-import sys
-
+import pdns.remotebackend
 from require import require, extend
-
-from ddserver.utils.txtprot import (LexerDeclaration,
-                                    FormatterDeclaration,
-                                    MessageDeclaration,
-                                    FieldDeclaration)
-
-
-# See http://doc.powerdns.com/html/backends-detail.html#pipebackend
-# for further protocol specification
-
-
-# Declaration of the PowerDNS pipe protocol
-lexer = LexerDeclaration(splitter='\t',
-                         messages=(MessageDeclaration('HELO',
-                                                      FieldDeclaration('version', int)),
-
-                                   MessageDeclaration('Q',
-                                                      FieldDeclaration('qname', str),
-                                                      FieldDeclaration('qclass', str),
-                                                      FieldDeclaration('qtype', str),
-                                                      FieldDeclaration('id', int),
-                                                      FieldDeclaration('remote', str)),
-
-                                   MessageDeclaration('AXFR',
-                                                      FieldDeclaration('id', int)),
-
-                                   MessageDeclaration('PING')))
-
-
-formatter = FormatterDeclaration(splitter='\t',
-                                 messages=(MessageDeclaration('OK',
-                                                              FieldDeclaration('banner', str)),
-
-                                           MessageDeclaration('DATA',
-                                                              FieldDeclaration('qname', str),
-                                                              FieldDeclaration('qclass', str),
-                                                              FieldDeclaration('qtype', str),
-                                                              FieldDeclaration('ttl', str),
-                                                              FieldDeclaration('id', int),
-                                                              FieldDeclaration('content', str)),
-
-                                           MessageDeclaration('LOG',
-                                                              FieldDeclaration('message', str)),
-
-                                           MessageDeclaration('END'),
-                                           MessageDeclaration('FAIL')))
+from ddserver.config import parse_bool
 
 
 @extend('ddserver.config:ConfigDeclaration')
 def config_dns(config_decl):
-  with config_decl.declare('dns') as s:
-    s('ttl',
-      conv=int,
-      default=60)
+    with config_decl.declare('dns') as s:
+        s('ttl',
+          conv=int,
+          default=60)
+        s('answer_soa',
+          conv=parse_bool,
+          default=False)
 
 
-@require(logger='ddserver.utils.logger:Logger')
-def receiver(logger):
-  """ Receive and process messages from PowerDNS
-  """
+class DdserverHandler(pdns.remotebackend.Handler):
+    db = require('ddserver.db:Database')
+    logger = require('ddserver.utils.logger:Logger')
+    config = require('ddserver.config:Config')
 
-  while True:
-    # Read a line
-    line = sys.stdin.readline()
-    if not line:
-      break
+    def answer_soa(self, qname):
+        """ answer questions of type SOA.
+            this should be done by another backend (together with NS, MX, ...)
+        """
+        with self.db.cursor() as cur:
+            cur.execute('''
+                SELECT *
+                  FROM `suffixes`
+                 WHERE `name` = %(name)s
+            ''', {'name': qname})
+            suffix = cur.fetchone()
 
-    # Lex the line
-    message = lexer(line)
+            if suffix:
+                content = ' '.join(('ns.' + qname + '.',
+                                    'hostmaster.' + qname + '.',
+                                    '2015999901',
+                                    '43200',     # 12h
+                                    '7200',      # 2h
+                                    '604800',    # 7d
+                                    '43200'))    # 12h
+                self.result.append(self.record_prio_ttl(qname, 'SOA', content, 0, 300))
 
-    # Check if we got a message
-    if message is None:
-      logger.error('recursor: Unknown tag: %s', line)
-      continue
+    def answer_a(self, qname):
+        """ answer questions of type A or ANY
+        """
+        with self.db.cursor() as cur:
+            cur.execute('''
+                SELECT
+                  `host`.`hostname` AS `hostname`,
+                  `suffix`.`name` AS `suffix`,
+                  `host`.`address` AS `address`
+                FROM `hosts` AS `host`
+                LEFT JOIN `suffixes` AS `suffix`
+                  ON ( `suffix`.`id` = `host`.`suffix_id` )
+                WHERE `host`.`address` IS NOT NULL
+                  AND CONCAT(`host`.`hostname`, '.', `suffix`.`name`) = %(name)s
+            ''', {'name': qname})
+            host = cur.fetchone()
 
-    logger.debug('recursor: Received message: %s', message)
+            if host and host['address'] is not None:
+                response = self.record_prio_ttl(qname, 'A', host['address'], 0, self.config.dns.ttl)
+                self.logger.debug('response: %s', response)
+                self.result.append(response)
 
-    # Forward the message
-    yield message
+    def answer_aaaa(self, qname):
+        """ answer questions of type AAAA or ANY
+        """
+        with self.db.cursor() as cur:
+            cur.execute('''
+                SELECT
+                  `host`.`hostname` AS `hostname`,
+                  `suffix`.`name` AS `suffix`,
+                  `host`.`address_v6` AS `address_v6`
+                FROM `hosts` AS `host`
+                LEFT JOIN `suffixes` AS `suffix`
+                  ON ( `suffix`.`id` = `host`.`suffix_id` )
+                WHERE `host`.`address` IS NOT NULL
+                  AND CONCAT(`host`.`hostname`, '.', `suffix`.`name`) = %(name)s
+            ''', {'name': qname})
+            host = cur.fetchone()
 
+            if host and host['address_v6'] is not None:
+                response = self.record_prio_ttl(qname, 'AAAA', host['address_v6'], 0, self.config.dns.ttl)
+                self.logger.debug('response: %s', response)
+                self.result.append(response)
 
-@require(logger='ddserver.utils.logger:Logger')
-def send(cls,
-         logger,
-         **kwargs):
-  """ Send responses to PowerDNS
-  """
+    def do_lookup(self, args):
+        """ decide what to answer
+        """
+        self.result = []
+        self.logger.debug('request: %s', args)
 
-  # Create message
-  message = cls(**kwargs)
+        if self.config.dns.answer_soa and (args['qtype'] == 'ANY' or args['qtype'] == 'SOA'):
+            self.answer_soa(args['qname'])
 
-  logger.debug('recursor: Responding message: %s', message)
+        if args['qtype'] == 'ANY' or args['qtype'] == 'A':
+            self.answer_a(args['qname'])
 
-  # Format the response
-  line = formatter(message)
-
-  # Send line to standard output
-  sys.stdout.write(line + '\n')
-  sys.stdout.flush()
-
-
-@require(db='ddserver.db:Database')
-def answer_soa(query,
-               db):
-  """ Handle SOA records and respond with defined suffixes
-  """
-
-  with db.cursor() as cur:
-    cur.execute('''
-      SELECT *
-      FROM `suffixes`
-      WHERE `name` = %(name)s
-    ''', {'name': query.qname})
-    suffix = cur.fetchone()
-
-    if suffix:
-      send(formatter.DATA, qname=query.qname,
-                           qclass=query.qclass,
-                           qtype='SOA',
-                           ttl=3600,
-                           id=query.id,
-                           content=' '.join(('ns.' + query.qname,
-                                             'webmaster.' + query.qname,
-                                             '0',
-                                             '86400',     # 24h
-                                             '7200',      # 2h
-                                             '3600000',   # 1000h
-                                             '172800')))  # 2d
-
-
-@require(db='ddserver.db:Database',
-         config='ddserver.config:Config')
-def answer_a(query,
-             db,
-             config):
-  """ Handle A records
-  """
-
-  with db.cursor() as cur:
-    cur.execute('''
-        SELECT
-          `host`.`hostname` AS `hostname`,
-          `suffix`.`name` AS `suffix`,
-          `host`.`address` AS `address`
-        FROM `hosts` AS `host`
-        LEFT JOIN `suffixes` AS `suffix`
-          ON ( `suffix`.`id` = `host`.`suffix_id` )
-        WHERE `host`.`address` IS NOT NULL
-          AND CONCAT(`host`.`hostname`, '.', `suffix`.`name`) = %(name)s
-    ''', {'name': query.qname})
-    host = cur.fetchone()
-
-    if host:
-      send(formatter.DATA, qname=query.qname,
-                           qclass=query.qclass,
-                           qtype='A',
-                           ttl=config.dns.ttl,
-                           id=query.id,
-                           content=host['address'])
+        if args['qtype'] == 'ANY' or args['qtype'] == 'AAAA':
+            self.answer_aaaa(args['qname'])
 
 
-@require(db='ddserver.db:Database',
-         config='ddserver.config:Config')
-def answer_aaaa(query,
-                db,
-                config):
-  """ Handle AAAA records
-  """
-
-  with db.cursor() as cur:
-    cur.execute('''
-        SELECT
-          `host`.`hostname` AS `hostname`,
-          `suffix`.`name` AS `suffix`,
-          `host`.`address_v6` AS `address_v6`
-        FROM `hosts` AS `host`
-        LEFT JOIN `suffixes` AS `suffix`
-          ON ( `suffix`.`id` = `host`.`suffix_id` )
-        WHERE `host`.`address_v6` IS NOT NULL
-          AND CONCAT(`host`.`hostname`, '.', `suffix`.`name`) = %(name)s
-    ''', {'name': query.qname})
-    host = cur.fetchone()
-
-    if host:
-      send(formatter.DATA, qname=query.qname,
-                           qclass=query.qclass,
-                           qtype='AAAA',
-                           ttl=config.dns.ttl,
-                           id=query.id,
-                           content=host['address_v6'])
-
-
-def answer(query):
-  """ Determine query type and respond to it
-  """
-
-  if query.qtype == 'SOA' or query.qtype == 'ANY':
-    answer_soa(query)
-
-  if query.qtype == 'A' or query.qtype == 'ANY':
-    answer_a(query)
-
-  if query.qtype == 'AAAA' or query.qtype == 'ANY':
-    answer_aaaa(query)
-
-  else:
-    # Ignore all other queries
-    pass
-
-
-
-@require(logger='ddserver.utils.logger:Logger')
-def main(logger):
-  messages = receiver()
-
-  # Handle messages until HELO was received
-  for message in messages:
-    # Handle HELO message
-    if message.tag == 'HELO':
-      # Expecting ABI version 1
-      if message.version != 1:
-        logger.error('recursor: Unappropriate ABI version: %s', message.version)
-        send(formatter.FAIL)
-
-      send(formatter.OK,
-           banner='ddserver')
-      break
-
-    else:
-      logger.error('recursor: Missing HELO before command: %s', message.tag)
-      send(formatter.FAIL)
-
-  # Handle all messages after HELO
-  for message in messages:
-    if message.tag == 'HELO':
-      logger.error('recursor: Duplicated HELO')
-      send(formatter.FAIL)
-
-    elif message.tag == 'Q':
-      # Handle query
-      answer(query=message)
-
-      send(formatter.END)
-
-    elif message.tag == 'AXFR':
-      # We do not support transfer by now
-      send(formatter.END)
-
-    elif message.tag == 'PING':
-      # Ping does not require any data response
-      send(formatter.END)
-
-    else:
-      logger.error('recursor: Unhandled message tag: %s', message)
-      send(formatter.FAIL)
+def main():
+    pdns.remotebackend.PipeConnector(DdserverHandler).run()
 
 
 if __name__ == '__main__':
-  main()
+    main()

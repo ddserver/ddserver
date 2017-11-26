@@ -59,7 +59,8 @@ def get_hosts_display(user,
           `host`.`address` AS `address`,
           `host`.`address_v6` AS `address_v6`,
           `host`.`updated` AS `updated`,
-          `host`.`description` AS `description`
+          `host`.`description` AS `description`,
+          `host`.`abuse` AS `abuse`
         FROM `hosts` AS `host`
         LEFT JOIN `suffixes` AS `suffix`
           ON ( `suffix`.`id` = `host`.`suffix_id` )
@@ -149,7 +150,7 @@ def post_hosts_add(user,
     ''', {'hostname': data.hostname,
           'address': data.address,
           'address_v6': data.address_v6,
-          'description': data.description,
+          'description': data.description.replace('\r\n', ' '),
           'password': encrypted_password,
           'user_id': user.id,
           'suffix_id': data.suffix})

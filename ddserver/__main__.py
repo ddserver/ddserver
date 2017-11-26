@@ -17,19 +17,7 @@ You should have received a copy of the GNU Affero General Public License
 along with ddserver. If not, see <http://www.gnu.org/licenses/>.
 '''
 
-from require import require
-
-import ddserver.interface.pages.index  # @UnusedImport: for web application
-import ddserver.interface.pages.signup  # @UnusedImport: for web application
-import ddserver.interface.pages.lostpasswd  # @UnusedImport: for web application
-import ddserver.interface.pages.login  # @UnusedImport: for web application
-import ddserver.interface.pages.user.account  # @UnusedImport: for web application
-import ddserver.interface.pages.user.hosts  # @UnusedImport: for web application
-import ddserver.interface.pages.user.host  # @UnusedImport: for web application
-import ddserver.interface.pages.admin.users  # @UnusedImport: for web application
-import ddserver.interface.pages.admin.suffixes  # @UnusedImport: for web application
-
-import ddserver.updater.nic  # @UnusedImport: for web application
+from require import require, Export
 
 
 
@@ -42,3 +30,4 @@ def main(web):
 
 if __name__ == '__main__':
     main()
+

@@ -23,8 +23,7 @@ from require import extend, require
 
 from ddserver.web import route
 
-from ddserver.interface.user import authorized
-from ddserver.interface.user import authorized_by_code
+from ddserver.interface.user import authorized, verify_yubikey_otp
 
 from ddserver.interface import validation
 from ddserver.interface.validation import validate
@@ -131,3 +130,80 @@ def post_account_delete(user,
 
   bottle.redirect('/')
 
+
+
+@route('/user/account/yubikey/enable', method = 'POST')
+@authorized()
+@validate('/user/account',
+          yubico_id = validation.Int(),
+          yubico_key = validation.String())
+@require(db = 'ddserver.db:Database',
+         messages = 'ddserver.interface.message:MessageManager')
+def post_account_yubico_enable(user,
+                               data,
+                               db,
+                               messages):
+  """ Enable Yubikey OTP
+  """
+
+  with db.cursor() as cur:
+    cur.execute('''
+        UPDATE `users`
+        SET `yubico_id` = %(yubico_id)s,
+            `yubico_key` = %(yubico_key)s
+        WHERE `id` = %(id)s
+    ''', {'yubico_id' : data.yubico_id,
+          'yubico_key' : data.yubico_key,
+          'id': user.id})
+
+  messages.success('Ok, done.')
+
+  bottle.redirect('/user/account')
+
+
+
+@route('/user/account/yubikey/disable', method = 'POST')
+@authorized()
+@require(db = 'ddserver.db:Database',
+         messages = 'ddserver.interface.message:MessageManager')
+def post_account_yubico_disable(user,
+                                db,
+                                messages):
+  """ Disable Yubikey OTP
+  """
+
+  with db.cursor() as cur:
+    cur.execute('''
+        UPDATE `users`
+        SET `yubico_id` = NULL,
+            `yubico_key` = NULL
+        WHERE `id` = %(id)s
+    ''', {'id': user.id})
+
+  messages.success('Ok, done.')
+
+  bottle.redirect('/user/account')
+
+
+
+@route('/user/account/yubikey/test', method = 'POST')
+@authorized()
+@validate('/user/account',
+          yubikey_otp = validation.String())
+@require(db = 'ddserver.db:Database',
+         messages = 'ddserver.interface.message:MessageManager')
+def post_account_yubico_test(user,
+                             db,
+                             messages,
+                             data):
+  """ Test Yubikey OTP
+  """
+
+  result = verify_yubikey_otp(username = user.username,
+                              yubikey_otp = data.yubikey_otp)
+  if result:
+    messages.success('Congratulation, your Yubikey works.')
+  else:
+    messages.error('Error validating your Yubikey OTP.')
+
+  bottle.redirect('/user/account')

@@ -21,11 +21,11 @@ import os
 
 import bottle
 
-from ddserver.web import route
-
-from ddserver.interface.user import authorized
-
 from require import require, extend
+
+from ddserver.web import route
+from ddserver.interface.user import authorized
+import ddserver.resources
 
 
 
@@ -34,7 +34,7 @@ def config_wsgi(config_decl):
   with config_decl.declare('wsgi') as s:
     s('static_files',
       conv = str,
-      default = '/usr/share/ddserver/static')
+      default = os.path.dirname(ddserver.resources.__file__) + '/web')
 
 
 
@@ -63,7 +63,8 @@ def get_index(db,
   if session.username:
     motd = None
     if os.path.isfile('/etc/ddserver/motd'):
-      motd = open('/etc/ddserver/motd').read()
+      with open('/etc/ddserver/motd') as f:
+        motd = f.read()
 
     (users, zones, hosts, userhosts) = get_statistics()
 
