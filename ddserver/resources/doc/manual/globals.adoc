@@ -1,0 +1,13 @@
+// Global settings
+:ascii-ids:
+:encoding: UTF-8
+:lang: en
+:icons: font
+:toc: macro
+:toclevels: 3
+:numbered:
+
+:stylesdir: stylesheets
+:stylesheet: ddserver.css
+
+include::header.txt[]

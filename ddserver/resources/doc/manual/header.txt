@@ -1,0 +1,27 @@
+[options="header"]
+++++
+  <header class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#mainmenu">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="index.html"><img class="img-responsive" src="../../web/img/logo-long.png"></a>
+      </div>
+
+      <div class="collapse navbar-collapse navbar-inverse " id="mainmenu">
+        <ul class="nav navbar-nav pull-right">
+          <li><a href="index.html"><i class="fa fa-fw fa-home"></i> Intro</a></li>
+          <li><a href="install.html"><i class="fa fa-fw fa-home"></i> Installation</a></li>
+          <li><a href="configure.html"><i class="fa fa-fw fa-home"></i> Configuration</a></li>
+          <li><a href="user.html"><i class="fa fa-fw fa-home"></i> Usage</a></li>
+          <li class="divider"></li>
+          <li><a href="https://www.github.com/ddserver"><i class="fa fa-fw fa-github"></i> Github</a></li>
+        </ul>
+      </div>
+    </div>
+  </header>
+++++

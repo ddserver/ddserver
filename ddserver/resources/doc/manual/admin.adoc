@@ -1,6 +1,9 @@
+include::globals.adoc[]
 
 // Administrator manual
 == Running ddserver
+
+toc::[]
 
 As mentioned above, ddserver comes with multiple separate parts. The WebUI
 (ddserver-interface) provides users and administrators with a GUI to manage

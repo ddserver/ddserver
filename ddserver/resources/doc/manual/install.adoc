@@ -1,6 +1,9 @@
+include::globals.adoc[]
 
-// Installation manual
-== Installation
+[float]
+= Installation manual
+
+toc::[]
 
 The following sections describe the installation of ddserver, including
 the ddserver-interface, ddserver-updater and the ddserver-recursor.
@@ -9,7 +12,7 @@ For testing, a vagrant box is available which will install and start the
 ddserver-interface and ddserver-updater in a CentOS virtual machine.
 See link:https://github.com/ddserver[https://github.com/ddserver].
 
-=== Prerequisites
+== Prerequisites
 
 ddserver is written in Python and was tested with versions 2.7 and 3.4 of
 the python programming language. The installation process is based on python
@@ -31,7 +34,7 @@ python-dev
 python-setuptools
 ----
 
-=== Getting the Source
+== Getting the Source
 
 ddserver is available from link:https://github.com/ddserver/ddserver[GitHub].
 Releases can be downloaded from there, but using git to clone the current
@@ -46,7 +49,7 @@ cd /tmp
 git clone https://github.com/ddserver/ddserver.git
 ----
 
-=== Creating a virtual environment
+== Creating a virtual environment
 
 The preferred way of installing ddserver is by using a python virtual
 environment. This keeps your system clean and avoids conflicting packages.
@@ -72,7 +75,7 @@ source ./bin/activate
 You can recognize that you are inside of your virtual environment by your
 PROMPT being prefixed with (ddserver).
 
-=== Installing ddserver
+== Installing ddserver
 
 Change to the directory where you cloned ddserver to and use
 'python-setuptools' to install ddserver
@@ -100,7 +103,7 @@ some important locations inside your virtual environment.
 
 |===
 
-=== Installing the database
+== Installing the database
 
 ddserver uses a MySQL database backend to store information about user
 accounts, zones, hostnames, etc. To install the ddserver database schema,
@@ -124,7 +127,7 @@ schema by usng the following command.
 mysql -u root -p ddserver < /opt/ddserver/lib/python*/site-packages/ddserver-*.egg/doc/db/schema.sql
 ----
 
-=== Installing the configuration file
+== Installing the configuration file
 
 By default, ddserver will try to load its configuration file from
 /etc/ddserver/ddserver.conf. You should now copy the example configuration

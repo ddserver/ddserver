@@ -1,6 +1,9 @@
+include::globals.adoc[]
 
 // User manual
 == User manual
+
+toc::[]
 
 The following sections give a brief overview of the usage of the ddserver WebUI.
 
@@ -130,7 +133,7 @@ This section describes the concept of hostnames in ddserver. Hostnames can be ad
 Each hostname gets an individual password used to update its IPv4 address, as well as an optional description. Further,
 a static IPv6 address can be assigned manually to each hostname.
 
-=== Adding a hostname
+==== Adding a hostname
 
 As soon as at least one dynamic zone is available in ddserver, any user may start to add hostnames to it.
 To create a new hostname, users navigate to _Hostnames &rarr; Add hostname_ and fill in the form they get presented.
