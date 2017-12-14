@@ -148,14 +148,6 @@ def update(logger, db, username, password, hostnames, address):
       responses.append(resp_badauth())
       continue
 
-    # Check if the address has changed
-    if host['address'] == address:
-      logger.debug('updater: Address has not changed: %s',
-                   address)
-
-      responses.append(resp_nochg(value=address))
-      continue
-
     # validate the ip address
     try:
       validator = formencode.validators.IPAddress()
@@ -167,12 +159,28 @@ def update(logger, db, username, password, hostnames, address):
       responses.append(resp_abuse())
       continue
 
-    # Update the host entry
+    # If the previous checks passed (hostname, username, password, and
+    # IP address are valid), we update the last update timestamp
     with db.cursor() as cur:
       cur.execute('''
           UPDATE `hosts`
-          SET `address` = %(address)s,
-              `updated` = CURRENT_TIMESTAMP
+          SET `updated` = CURRENT_TIMESTAMP
+          WHERE `id` = %(id)s
+      ''', {'id': host['id']})
+
+    # Check if the address has changed
+    if host['address'] == address:
+      logger.debug('updater: Address has not changed: %s',
+                   address)
+
+      responses.append(resp_nochg(value=address))
+      continue
+
+    # Update the hosts ip address, if it has changed
+    with db.cursor() as cur:
+      cur.execute('''
+          UPDATE `hosts`
+          SET `address` = %(address)s
           WHERE `id` = %(id)s
       ''', {'id': host['id'],
             'address': address})
