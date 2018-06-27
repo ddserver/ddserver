@@ -62,7 +62,15 @@ class DdserverHandler(pdns.remotebackend.Handler):
 
     def answer_a(self, qname):
         """ answer questions of type A or ANY
+
+            note: with version 4 of pdns, the final dot for the root zone
+                  is appended to the query sent to the backends (which is
+                  totally correct). we remove the dot, to be compatible
+                  with all versions of pdns.
         """
+        if qname[-1:] == '.':
+            qname = qname[:-1]
+
         with self.db.cursor() as cur:
             cur.execute('''
                 SELECT
@@ -84,7 +92,15 @@ class DdserverHandler(pdns.remotebackend.Handler):
 
     def answer_aaaa(self, qname):
         """ answer questions of type AAAA or ANY
+
+            note: with version 4 of pdns, the final dot for the root zone
+                  is appended to the query sent to the backends (which is
+                  totally correct). we remove the dot, to be compatible
+                  with all versions of pdns.
         """
+        if qname[-1:] == '.':
+            qname = qname[:-1]
+
         with self.db.cursor() as cur:
             cur.execute('''
                 SELECT
