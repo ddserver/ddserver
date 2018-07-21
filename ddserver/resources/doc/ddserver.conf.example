@@ -35,7 +35,7 @@ password = YourDatabasePassword
 ; ------------------------------
 ;
 ; password_min_chars
-: The minimum number of characters for a users password.
+; The minimum number of characters for a users password.
 ;
 [auth]
 ;password_min_chars = 8
@@ -45,7 +45,7 @@ password = YourDatabasePassword
 ; --------------------------
 ;
 ; answer_soa
-: Answer SOA queries. This should normally be done by another backend,
+; Answer SOA queries. This should normally be done by another backend,
 ; together with resource records like NS, or MX. However, if you do not
 ; use another backend, ddserver can answer instead, using these values:
 ; "ns.<domain>. hostmaster.<domain>. 2015999901 43200 7200 604800 43200"
@@ -76,7 +76,7 @@ password = YourDatabasePassword
 ; -------------------------------------------------------
 ;
 ; enabled
-: Enable or disable account registration.
+; Enable or disable account registration.
 ;
 ; allowed_maildomains
 ; When account registration is enabled, this parameter specifies a list
