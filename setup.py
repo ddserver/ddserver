@@ -49,7 +49,7 @@ setuptools.setup(
         'enum34 >= 1.0.0',
         'configparser >= 3.2',
         'yubico-client >= 1.9',
-        'Pdns-Remotebackend >= 0.6'
+        'Pdns-Remotebackend == 0.6'
     ],
 
     packages=setuptools.find_packages(),
