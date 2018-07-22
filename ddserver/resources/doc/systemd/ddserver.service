@@ -4,7 +4,7 @@ Description=ddserver - A dynamic DNS service.
 After=network.target mysql.service
 
 [Service]
-ExecStart=/usr/local/bin/ddserver-bundle
+ExecStart=/opt/ddserver/bin/ddserver-bundle
 PIDFile=/var/run/ddserver.pid
 
 [Install]
