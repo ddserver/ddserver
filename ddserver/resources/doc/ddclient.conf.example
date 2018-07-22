@@ -32,7 +32,7 @@ ssl=yes
 # end. Please note that there can multiple domains for the same IP separated
 # with a comma, but no space.
 protocol=noip, \
-server=dyn.c4fd.org, \
+server=ddserver.org, \
 login=USERNAME, \
 password=PASSWORD \
-DOMAIN1.dyn.c4fd.org,DOMAIN2.dyn.c4fd.org
+DOMAIN1.ddserver.org,DOMAIN2.ddserver.org
