@@ -77,9 +77,10 @@ setuptools.setup(
                     'ddserver/resources/doc/schema.upgrade.sql']),
         ('doc/init/centos.init.d', ['ddserver/resources/doc/centos.init.d/ddserver']),
         ('doc/init/debian.init.d', ['ddserver/resources/doc/debian.init.d/ddserver']),
-        ('doc/systemd', ['ddserver/resources/doc/systemd/ddserver.service']),
-        ('doc/wsgi', ['ddserver/resources/doc/ddserver.wsgi',
-                      'ddserver/resources/doc/httpd.conf'])
+        ('doc/systemd', ['ddserver/resources/doc/systemd/ddserver.service',
+                         'ddserver/resources/doc/systemd/httpd.conf']),
+        ('doc/wsgi', ['ddserver/resources/doc/wsgi/ddserver.wsgi',
+                      'ddserver/resources/doc/wsgi/httpd.conf'])
     ],
 
     entry_points={
