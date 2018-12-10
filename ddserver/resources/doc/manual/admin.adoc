@@ -1,0 +1,48 @@
+
+// Administrator manual
+== Running the ddserver WebUI and updater
+
+Although, ddserver comes with a separate WebUI (ddserver-interface) and updater (ddserver-updater), the easiest way to run ddserver is by using ddserver-bundle, which starts both, the WebUI and the updater.
+
+You can start the ddserver-bundle by using the init-script or by starting the ddserver-bundle executable on the command line
+
+[source, bash]
+----
+/etc/init.d/ddserver start
+----
+
+or
+
+[source, bash]
+----
+ddserver-bundle
+----
+
+Now, open your webbrowser and navigate to your configured URL (default: link:http://localhost:8080).
+
+=== Running the ddserver-recursor
+
+The ddserver-recursor is needed by PorweDNS to retrieve DNS records from the ddserver database.
+It gets called using the pdns-pipe-backend.
+
+If you did not already install the PowerDNS pipe backend, you should do this now.
+On Debian GNU/Linux you can do this by typing
+
+[source, bash]
+----
+apt-get install pdns-backend-pipe
+----
+
+Now, edit your PowerDNS configuration file and add the following to connect ddserver to PowerDNS
+
+[source, bash]
+----
+launch=pipe
+pipe-command=/usr/local/bin/ddserver-recursor
+----
+
+IMPORTANT: The user, you are running powerdns as needs write privileges to the ddserver logfile '/var/log/ddserver.log'
+
+TIP: If you are already running powerdns using another backend (i.e. the gmysql backend), you can just append the pipe packend to your launch-configuration. (i.e. 'launch=gmysql,pipe').
+
+//EOF

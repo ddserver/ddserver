@@ -3,6 +3,8 @@
 
 /ddserver.egg-info/
 
+/ddserver/resources/doc/manual/*.html
+
 /.project
 /.pydevproject
 /.idea
