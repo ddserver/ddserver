@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="ddserver is a dynamic DNS service">
+
+  <title>{% block title %}ddserver - A dynamic DNS service{% endblock %}</title>
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/logo-icon.png') }}">
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='vendor/bootstrap/bootstrap.min.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='vendor/bootstrap-icons/bootstrap-icons.min.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/ddserver.css') }}">
+  <script src="{{ url_for('static', filename='vendor/bootstrap/bootstrap.bundle.min.js') }}" defer></script>
+</head>
+
+<body>
+  <header class="navbar navbar-expand-md bg-dark sticky-top" data-bs-theme="dark">
+    <div class="container">
+      <a class="navbar-brand" href="{{ url_for('public.index') }}">
+        <img src="{{ url_for('static', filename='img/logo-long.png') }}" alt="ddserver">
+      </a>
+
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainmenu"
+              aria-controls="mainmenu" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <nav class="collapse navbar-collapse" id="mainmenu">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('public.index') }}"><i class="bi bi-house"></i> Start</a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container main">
+    <noscript>
+      <div class="alert alert-warning">
+        Please enable JavaScript to use this application.
+      </div>
+    </noscript>
+
+    {% for category, message in get_flashed_messages(with_categories=true) %}
+      <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    {% endfor %}
+
+    {% block content %}
+    {% endblock %}
+  </main>
+</body>
+</html>

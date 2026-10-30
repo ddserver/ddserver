@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <div class="row">
+    <div class="col-md-12"><h1>Welcome to ddserver</h1></div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-8">
+      <p>
+        <strong>ddserver</strong> is a server-side application for dynamic DNS management.
+      </p>
+      <p>
+        It allows you to specify hostnames (subdomains) inside a DNS zone, and to
+        update the IPv4 and IPv6 addresses of these hostnames dynamically by using a
+        <a target="_blank" href="https://www.noip.com/integrate">simple update protocol</a>
+        over HTTP(S). This enables you to access hosts with changing IP addresses by a
+        static domain name. As updates of the IP address are performed using an open update
+        protocol, most DSL home-routers are able to send IP address updates. Also, there is
+        a tool called <a target="_blank" href="https://ddclient.net">ddclient</a>,
+        which can be used to send updates from any *NIX-based operating system.
+      </p>
+
+      <h3>Documentation and Support</h3>
+      <p>
+        For further documentation, please refer to
+        <a target="_blank" href="https://docs.ddserver.org">https://docs.ddserver.org</a>.
+      </p>
+      <p>
+        Please report bugs or suggest new features to help us improve ddserver.<br>
+        <a target="_blank" href="https://github.com/ddserver/ddserver/issues">https://github.com/ddserver/ddserver/issues</a>.
+      </p>
+
+      <h3>License</h3>
+      <p>
+        ddserver is free software: you can redistribute it and/or modify it under
+        the terms of the GNU Affero General Public License as published by the
+        Free Software Foundation, either version 3 of the License, or (at your
+        option) any later version.
+        See <a target="_blank" href="https://www.gnu.org/licenses/agpl-3.0.html">https://www.gnu.org/licenses/agpl-3.0.html</a>
+        for the full text of the license.
+      </p>
+    </div>
+  </div>
+{% endblock %}

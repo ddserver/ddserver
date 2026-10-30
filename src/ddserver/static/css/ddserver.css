@@ -1,0 +1,69 @@
+/*
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ *
+ * ddserver specific styles
+ */
+
+/*
+ * main content
+ */
+.main {
+  padding: 20px;
+}
+
+/*
+ * headings
+ */
+h1 {
+  font-size: 28px;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 5px;
+  margin-bottom: 15px;
+}
+
+h3 {
+  font-size: 18px;
+  padding-top: 10px;
+  margin-top: 0;
+}
+
+h4 {
+  font-size: 16px;
+  padding-top: 10px;
+  margin-top: 0;
+}
+
+/*
+ * links
+ */
+a {
+  transition: color 0.5s ease;
+}
+
+a:hover {
+  color: #0069ba;
+}
+
+/*
+ * sub content
+ */
+.box {
+  border: 1px solid #ddd;
+  background: #f9f9f9;
+  border-radius: 5px;
+  padding: 10px;
+  margin-bottom: 20px;
+}
+
+/*
+ * navigation bar
+ */
+.navbar {
+  padding-top: 4px;
+  padding-bottom: 4px;
+  box-shadow: 0 3px 4px rgba(0, 0, 0, 0.4);
+}
+
+.navbar-brand img {
+  height: 24px;
+}

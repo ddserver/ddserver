@@ -1,0 +1,8 @@
+# Example configuration for ddserver.
+
+[web]
+
+# Secret key used to sign session cookies.
+# Generate with: python3 -c 'import secrets; print(secrets.token_hex(32))'
+#
+secret_key = "change-me"
