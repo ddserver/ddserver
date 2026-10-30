@@ -1,11 +1,12 @@
+__pycache__/
+*.pyc
+
+/.venv/
+/.pytest_cache/
+/.ruff_cache/
+
 /build/
 /dist/
 
-/ddserver.egg-info/
-
-/.project
-/.pydevproject
-/.idea
+/.idea/
 /*.iml
-
-*.pyc
