@@ -1,5 +1,0 @@
-From: {{config.contact.email}}
-To: {{rcpt}}
-Subject: {% block subject %}{% endblock %}
-
-{% block content %}{% endblock %}
