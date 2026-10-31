@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from "macros.html" import confirm_button %}
 
 {% block content %}
   <div class="row">
@@ -15,6 +16,7 @@
             <th>Created</th>
             <th>Role</th>
             <th>Status</th>
+            <th></th>
           </tr>
         </thead>
         <tbody>
@@ -25,6 +27,30 @@
               <td>{{ user.created.strftime('%Y-%m-%d') }}</td>
               <td>{{ 'Admin' if user.admin else 'User' }}</td>
               <td>{{ user.status.value }}</td>
+              <td class="text-end">
+                {% if user.id == g.user.id %}
+                  <span class="text-secondary">This is you</span>
+                {% else %}
+                  <form class="d-inline" action="{{ url_for('admin.set_admin', user_id=user.id) }}" method="post">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <input type="hidden" name="admin" value="{{ '0' if user.admin else '1' }}">
+                    <button class="btn btn-sm btn-outline-secondary" type="submit">
+                      {{ 'Revoke admin' if user.admin else 'Make admin' }}
+                    </button>
+                  </form>
+
+                  {% call confirm_button(
+                    id='delete-user-%d' % user.id,
+                    title='Delete this user',
+                    action=url_for('admin.delete_user', user_id=user.id),
+                    button='Delete',
+                    small=true
+                  ) %}
+                    <p>Do you really want to delete this user?</p>
+                    <p>Username: <strong>{{ user.username }}</strong></p>
+                  {% endcall %}
+                {% endif %}
+              </td>
             </tr>
           {% endfor %}
         </tbody>

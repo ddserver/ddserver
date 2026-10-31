@@ -122,6 +122,56 @@ def user_list(config):
     _print_table(("USERNAME", "EMAIL", "ADMIN", "STATUS", "CREATED"), rows)
 
 
+@user.command(name="delete")
+@click.argument("username")
+@click.option("--yes", is_flag=True, help="Do not ask for confirmation.")
+@click.pass_obj
+def user_delete(config, username: str, yes: bool):
+    """Delete a user."""
+    with _session(config) as session:
+        try:
+            existing_user = users.get_user(session, username)
+
+            if not yes:
+                click.confirm(f"Delete user {existing_user.username}?", abort=True)
+
+            users.delete_user(session, existing_user)
+        except users.UserError as e:
+            raise click.ClickException(str(e)) from e
+
+        session.commit()
+        click.echo(f"User {existing_user.username} deleted.")
+
+
+@user.command(name="grant-admin")
+@click.argument("username")
+@click.pass_obj
+def user_grant_admin(config, username: str):
+    """Grant the admin role to a user."""
+    _set_admin(config, username, True)
+
+
+@user.command(name="revoke-admin")
+@click.argument("username")
+@click.pass_obj
+def user_revoke_admin(config, username: str):
+    """Revoke the admin role from a user."""
+    _set_admin(config, username, False)
+
+
+def _set_admin(config, username: str, admin: bool) -> None:
+    with _session(config) as session:
+        try:
+            existing_user = users.get_user(session, username)
+            users.set_admin(session, existing_user, admin)
+        except users.UserError as e:
+            raise click.ClickException(str(e)) from e
+
+        session.commit()
+        state = "now" if admin else "no longer"
+        click.echo(f"User {existing_user.username} is {state} an admin.")
+
+
 def _session(config) -> Session:
     """Open a database session for a command."""
     engine = db.make_engine(config.database.url)

@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from "macros.html" import confirm_button %}
 
 {% block content %}
   <div class="row">
@@ -8,7 +9,12 @@
   <div class="row">
     <div class="col-md-4">
       <h3>Account information</h3>
-      <p>This is your username, email address and account creation date.</p>
+      <p>
+        This is your username, email address and account creation date.<br>
+        If you do not want to use your account anymore, click the "Delete account"
+        button. This will immediately remove all your hostnames and user information
+        from our system and can not be undone.
+      </p>
     </div>
 
     <div class="col-md-4">
@@ -45,6 +51,23 @@
             <input class="form-control" type="text" id="created" value="{{ g.user.created.strftime('%Y-%m-%d') }}" readonly>
           </div>
         </div>
+
+        {% call confirm_button(
+          id='delete-account',
+          title='Delete your account',
+          action=url_for('account.delete'),
+          button='Delete account',
+          confirm='Delete my account'
+        ) %}
+          <p>
+            If you really want to delete your account, please confirm by clicking the
+            <em>Delete my account</em> button.
+          </p>
+          <p>
+            <strong>Please note</strong>: This will immediately remove all your
+            hostnames and user information from our system and can not be undone.
+          </p>
+        {% endcall %}
       </div>
     </div>
 

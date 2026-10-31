@@ -2,14 +2,14 @@
 """
 User management.
 
-Add, Update, list or authenticate users. Commit to DB is done by the caller.
+Add, update, delete, list or authenticate users. Commit to DB is done by the caller.
 """
 
 import functools
 import re
 import secrets
 
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from ddserver.models import User, UserStatus
@@ -79,6 +79,27 @@ def create_user(
 def list_users(session: Session) -> list[User]:
     """Return all users, ordered by username."""
     return list(session.scalars(select(User).order_by(User.username)))
+
+
+def get_user(session: Session, username: str) -> User:
+    """Return the user with this name, raise UserError if there is none."""
+    username = username.strip().lower()
+    user = session.scalar(select(User).where(User.username == username))
+
+    if user is None:
+        raise UserError(f"There is no user {username}")
+
+    return user
+
+
+def delete_user(session: Session, user: User) -> None:
+    """Delete a user."""
+    session.delete(user)
+
+
+def set_admin(session: Session, user: User, admin: bool) -> None:
+    """Grant or revoke the admin role."""
+    user.admin = admin
 
 
 def authenticate(session: Session, username: str, password: str) -> User | None:

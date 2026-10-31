@@ -1,7 +1,16 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 """The account page of the logged-in user."""
 
-from flask import Blueprint, flash, g, redirect, render_template, request, url_for
+from flask import (
+    Blueprint,
+    flash,
+    g,
+    redirect,
+    render_template,
+    request,
+    session,
+    url_for,
+)
 
 from ddserver import users
 from ddserver.db import get_session
@@ -42,3 +51,21 @@ def change_password():
     flash("Your password has been changed.", "success")
 
     return redirect(url_for("account.index"))
+
+
+@blueprint.post("/delete")
+@login_required
+def delete():
+    db_session = get_session()
+
+    try:
+        users.delete_user(db_session, g.user)
+    except users.UserError as e:
+        flash(f"{e}.", "danger")
+        return redirect(url_for("account.index"))
+
+    db_session.commit()
+    session.clear()
+    flash("Your account has been deleted.", "success")
+
+    return redirect(url_for("public.index"))

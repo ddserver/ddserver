@@ -1,0 +1,29 @@
+{#
+  A red button which opens a dialog. Only the dialog sends the POST request (with
+  CSRF token) to `action`. The dialog text is the body of the `{% call %}` block.
+#}
+{% macro confirm_button(id, title, action, button, confirm='Delete', small=false) %}
+  <button class="btn {{ 'btn-sm' if small }} btn-danger" type="button"
+          data-bs-toggle="modal" data-bs-target="#{{ id }}">{{ button }}</button>
+
+  <div class="modal fade text-start" id="{{ id }}" tabindex="-1" aria-labelledby="{{ id }}-title" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title" id="{{ id }}-title">{{ title }}</h4>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          {{ caller() }}
+        </div>
+        <div class="modal-footer">
+          <form action="{{ action }}" method="post">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Cancel</button>
+            <button class="btn btn-danger" type="submit">{{ confirm }}</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endmacro %}
