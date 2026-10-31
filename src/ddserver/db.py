@@ -28,13 +28,15 @@ from sqlalchemy.orm import DeclarativeBase, Session
 
 
 class Base(DeclarativeBase):
-    metadata = MetaData(naming_convention={
-        "ix": "ix_%(column_0_label)s",
-        "uq": "uq_%(table_name)s_%(column_0_name)s",
-        "ck": "ck_%(table_name)s_%(constraint_name)s",
-        "fk": "fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s",
-        "pk": "pk_%(table_name)s",
-    })
+    metadata = MetaData(
+        naming_convention={
+            "ix": "ix_%(column_0_label)s",
+            "uq": "uq_%(table_name)s_%(column_0_name)s",
+            "ck": "ck_%(table_name)s_%(constraint_name)s",
+            "fk": "fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s",
+            "pk": "pk_%(table_name)s",
+        }
+    )
 
 
 class UTCDateTime(TypeDecorator):
@@ -63,7 +65,7 @@ class UTCDateTime(TypeDecorator):
 
 
 def utcnow() -> datetime:
-    """Return the current time in UTC (for UTCDateTime columns)."""
+    """Return the current time in UTC (for `UTCDateTime` columns)."""
     return datetime.now(UTC)
 
 
@@ -83,7 +85,7 @@ def _enable_sqlite_foreign_keys(connection, connection_record):
 
 
 def init_app(app: Flask, engine: Engine) -> None:
-    """Make engine available to `get_session()` within `app`."""
+    """Make `engine` available to `get_session()` within `app`."""
     app.extensions["ddserver.db"] = engine
     app.teardown_appcontext(_close_session)
 

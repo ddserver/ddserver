@@ -17,7 +17,7 @@ def hash_password(password: str) -> str:
 
 
 def verify_password(password: str, password_hash: str | None) -> bool:
-    """Check password against a stored password_hash.
+    """Check `password` against a stored `password_hash`.
 
     A missing hash (a user who has not set a password) never matches.
     """

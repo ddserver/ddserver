@@ -25,7 +25,7 @@ class UserError(Exception):
 
 
 def normalize_username(username: str) -> str:
-    """Return username in lowercase, raise UserError on invalid username."""
+    """Return `username` in lowercase, raise `UserError` on invalid `username`."""
     username = username.strip().lower()
 
     if not USERNAME_PATTERN.fullmatch(username):
@@ -38,7 +38,7 @@ def normalize_username(username: str) -> str:
 
 
 def normalize_email(email: str) -> str:
-    """Return email in lowercase, raise UserError if email is invalid."""
+    """Return `email` in lowercase, raise `UserError` if `email` is invalid."""
     email = email.strip().lower()
 
     if not EMAIL_PATTERN.fullmatch(email):
@@ -82,7 +82,7 @@ def list_users(session: Session) -> list[User]:
 
 
 def get_user(session: Session, username: str) -> User:
-    """Return the user with this name, raise UserError if there is none."""
+    """Return the user with this `username`, raise `UserError` if there is none."""
     username = username.strip().lower()
     user = session.scalar(select(User).where(User.username == username))
 
@@ -107,7 +107,7 @@ def set_admin(session: Session, user: User, admin: bool) -> None:
 
 
 def authenticate(session: Session, username: str, password: str) -> User | None:
-    """Return the active user with these credentials, otherwise None.
+    """Return the active user with these credentials, otherwise `None`.
 
     Replaces an outdated password hash, so the caller has to commit.
     """
@@ -142,7 +142,7 @@ def change_password(user: User, current_password: str, new_password: str) -> Non
 
 
 def _check_not_last_admin(session: Session, user: User) -> None:
-    """Raise UserError if `user` is the only admin who is able to log in."""
+    """Raise `UserError` if `user` is the only admin who is able to log in."""
     if not user.admin or user.status != UserStatus.ACTIVE:
         return
 
