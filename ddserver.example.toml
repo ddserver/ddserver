@@ -6,3 +6,10 @@
 # Generate with: python3 -c 'import secrets; print(secrets.token_hex(32))'
 #
 secret_key = "change-me"
+
+
+[database]
+
+# Database URL in SQLAlchemy format.
+#
+# url = "sqlite:///ddserver.db"

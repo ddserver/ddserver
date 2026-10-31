@@ -6,6 +6,7 @@ __pycache__/
 /.ruff_cache/
 
 /ddserver.toml
+/ddserver.db
 
 /build/
 /dist/

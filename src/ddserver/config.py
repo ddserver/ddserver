@@ -26,8 +26,15 @@ class WebConfig:
 
 
 @dataclass(frozen=True)
+class DatabaseConfig:
+    # A relative SQLite path is relative to the current working directory.
+    url: str = "sqlite:///ddserver.db"
+
+
+@dataclass(frozen=True)
 class Config:
     web: WebConfig
+    database: DatabaseConfig
 
 
 def load_config(path: Path) -> Config:

@@ -4,6 +4,7 @@ from pathlib import Path
 
 import click
 
+from ddserver import db
 from ddserver.app import create_app
 from ddserver.config import DEFAULT_PATH, ConfigError, load_config
 
@@ -48,4 +49,30 @@ def main(ctx: click.Context, config_path: Path):
 @click.pass_obj
 def run(config, host: str, port: int, debug: bool):
     """Run the dev webserver."""
-    create_app(config).run(host=host, port=port, debug=debug)
+    try:
+        app = create_app(config)
+    except db.SchemaError as e:
+        raise click.ClickException(str(e)) from e
+
+    app.run(host=host, port=port, debug=debug)
+
+
+@main.group(name="db")
+def database():
+    """Manage the database."""
+
+
+@database.command()
+@click.pass_obj
+def upgrade(config):
+    """Create the database or upgrade it to the current schema."""
+    db.upgrade(db.make_engine(config.database.url))
+    click.echo("The database schema is up to date.")
+
+
+@database.command()
+@click.option("-m", "--message", required=True, help="Short description.")
+@click.pass_obj
+def revision(config, message: str):
+    """Create a draft migration from model changes (for developers)."""
+    db.revision(db.make_engine(config.database.url), message)
