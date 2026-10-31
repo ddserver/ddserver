@@ -32,6 +32,8 @@ def test_zone_name_normalized(session):
         "my-zone.example.org",
         "xn--mnchen-3ya.example.org",
         "1.example.org",
+        f"{'a' * 63}.example.org",
+        ".".join(["a" * 61] * 4),  # 247 characters
     ],
 )
 def test_valid_zone_name(session, name):
@@ -52,6 +54,8 @@ def test_valid_zone_name(session, name):
         "dyn_1.example.org",
         "dyn example.org",
         "münchen.example.org",
+        f"{'a' * 64}.example.org",
+        ".".join(["a" * 63] * 4),  # 255 characters
     ],
 )
 def test_invalid_zone_name(session, name):
@@ -71,6 +75,11 @@ def test_get_zone(session):
     session.commit()
 
     assert get_zone(session, "DYN.example.org.") is zone
+
+
+def test_get_unknown_zone(session):
+    with pytest.raises(ZoneError, match=r"There is no zone dyn\.example\.org"):
+        get_zone(session, "dyn.example.org")
 
 
 def test_delete_zone(session):
