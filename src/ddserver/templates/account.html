@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <div class="row">
+    <div class="col-md-12"><h1>Manage Account</h1></div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-4">
+      <h3>Account information</h3>
+      <p>This is your username, email address and account creation date.</p>
+    </div>
+
+    <div class="col-md-4">
+      <h3>Change your password</h3>
+      <p>
+        Your login password should consist of upper- and lowercase characters, as
+        well as numbers or special characters. The minimum password length is
+        {{ password_min_length }} characters.
+      </p>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-4">
+      <div class="box">
+        <div class="mb-3">
+          <label class="form-label" for="username">Username</label>
+          <div class="input-group">
+            <span class="input-group-text"><i class="bi bi-person"></i></span>
+            <input class="form-control" type="text" id="username" value="{{ g.user.username }}" readonly>
+          </div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label" for="email">E-Mail Address</label>
+          <div class="input-group">
+            <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+            <input class="form-control" type="email" id="email" value="{{ g.user.email }}" readonly>
+          </div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label" for="created">Account created</label>
+          <div class="input-group">
+            <span class="input-group-text"><i class="bi bi-clock"></i></span>
+            <input class="form-control" type="text" id="created" value="{{ g.user.created.strftime('%Y-%m-%d') }}" readonly>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="box">
+        <form action="{{ url_for('account.change_password') }}" method="post">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <div class="mb-3">
+            <label class="form-label" for="current_password">Current password</label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-lock"></i></span>
+              <input class="form-control" type="password" id="current_password" name="current_password"
+                     autocomplete="current-password" required>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="new_password">New password</label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-lock"></i></span>
+              <input class="form-control" type="password" id="new_password" name="new_password"
+                     minlength="{{ password_min_length }}" autocomplete="new-password" required>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="new_password_repeat">Retype new password</label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-lock"></i></span>
+              <input class="form-control" type="password" id="new_password_repeat" name="new_password_repeat"
+                     minlength="{{ password_min_length }}" autocomplete="new-password" required>
+            </div>
+          </div>
+          <button class="btn btn-primary" type="submit">Update password</button>
+        </form>
+      </div>
+    </div>
+  </div>
+{% endblock %}

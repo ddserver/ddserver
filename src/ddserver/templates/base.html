@@ -31,6 +31,22 @@
           <li class="nav-item">
             <a class="nav-link" href="{{ url_for('public.index') }}"><i class="bi bi-house"></i> Start</a>
           </li>
+          {% if g.user %}
+            <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('account.index') }}"><i class="bi bi-person"></i> Account</a>
+            </li>
+            {% if g.user.admin %}
+              <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('admin.users') }}"><i class="bi bi-people"></i> Users</a>
+              </li>
+            {% endif %}
+            <li class="nav-item">
+              <form action="{{ url_for('auth.logout') }}" method="post">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button class="nav-link" type="submit"><i class="bi bi-power"></i> Logout</button>
+              </form>
+            </li>
+          {% endif %}
         </ul>
       </nav>
     </div>

@@ -41,5 +41,27 @@
         for the full text of the license.
       </p>
     </div>
+
+    {% if not g.user %}
+      <div class="col-md-4">
+        <div class="box">
+          <h3>Login</h3>
+          <form action="{{ url_for('auth.login') }}" method="post">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="input-group mb-3">
+              <span class="input-group-text"><i class="bi bi-person"></i></span>
+              <input class="form-control" type="text" name="username" placeholder="Username"
+                     aria-label="Username" autocomplete="username" required>
+            </div>
+            <div class="input-group mb-3">
+              <span class="input-group-text"><i class="bi bi-lock"></i></span>
+              <input class="form-control" type="password" name="password" placeholder="Password"
+                     aria-label="Password" autocomplete="current-password" required>
+            </div>
+            <button class="btn btn-primary" type="submit">Login</button>
+          </form>
+        </div>
+      </div>
+    {% endif %}
   </div>
 {% endblock %}
