@@ -178,6 +178,13 @@ def list_hosts(session: Session, user: User) -> list[Host]:
     )
 
 
+def list_hosts_of_zone(session: Session, zone: Zone) -> list[Host]:
+    """Return the hosts in `zone`, ordered by name."""
+    return list(
+        session.scalars(select(Host).where(Host.zone_id == zone.id).order_by(Host.name))
+    )
+
+
 def count_hosts_by_zone(session: Session) -> dict[int, int]:
     """Return the number of hosts per zone id, without zones that have no hosts."""
     rows = session.execute(select(Host.zone_id, func.count()).group_by(Host.zone_id))

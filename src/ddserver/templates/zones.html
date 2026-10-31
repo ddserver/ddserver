@@ -22,7 +22,7 @@
             {% for zone in zones %}
               {% set host_count = host_counts.get(zone.id, 0) %}
               <tr>
-                <td>{{ zone.name }}</td>
+                <td><a href="{{ url_for('admin.zone_hosts', zone_id=zone.id) }}">{{ zone.name }}</a></td>
                 <td>{{ host_count }}</td>
                 <td>{{ zone.created.strftime('%Y-%m-%d') }}</td>
                 <td class="text-end">

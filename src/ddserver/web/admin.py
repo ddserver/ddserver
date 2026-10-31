@@ -17,7 +17,7 @@ from ddserver import hosts
 from ddserver import users as user_management
 from ddserver import zones as zone_management
 from ddserver.db import get_session
-from ddserver.models import User, Zone
+from ddserver.models import Base, Host, User, Zone
 from ddserver.web.auth import admin_required
 
 blueprint = Blueprint("admin", __name__, url_prefix="/admin")
@@ -31,6 +31,20 @@ def users():
         users=user_management.list_users(get_session()),
         format_host_limit=user_management.format_host_limit,
         default_limit=current_app.extensions["ddserver.config"].hosts.default_limit,
+    )
+
+
+@blueprint.get("/users/<int:user_id>")
+@admin_required
+def user_hosts(user_id: int):
+    db_session = get_session()
+    user = _get_or_404(User, user_id)
+
+    return render_template(
+        "admin_hosts.html",
+        heading=f"User: {user.username}",
+        hosts=hosts.list_hosts(db_session, user),
+        back="user",
     )
 
 
@@ -70,10 +84,7 @@ def set_admin(user_id: int):
 @admin_required
 def set_host_limit(user_id: int):
     db_session = get_session()
-    user = db_session.get(User, user_id)
-
-    if user is None:
-        abort(404)
+    user = _get_or_404(User, user_id)
 
     try:
         user.host_limit = user_management.parse_host_limit(
@@ -119,15 +130,25 @@ def add_zone():
     return redirect(url_for("admin.zones"))
 
 
+@blueprint.get("/zones/<int:zone_id>")
+@admin_required
+def zone_hosts(zone_id: int):
+    db_session = get_session()
+    zone = _get_or_404(Zone, zone_id)
+
+    return render_template(
+        "admin_hosts.html",
+        heading=f"Zone: {zone.name}",
+        hosts=hosts.list_hosts_of_zone(db_session, zone),
+        back="zone",
+    )
+
+
 @blueprint.post("/zones/<int:zone_id>/delete")
 @admin_required
 def delete_zone(zone_id: int):
     db_session = get_session()
-    zone = db_session.get(Zone, zone_id)
-
-    if zone is None:
-        abort(404)
-
+    zone = _get_or_404(Zone, zone_id)
     name = zone.name
 
     zone_management.delete_zone(db_session, zone)
@@ -137,16 +158,43 @@ def delete_zone(zone_id: int):
     return redirect(url_for("admin.zones"))
 
 
+@blueprint.post("/hosts/<int:host_id>/delete")
+@admin_required
+def delete_host(host_id: int):
+    db_session = get_session()
+    host = _get_or_404(Host, host_id)
+    fqdn = f"{host.name}.{host.zone.name}"
+
+    # `back` only selects one of our own pages, it is never used as a URL.
+    if request.args.get("back") == "user":
+        back = url_for("admin.user_hosts", user_id=host.user_id)
+    else:
+        back = url_for("admin.zone_hosts", zone_id=host.zone_id)
+
+    hosts.delete_host(db_session, host)
+    db_session.commit()
+    flash(f"Hostname {fqdn} has been deleted.", "success")
+
+    return redirect(back)
+
+
+def _get_or_404[T: Base](model: type[T], object_id: int) -> T:
+    """Return the object with `object_id`, otherwise answer `404 Not Found`."""
+    found = get_session().get(model, object_id)
+
+    if found is None:
+        abort(404)
+
+    return found
+
+
 def _get_other_user(user_id: int) -> User:
     """Return a user to act on, which cannot be the admin who is logged in.
 
     Admins can neither remove their own role nor lock themselves out from this page:
     the next page would be forbidden. They delete themselves on the account page.
     """
-    user = get_session().get(User, user_id)
-
-    if user is None:
-        abort(404)
+    user = _get_or_404(User, user_id)
 
     if user.id == g.user.id:
         abort(403)
