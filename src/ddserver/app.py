@@ -6,7 +6,7 @@ from flask_wtf.csrf import CSRFProtect
 
 from ddserver import db
 from ddserver.config import Config
-from ddserver.web import account, admin, auth, hosts, public
+from ddserver.web import account, admin, auth, hosts, nic, public
 
 
 def create_app(config: Config) -> Flask:
@@ -27,5 +27,6 @@ def create_app(config: Config) -> Flask:
     app.register_blueprint(hosts.blueprint)
     app.register_blueprint(account.blueprint)
     app.register_blueprint(admin.blueprint)
+    app.register_blueprint(nic.blueprint)
 
     return app
