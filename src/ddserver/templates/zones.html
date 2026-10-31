@@ -13,14 +13,17 @@
           <thead>
             <tr>
               <th>Zone</th>
+              <th>Hostnames</th>
               <th>Created</th>
               <th></th>
             </tr>
           </thead>
           <tbody>
             {% for zone in zones %}
+              {% set host_count = host_counts.get(zone.id, 0) %}
               <tr>
                 <td>{{ zone.name }}</td>
+                <td>{{ host_count }}</td>
                 <td>{{ zone.created.strftime('%Y-%m-%d') }}</td>
                 <td class="text-end">
                   {% call confirm_button(
@@ -32,6 +35,13 @@
                     small=true
                   ) %}
                     <p>Do you really want to delete this zone?</p>
+                    {% if host_count %}
+                      <p>
+                        Be aware, that this will also delete
+                        <strong>{{ host_count }} hostname{{ 's' if host_count != 1 }}</strong>
+                        using this zone!
+                      </p>
+                    {% endif %}
                     <p>Zone: <strong>{{ zone.name }}</strong></p>
                   {% endcall %}
                 </td>

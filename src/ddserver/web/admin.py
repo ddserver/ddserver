@@ -4,6 +4,7 @@
 from flask import (
     Blueprint,
     abort,
+    current_app,
     flash,
     g,
     redirect,
@@ -12,6 +13,7 @@ from flask import (
     url_for,
 )
 
+from ddserver import hosts
 from ddserver import users as user_management
 from ddserver import zones as zone_management
 from ddserver.db import get_session
@@ -24,9 +26,12 @@ blueprint = Blueprint("admin", __name__, url_prefix="/admin")
 @blueprint.get("/users")
 @admin_required
 def users():
-    users = user_management.list_users(get_session())
-
-    return render_template("users.html", users=users)
+    return render_template(
+        "users.html",
+        users=user_management.list_users(get_session()),
+        format_host_limit=user_management.format_host_limit,
+        default_limit=current_app.extensions["ddserver.config"].hosts.default_limit,
+    )
 
 
 @blueprint.post("/users/<int:user_id>/delete")
@@ -61,12 +66,40 @@ def set_admin(user_id: int):
     return redirect(url_for("admin.users"))
 
 
+@blueprint.post("/users/<int:user_id>/host-limit")
+@admin_required
+def set_host_limit(user_id: int):
+    db_session = get_session()
+    user = db_session.get(User, user_id)
+
+    if user is None:
+        abort(404)
+
+    try:
+        user.host_limit = user_management.parse_host_limit(
+            request.form.get("host_limit", "")
+        )
+    except user_management.UserError as e:
+        flash(f"{e}.", "danger")
+        return redirect(url_for("admin.users"))
+
+    db_session.commit()
+    limit = user_management.format_host_limit(user)
+    flash(f"Host limit of {user.username}: {limit}.", "success")
+
+    return redirect(url_for("admin.users"))
+
+
 @blueprint.get("/zones")
 @admin_required
 def zones():
-    zones = zone_management.list_zones(get_session())
+    db_session = get_session()
 
-    return render_template("zones.html", zones=zones)
+    return render_template(
+        "zones.html",
+        zones=zone_management.list_zones(db_session),
+        host_counts=hosts.count_hosts_by_zone(db_session),
+    )
 
 
 @blueprint.post("/zones")

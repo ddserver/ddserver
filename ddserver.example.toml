@@ -13,3 +13,15 @@ secret_key = "change-me"
 # Database URL in SQLAlchemy format.
 #
 # url = "sqlite:///ddserver.db"
+
+
+[hosts]
+
+# Names which users cannot register, in any zone.
+#
+# reserved = ["www", "mail"]
+
+# Number of hostnames a user can have.
+# This can be changed on a per user basis in the webui.
+#
+# default_limit = 5

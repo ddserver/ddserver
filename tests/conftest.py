@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 import ddserver.models  # noqa: F401 (defines the tables in Base.metadata)
 from ddserver import db
 from ddserver.app import create_app
-from ddserver.config import Config, DatabaseConfig, WebConfig
+from ddserver.config import Config, DatabaseConfig, HostsConfig, WebConfig
 from ddserver.db import Base, get_session, make_engine
 from ddserver.users import create_user
 
@@ -36,6 +36,7 @@ def app(tmp_path):
     config = Config(
         web=WebConfig(secret_key="test"),
         database=DatabaseConfig(url=f"sqlite:///{tmp_path / 'test.db'}"),
+        hosts=HostsConfig(reserved=("www", "mail")),
     )
     db.upgrade(make_engine(config.database.url))
 

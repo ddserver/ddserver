@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% from "macros.html" import confirm_button %}
+
+{% block content %}
+  <div class="row">
+    <div class="col-md-12"><h1>Manage hostnames</h1></div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-6">
+      <h3>Hostname information</h3>
+      <div class="box">
+        <form action="{{ url_for('hosts.update', host_id=host.id) }}" method="post">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+          <div class="mb-3">
+            <label class="form-label" for="hostname">Hostname</label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-display"></i></span>
+              <input class="form-control" type="text" id="hostname" value="{{ host.name }}.{{ host.zone.name }}" readonly>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label" for="ipv4">IPv4 address</label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-info"></i></span>
+              <input class="form-control" type="text" id="ipv4" name="ipv4" value="{{ form.get('ipv4', host.ipv4 or '') }}">
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label" for="ipv6">IPv6 address</label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-info"></i></span>
+              <input class="form-control" type="text" id="ipv6" name="ipv6" value="{{ form.get('ipv6', host.ipv6 or '') }}">
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label" for="description">Description (optional)</label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-text-left"></i></span>
+              <textarea class="form-control" id="description" name="description" rows="2" maxlength="255">{{ form.get('description', host.description or '') }}</textarea>
+            </div>
+          </div>
+
+          <button class="btn btn-primary" type="submit">Update</button>
+          <a class="btn btn-secondary" href="{{ url_for('hosts.index') }}">Back</a>
+        </form>
+      </div>
+
+      <h3>Delete this hostname</h3>
+      <p>This immediately removes the hostname and can not be undone.</p>
+      {% call confirm_button(
+        id='delete-host-%d' % host.id,
+        title='Delete this hostname',
+        action=url_for('hosts.delete', host_id=host.id),
+        button='Delete',
+        confirm='Delete hostname'
+      ) %}
+        <p>Do you really want to delete this hostname?</p>
+        <p>Hostname: <strong>{{ host.name }}.{{ host.zone.name }}</strong></p>
+      {% endcall %}
+    </div>
+
+    <div class="col-md-6">
+      <h3>Update host password</h3>
+      <p>
+        Set a new password to update the addresses of this hostname. The minimum password
+        length is {{ password_min_length }} characters.
+      </p>
+      <div class="box">
+        <form action="{{ url_for('hosts.change_password', host_id=host.id) }}" method="post">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+          <div class="mb-3">
+            <label class="form-label" for="password">Password</label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-lock"></i></span>
+              <input class="form-control" type="password" id="password" name="password"
+                     minlength="{{ password_min_length }}" autocomplete="new-password" required>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label" for="password_repeat">Retype password</label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-lock"></i></span>
+              <input class="form-control" type="password" id="password_repeat" name="password_repeat"
+                     minlength="{{ password_min_length }}" autocomplete="new-password" required>
+            </div>
+          </div>
+
+          <button class="btn btn-primary" type="submit">Update password</button>
+        </form>
+      </div>
+    </div>
+  </div>
+{% endblock %}

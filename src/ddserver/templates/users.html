@@ -16,6 +16,7 @@
             <th>Created</th>
             <th>Role</th>
             <th>Status</th>
+            <th>Max hostnames</th>
             <th></th>
           </tr>
         </thead>
@@ -27,6 +28,18 @@
               <td>{{ user.created.strftime('%Y-%m-%d') }}</td>
               <td>{{ 'Admin' if user.admin else 'User' }}</td>
               <td>{{ user.status.value }}</td>
+              <td>
+                <form action="{{ url_for('admin.set_host_limit', user_id=user.id) }}" method="post">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                  <div class="input-group input-group-sm" style="width: 10em">
+                    <input class="form-control" type="text" name="host_limit"
+                           value="{{ format_host_limit(user) }}" aria-label="Maximum number of hostnames">
+                    <button class="btn btn-outline-secondary" type="submit" title="Save" aria-label="Save">
+                      <i class="bi bi-check-lg"></i>
+                    </button>
+                  </div>
+                </form>
+              </td>
               <td class="text-end">
                 {% if user.id == g.user.id %}
                   <span class="text-secondary">This is you</span>
@@ -46,7 +59,7 @@
                     button='Delete',
                     small=true
                   ) %}
-                    <p>Do you really want to delete this user?</p>
+                    <p>Do you really want to delete this user and all their hostnames?</p>
                     <p>Username: <strong>{{ user.username }}</strong></p>
                   {% endcall %}
                 {% endif %}
@@ -55,6 +68,11 @@
           {% endfor %}
         </tbody>
       </table>
+
+      <p class="text-secondary">
+        Max hostnames: a number, <em>default</em> (currently {{ default_limit }}) or
+        <em>unlimited</em>.
+      </p>
     </div>
   </div>
 {% endblock %}

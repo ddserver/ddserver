@@ -8,6 +8,8 @@ from argon2.exceptions import InvalidHashError, VerifyMismatchError
 
 log = logging.getLogger(__name__)
 
+PASSWORD_MIN_LENGTH = 8
+
 _hasher = PasswordHasher()
 
 

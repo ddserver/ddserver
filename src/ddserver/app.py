@@ -6,7 +6,7 @@ from flask_wtf.csrf import CSRFProtect
 
 from ddserver import db
 from ddserver.config import Config
-from ddserver.web import account, admin, auth, public
+from ddserver.web import account, admin, auth, hosts, public
 
 
 def create_app(config: Config) -> Flask:
@@ -14,6 +14,7 @@ def create_app(config: Config) -> Flask:
     app = Flask(__name__)
     app.config["SECRET_KEY"] = config.web.secret_key
     app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
+    app.extensions["ddserver.config"] = config
 
     CSRFProtect(app)
 
@@ -23,6 +24,7 @@ def create_app(config: Config) -> Flask:
 
     app.register_blueprint(public.blueprint)
     app.register_blueprint(auth.blueprint)
+    app.register_blueprint(hosts.blueprint)
     app.register_blueprint(account.blueprint)
     app.register_blueprint(admin.blueprint)
 

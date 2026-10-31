@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <div class="row">
+    <div class="col-md-12"><h1>Manage hostnames</h1></div>
+  </div>
+
+  <div class="row">
+    {% if zones %}
+      <div class="col-md-8">
+        <h3>Add a new hostname</h3>
+        <p>
+          Use the form on the right to add your hostnames. You can have
+          {{ 'unlimited' if host_limit >= unlimited else 'up to %d' % host_limit }}
+          hostnames with a maximum length of 63 characters each. Only alphanumeric
+          characters plus the minus (-) character are allowed.
+        </p>
+
+        <h3>Select a zone</h3>
+        <p>
+          From the dropdown menu, you can choose from a list of available zones for your
+          DNS name.
+        </p>
+
+        <h3>Set a password</h3>
+        <p>
+          Each hostname gets its individual password used to update its addresses. The
+          minimum password length is {{ password_min_length }} characters. If you want to
+          update multiple hostnames at once, you have to use the same password for each of
+          them.
+        </p>
+
+        <h3>(Optional) Set initial addresses</h3>
+        <p>
+          If you specify an initial IPv4 or IPv6 address, your hostname will instantly be
+          available by this address. If you leave these fields blank, you will have to send
+          an update using your homerouter or the ddclient program, before the hostname can
+          be resolved using DNS queries.
+        </p>
+
+        <h3>(Optional) Add a description</h3>
+        <p>
+          A description can be set to add personal notes. The description is only visible
+          in the ddserver web interface.
+        </p>
+      </div>
+
+      <div class="col-md-4">
+        <div class="box">
+          <form action="{{ url_for('hosts.add_post') }}" method="post">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+            <div class="mb-3">
+              <label class="form-label" for="name">Hostname</label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-display"></i></span>
+                <input class="form-control" type="text" id="name" name="name"
+                       value="{{ form.get('name', '') }}" maxlength="63" required>
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label" for="zone">Zone</label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-diagram-3"></i></span>
+                <select class="form-select" id="zone" name="zone">
+                  {% for zone in zones %}
+                    <option value="{{ zone.id }}" {{ 'selected' if form.get('zone') == zone.id|string }}>{{ zone.name }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label" for="password">Password</label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                <input class="form-control" type="password" id="password" name="password"
+                       minlength="{{ password_min_length }}" autocomplete="new-password" required>
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label" for="password_repeat">Retype password</label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                <input class="form-control" type="password" id="password_repeat" name="password_repeat"
+                       minlength="{{ password_min_length }}" autocomplete="new-password" required>
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label" for="ipv4">Initial IPv4 address (optional)</label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-info"></i></span>
+                <input class="form-control" type="text" id="ipv4" name="ipv4" value="{{ form.get('ipv4', '') }}">
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label" for="ipv6">Initial IPv6 address (optional)</label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-info"></i></span>
+                <input class="form-control" type="text" id="ipv6" name="ipv6" value="{{ form.get('ipv6', '') }}">
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label" for="description">Description (optional)</label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-text-left"></i></span>
+                <textarea class="form-control" id="description" name="description" rows="2" maxlength="255">{{ form.get('description', '') }}</textarea>
+              </div>
+            </div>
+
+            <button class="btn btn-primary" type="submit">Add hostname</button>
+            <a class="btn btn-secondary" href="{{ url_for('hosts.index') }}">Cancel</a>
+          </form>
+        </div>
+      </div>
+    {% else %}
+      <div class="col-md-12">
+        <p class="text-center">
+          At the moment, there are no zones configured to add hostnames to. Please try
+          again later or contact the administrator to get more information.
+        </p>
+      </div>
+    {% endif %}
+  </div>
+{% endblock %}

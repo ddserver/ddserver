@@ -5,7 +5,7 @@ from pathlib import Path
 import click
 from sqlalchemy.orm import Session
 
-from ddserver import db, users, zones
+from ddserver import db, hosts, users, zones
 from ddserver.app import create_app
 from ddserver.config import DEFAULT_PATH, ConfigError, load_config
 
@@ -113,13 +113,14 @@ def user_list(config):
                 u.username,
                 u.email,
                 "yes" if u.admin else "",
+                users.format_host_limit(u),
                 u.status.value,
                 f"{u.created:%Y-%m-%d}",
             )
             for u in users.list_users(session)
         ]
 
-    _print_table(("USERNAME", "EMAIL", "ADMIN", "STATUS", "CREATED"), rows)
+    _print_table(("USERNAME", "EMAIL", "ADMIN", "LIMIT", "STATUS", "CREATED"), rows)
 
 
 @user.command(name="delete")
@@ -133,7 +134,10 @@ def user_delete(config, username: str, yes: bool):
             existing_user = users.get_user(session, username)
 
             if not yes:
-                click.confirm(f"Delete user {existing_user.username}?", abort=True)
+                click.confirm(
+                    f"Delete user {existing_user.username} and all their hostnames?",
+                    abort=True,
+                )
 
             users.delete_user(session, existing_user)
         except users.UserError as e:
@@ -157,6 +161,27 @@ def user_grant_admin(config, username: str):
 def user_revoke_admin(config, username: str):
     """Revoke the admin role from a user."""
     _set_admin(config, username, False)
+
+
+@user.command(name="host-limit")
+@click.argument("username")
+@click.argument("limit")
+@click.pass_obj
+def user_host_limit(config, username: str, limit: str):
+    """Set the number of hostnames of a user.
+
+    LIMIT is a number, 'default' or 'unlimited'.
+    """
+    with _session(config) as session:
+        try:
+            existing_user = users.get_user(session, username)
+            existing_user.host_limit = users.parse_host_limit(limit)
+        except users.UserError as e:
+            raise click.ClickException(str(e)) from e
+
+        session.commit()
+        new_limit = users.format_host_limit(existing_user)
+        click.echo(f"Host limit of {existing_user.username}: {new_limit}.")
 
 
 def _set_admin(config, username: str, admin: bool) -> None:
@@ -215,7 +240,11 @@ def zone_delete(config, name: str, yes: bool):
             raise click.ClickException(str(e)) from e
 
         if not yes:
-            click.confirm(f"Delete zone {existing_zone.name}?", abort=True)
+            count = hosts.count_hosts_by_zone(session).get(existing_zone.id, 0)
+            click.confirm(
+                f"Delete zone {existing_zone.name} with {count} hostname(s)?",
+                abort=True,
+            )
 
         zones.delete_zone(session, existing_zone)
         session.commit()

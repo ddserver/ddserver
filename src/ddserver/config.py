@@ -32,9 +32,18 @@ class DatabaseConfig:
 
 
 @dataclass(frozen=True)
+class HostsConfig:
+    # Names which users cannot register.
+    reserved: tuple[str, ...] = ()
+    # Number of hosts per user, unless an admin sets another limit for that user.
+    default_limit: int = 5
+
+
+@dataclass(frozen=True)
 class Config:
     web: WebConfig
     database: DatabaseConfig
+    hosts: HostsConfig
 
 
 def load_config(path: Path) -> Config:
@@ -99,6 +108,12 @@ def _convert(expected: type, value, name: str):
             )
 
         return value
+
+    if expected == tuple[str, ...]:
+        if not isinstance(value, list) or not all(isinstance(v, str) for v in value):
+            raise ConfigError(f"{name}: expected a list of strings")
+
+        return tuple(value)
 
     raise TypeError(f"unsupported type in configuration declaration: {expected!r}")
 

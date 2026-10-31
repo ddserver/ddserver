@@ -10,6 +10,7 @@ import re
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from ddserver import hosts
 from ddserver.models import Zone
 
 ZONE_NAME_MAX_LENGTH = 253
@@ -66,5 +67,6 @@ def get_zone(session: Session, name: str) -> Zone:
 
 
 def delete_zone(session: Session, zone: Zone) -> None:
-    """Delete a zone."""
+    """Delete a zone and its hosts."""
+    hosts.delete_hosts_of_zone(session, zone)
     session.delete(zone)

@@ -12,12 +12,18 @@ import secrets
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
+from ddserver import hosts
 from ddserver.models import User, UserStatus
-from ddserver.passwords import hash_password, needs_rehash, verify_password
+from ddserver.passwords import (
+    PASSWORD_MIN_LENGTH,
+    hash_password,
+    needs_rehash,
+    verify_password,
+)
 
-PASSWORD_MIN_LENGTH = 8
 USERNAME_PATTERN = re.compile(r"[a-z0-9][a-z0-9._-]{0,31}")
 EMAIL_PATTERN = re.compile(r"[^@\s]+@[^@\s]+")
+HOST_LIMIT_PATTERN = re.compile(r"[0-9]{1,6}")
 
 
 class UserError(Exception):
@@ -81,6 +87,38 @@ def list_users(session: Session) -> list[User]:
     return list(session.scalars(select(User).order_by(User.username)))
 
 
+def parse_host_limit(value: str) -> int | None:
+    """Return the `User.host_limit` for a number, 'default' or 'unlimited'.
+
+    Raises `UserError` for anything else. An empty value means 'default'.
+    """
+    value = value.strip().lower()
+
+    if value in ("", "default"):
+        return None
+
+    if value == "unlimited":
+        return hosts.HOST_LIMIT_UNLIMITED
+
+    if not HOST_LIMIT_PATTERN.fullmatch(value):
+        raise UserError(
+            "Invalid host limit: use a number up to 999999, 'default' or 'unlimited'"
+        )
+
+    return int(value)
+
+
+def format_host_limit(user: User) -> str:
+    """Return the host limit of `user` the way `parse_host_limit` reads it."""
+    if user.host_limit is None:
+        return "default"
+
+    if user.host_limit >= hosts.HOST_LIMIT_UNLIMITED:
+        return "unlimited"
+
+    return str(user.host_limit)
+
+
 def get_user(session: Session, username: str) -> User:
     """Return the user with this `username`, raise `UserError` if there is none."""
     username = username.strip().lower()
@@ -95,6 +133,7 @@ def get_user(session: Session, username: str) -> User:
 def delete_user(session: Session, user: User) -> None:
     """Delete a user, unless it is the last admin."""
     _check_not_last_admin(session, user)
+    hosts.delete_hosts_of_user(session, user)
     session.delete(user)
 
 
