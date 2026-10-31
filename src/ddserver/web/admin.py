@@ -13,8 +13,9 @@ from flask import (
 )
 
 from ddserver import users as user_management
+from ddserver import zones as zone_management
 from ddserver.db import get_session
-from ddserver.models import User
+from ddserver.models import User, Zone
 from ddserver.web.auth import admin_required
 
 blueprint = Blueprint("admin", __name__, url_prefix="/admin")
@@ -58,6 +59,49 @@ def set_admin(user_id: int):
         flash(f"User {user.username} is no longer an admin.", "success")
 
     return redirect(url_for("admin.users"))
+
+
+@blueprint.get("/zones")
+@admin_required
+def zones():
+    zones = zone_management.list_zones(get_session())
+
+    return render_template("zones.html", zones=zones)
+
+
+@blueprint.post("/zones")
+@admin_required
+def add_zone():
+    db_session = get_session()
+
+    try:
+        zone = zone_management.create_zone(db_session, request.form.get("name", ""))
+    except zone_management.ZoneError as e:
+        flash(f"{e}.", "danger")
+        return redirect(url_for("admin.zones"))
+
+    db_session.commit()
+    flash(f"Zone {zone.name} has been added.", "success")
+
+    return redirect(url_for("admin.zones"))
+
+
+@blueprint.post("/zones/<int:zone_id>/delete")
+@admin_required
+def delete_zone(zone_id: int):
+    db_session = get_session()
+    zone = db_session.get(Zone, zone_id)
+
+    if zone is None:
+        abort(404)
+
+    name = zone.name
+
+    zone_management.delete_zone(db_session, zone)
+    db_session.commit()
+    flash(f"Zone {name} has been deleted.", "success")
+
+    return redirect(url_for("admin.zones"))
 
 
 def _get_other_user(user_id: int) -> User:

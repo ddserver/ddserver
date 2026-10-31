@@ -39,6 +39,9 @@
               <li class="nav-item">
                 <a class="nav-link" href="{{ url_for('admin.users') }}"><i class="bi bi-people"></i> Users</a>
               </li>
+              <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('admin.zones') }}"><i class="bi bi-diagram-3"></i> Zones</a>
+              </li>
             {% endif %}
             <li class="nav-item">
               <form action="{{ url_for('auth.logout') }}" method="post">
