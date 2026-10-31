@@ -93,12 +93,16 @@ def get_user(session: Session, username: str) -> User:
 
 
 def delete_user(session: Session, user: User) -> None:
-    """Delete a user."""
+    """Delete a user, unless it is the last admin."""
+    _check_not_last_admin(session, user)
     session.delete(user)
 
 
 def set_admin(session: Session, user: User, admin: bool) -> None:
-    """Grant or revoke the admin role."""
+    """Grant or revoke the admin role. Never remove the last admin."""
+    if not admin:
+        _check_not_last_admin(session, user)
+
     user.admin = admin
 
 
@@ -135,6 +139,21 @@ def change_password(user: User, current_password: str, new_password: str) -> Non
         )
 
     user.password = hash_password(new_password)
+
+
+def _check_not_last_admin(session: Session, user: User) -> None:
+    """Raise UserError if `user` is the only admin who is able to log in."""
+    if not user.admin or user.status != UserStatus.ACTIVE:
+        return
+
+    admins = session.scalar(
+        select(func.count())
+        .select_from(User)
+        .where(User.admin, User.status == UserStatus.ACTIVE)
+    )
+
+    if admins == 1:
+        raise UserError(f"{user.username} is the last admin")
 
 
 @functools.cache
