@@ -3,8 +3,9 @@
 from pathlib import Path
 
 import click
+from sqlalchemy.orm import Session
 
-from ddserver import db
+from ddserver import db, users
 from ddserver.app import create_app
 from ddserver.config import DEFAULT_PATH, ConfigError, load_config
 
@@ -76,3 +77,71 @@ def upgrade(config):
 def revision(config, message: str):
     """Create a draft migration from model changes (for developers)."""
     db.revision(db.make_engine(config.database.url), message)
+
+
+@main.group()
+def user():
+    """Manage users."""
+
+
+@user.command(name="add")
+@click.argument("username")
+@click.argument("email")
+@click.option("--admin", is_flag=True, help="Grant admin rights.")
+@click.pass_obj
+def user_add(config, username: str, email: str, admin: bool):
+    """Create an activated user."""
+    password = click.prompt("Password", hide_input=True, confirmation_prompt=True)
+
+    with _session(config) as session:
+        try:
+            new_user = users.create_user(session, username, email, password, admin)
+        except users.UserError as e:
+            raise click.ClickException(str(e)) from e
+
+        session.commit()
+        click.echo(f"User {new_user.username} created.")
+
+
+@user.command(name="list")
+@click.pass_obj
+def user_list(config):
+    """List all users."""
+    with _session(config) as session:
+        rows = [
+            (
+                u.username,
+                u.email,
+                "yes" if u.admin else "",
+                u.status.value,
+                f"{u.created:%Y-%m-%d}",
+            )
+            for u in users.list_users(session)
+        ]
+
+    _print_table(("USERNAME", "EMAIL", "ADMIN", "STATUS", "CREATED"), rows)
+
+
+def _session(config) -> Session:
+    """Open a database session for a command."""
+    engine = db.make_engine(config.database.url)
+
+    try:
+        db.check_schema(engine)
+    except db.SchemaError as e:
+        raise click.ClickException(str(e)) from e
+
+    return Session(engine)
+
+
+def _print_table(headers: tuple[str, ...], rows: list[tuple[str, ...]]) -> None:
+    """Output a formatted table."""
+    widths = [
+        max(len(value) for value in column)
+        for column in zip(headers, *rows, strict=True)
+    ]
+
+    for row in (headers, *rows):
+        click.echo(
+            "  ".join(f"{v:<{w}}" for v, w in zip(row, widths, strict=True)).rstrip()
+        )
