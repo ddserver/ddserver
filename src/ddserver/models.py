@@ -27,3 +27,11 @@ class User(Base):
     status: Mapped[UserStatus] = mapped_column(Enum(UserStatus, native_enum=False))
     host_limit: Mapped[int | None]
     created: Mapped[datetime] = mapped_column(UTCDateTime, default=utcnow)
+
+
+class Zone(Base):
+    __tablename__ = "zones"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(unique=True)
+    created: Mapped[datetime] = mapped_column(UTCDateTime, default=utcnow)

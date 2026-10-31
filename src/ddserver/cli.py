@@ -5,7 +5,7 @@ from pathlib import Path
 import click
 from sqlalchemy.orm import Session
 
-from ddserver import db, users
+from ddserver import db, users, zones
 from ddserver.app import create_app
 from ddserver.config import DEFAULT_PATH, ConfigError, load_config
 
@@ -170,6 +170,56 @@ def _set_admin(config, username: str, admin: bool) -> None:
         session.commit()
         state = "now" if admin else "no longer"
         click.echo(f"User {existing_user.username} is {state} an admin.")
+
+
+@main.group()
+def zone():
+    """Manage zones."""
+
+
+@zone.command(name="add")
+@click.argument("name")
+@click.pass_obj
+def zone_add(config, name: str):
+    """Add a zone."""
+    with _session(config) as session:
+        try:
+            new_zone = zones.create_zone(session, name)
+        except zones.ZoneError as e:
+            raise click.ClickException(str(e)) from e
+
+        session.commit()
+        click.echo(f"Zone {new_zone.name} added.")
+
+
+@zone.command(name="list")
+@click.pass_obj
+def zone_list(config):
+    """List all zones."""
+    with _session(config) as session:
+        rows = [(z.name, f"{z.created:%Y-%m-%d}") for z in zones.list_zones(session)]
+
+    _print_table(("NAME", "CREATED"), rows)
+
+
+@zone.command(name="delete")
+@click.argument("name")
+@click.option("--yes", is_flag=True, help="Do not ask for confirmation.")
+@click.pass_obj
+def zone_delete(config, name: str, yes: bool):
+    """Delete a zone."""
+    with _session(config) as session:
+        try:
+            existing_zone = zones.get_zone(session, name)
+        except zones.ZoneError as e:
+            raise click.ClickException(str(e)) from e
+
+        if not yes:
+            click.confirm(f"Delete zone {existing_zone.name}?", abort=True)
+
+        zones.delete_zone(session, existing_zone)
+        session.commit()
+        click.echo(f"Zone {existing_zone.name} deleted.")
 
 
 def _session(config) -> Session:
