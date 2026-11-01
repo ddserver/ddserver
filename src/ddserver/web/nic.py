@@ -22,6 +22,12 @@ def ip():
 def update():
     auth = request.authorization
 
+    # Asks clients which do not send credentials on their first attempt to do so.
+    if auth is None or auth.type != "basic":
+        response = _text(updater.ResponseCode.BADAUTH, status=401)
+        response.headers["WWW-Authenticate"] = 'Basic realm="ddserver"'
+        return response
+
     try:
         result = updater.update(
             get_session(),
