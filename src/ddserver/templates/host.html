@@ -95,6 +95,124 @@
           <button class="btn btn-primary" type="submit">Update password</button>
         </form>
       </div>
+
+      <h3>Client configuration</h3>
+      <p>Examples for ddclient, FRITZ!Box, OpenWrt and other routers.</p>
+      <button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#client-examples">Open examples</button>
+    </div>
+  </div>
+
+  {% set fqdn = host.name ~ '.' ~ host.zone.name %}
+  {% set username = host.user.username %}
+  {% set update_url = url_for('nic.update', _external=True) %}
+  {% set url_with_login = request.scheme ~ '://[USERNAME]:[PASSWORD]@' ~ request.host ~ url_for('nic.update') %}
+
+  <div class="modal fade" id="client-examples" tabindex="-1" aria-labelledby="client-examples-title" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title" id="client-examples-title">Client configuration</h4>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p>
+            Clients log in with your username and the password of this hostname, not with
+            your account password.
+          </p>
+
+          <ul class="nav nav-tabs mb-3" role="tablist">
+            <li class="nav-item" role="presentation">
+              <button class="nav-link active" type="button" role="tab" aria-selected="true"
+                      data-bs-toggle="tab" data-bs-target="#client-ddclient">ddclient</button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link" type="button" role="tab" aria-selected="false"
+                      data-bs-toggle="tab" data-bs-target="#client-fritzbox">FRITZ!Box</button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link" type="button" role="tab" aria-selected="false"
+                      data-bs-toggle="tab" data-bs-target="#client-openwrt">OpenWrt</button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link" type="button" role="tab" aria-selected="false"
+                      data-bs-toggle="tab" data-bs-target="#client-router">Other routers</button>
+            </li>
+          </ul>
+
+          <div class="tab-content">
+            <div class="tab-pane fade show active" id="client-ddclient" role="tabpanel" tabindex="0">
+              <pre class="mb-0"><code>protocol=dyndns2
+ssl={{ 'yes' if request.scheme == 'https' else 'no' }}
+server={{ request.host }}
+usev4=webv4
+webv4={{ url_for('nic.ip', _external=True) }}
+login={{ username }}
+password='&lt;host password&gt;'
+{{ fqdn }}</code></pre>
+            </div>
+            <div class="tab-pane fade" id="client-fritzbox" role="tabpanel" tabindex="0">
+              <p>
+                Go to <strong>Internet &rarr; Permit Access &rarr; DynDNS</strong>, enable
+                <em>Use DynDNS</em>, choose a custom provider and use these settings:
+              </p>
+              <pre class="mb-3"><code>Update URL:  {{ update_url }}?hostname=&lt;domain&gt;&amp;myip=&lt;ipaddr&gt;,&lt;ip6addr&gt;
+Domain name: {{ fqdn }}
+Username:    {{ username }}
+Password:    &lt;host password&gt;</code></pre>
+              <p class="mb-0">
+                The FRITZ!Box fills in the placeholders. Keep them as they are.
+              </p>
+            </div>
+            <div class="tab-pane fade" id="client-openwrt" role="tabpanel" tabindex="0">
+              <p>
+                Install <code>luci-app-ddns</code> and go to
+                <strong>Services &rarr; Dynamic DNS</strong>, or install
+                <code>ddns-scripts</code> and add this to <code>/etc/config/ddns</code>:
+              </p>
+              <pre class="mb-3"><code>config service 'ddserver_ipv4'
+	option enabled '1'
+	option update_url '{{ url_with_login }}?hostname=[DOMAIN]&amp;myip=[IP]'
+	option lookup_host '{{ fqdn }}'
+	option domain '{{ fqdn }}'
+	option username '{{ username }}'
+	option password '&lt;host password&gt;'
+	option interface 'wan'
+	option ip_source 'network'
+	option ip_network 'wan'
+{%- if request.scheme == 'https' %}
+	option use_https '1'
+	option cacert '/etc/ssl/certs/ca-certificates.crt'
+{%- endif %}</code></pre>
+              <p class="mb-0">
+                For IPv6, add a second section with <code>option use_ipv6 '1'</code> and
+                <code>wan6</code> as interface and network.
+                {% if request.scheme == 'https' %}
+                  HTTPS needs a download tool with TLS support and the package
+                  <code>ca-bundle</code>.
+                {% endif %}
+              </p>
+            </div>
+            <div class="tab-pane fade" id="client-router" role="tabpanel" tabindex="0">
+              <pre class="mb-3"><code>Update URL: {{ update_url }}?hostname={{ fqdn }}
+Username:   {{ username }}
+Password:   &lt;host password&gt;</code></pre>
+              <p>
+                Without <code>myip</code>, the address the request comes from is used. To set
+                it, add <code>&amp;myip=</code> and the placeholder of your router for its
+                address.
+              </p>
+              <p>
+                If your router has no fields for username and password, put them into the
+                URL. Special characters in the password must be URL-encoded.
+              </p>
+              <pre class="mb-0"><code>{{ request.scheme }}://{{ username }}:&lt;host password&gt;@{{ request.host }}{{ url_for('nic.update') }}?hostname={{ fqdn }}</code></pre>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
     </div>
   </div>
 {% endblock %}
