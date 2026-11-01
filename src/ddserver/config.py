@@ -51,11 +51,30 @@ class DnsConfig:
 
 
 @dataclass(frozen=True)
+class MailConfig:
+    # Address in the `From` header. Without one, no mail can be sent.
+    sender: str = ""
+    host: str = "localhost"
+    port: int = 587
+    # `starttls`, `tls` or `none`.
+    security: str = "starttls"
+    # Without a username, no login is attempted.
+    username: str = ""
+    password: str = ""
+
+    def __post_init__(self):
+        # A typo must not end up as mail without encryption.
+        if self.security not in ("starttls", "tls", "none"):
+            raise ConfigError("mail.security: expected starttls, tls or none")
+
+
+@dataclass(frozen=True)
 class Config:
     web: WebConfig
     database: DatabaseConfig
     hosts: HostsConfig
     dns: DnsConfig
+    mail: MailConfig
 
 
 def load_config(path: Path) -> Config:

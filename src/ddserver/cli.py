@@ -5,7 +5,7 @@ from pathlib import Path
 import click
 from sqlalchemy.orm import Session
 
-from ddserver import db, dns, hosts, users, zones
+from ddserver import db, dns, hosts, mail, users, zones
 from ddserver.app import create_app
 from ddserver.config import DEFAULT_PATH, ConfigError, load_config
 
@@ -283,6 +283,22 @@ def sync(config, all_hosts: bool):
 
     if not all(results) or remaining:
         raise click.ClickException("some changes did not reach DNS, see the log")
+
+
+@main.group(name="mail")
+def mail_group():
+    """Send mail."""
+
+
+@mail_group.command(name="test")
+@click.argument("address")
+@click.pass_obj
+def mail_test(config, address: str):
+    """Send a test mail to the given address."""
+    if not mail.send(config.mail, address, "ddserver test mail", "test.txt"):
+        raise click.ClickException("sending the mail failed, see the log")
+
+    click.echo(f"Test mail to {address} sent.")
 
 
 def _session(config) -> Session:

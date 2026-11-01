@@ -44,3 +44,24 @@ secret_key = "change-me"
 # TTL of the published records, in seconds.
 #
 # ttl = 60
+
+
+[mail]
+
+# Sender of all mails. Without a sender, no mail can be sent.
+# Test with: ddserver mail test <address>
+#
+# sender = "ddserver@example.org"
+
+# SMTP server. For `security`, use `starttls` (usually port 587),
+# `tls` (usually port 465) or `none`.
+#
+# host = "localhost"
+# port = 587
+# security = "starttls"
+
+# Login at the SMTP server.
+# Leave username empty if you do not need to log in.
+#
+# username = ""
+# password = ""
