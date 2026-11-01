@@ -77,6 +77,10 @@
                 <span class="input-group-text"><i class="bi bi-lock"></i></span>
                 <input class="form-control" type="password" id="password" name="password"
                        minlength="{{ password_min_length }}" autocomplete="new-password" required>
+                <button class="btn btn-outline-secondary" type="button" id="generate-password"
+                        title="Generate a random password" aria-label="Generate a random password">
+                  <i class="bi bi-magic"></i>
+                </button>
               </div>
             </div>
 
@@ -94,6 +98,12 @@
               <div class="input-group">
                 <span class="input-group-text"><i class="bi bi-info"></i></span>
                 <input class="form-control" type="text" id="ipv4" name="ipv4" value="{{ form.get('ipv4', '') }}">
+                {% if current.ipv4 %}
+                  <button class="btn btn-outline-secondary" type="button" title="Use your current address ({{ current.ipv4 }})"
+                          aria-label="Use your current address" data-use-address="ipv4" data-address="{{ current.ipv4 }}">
+                    <i class="bi bi-house"></i>
+                  </button>
+                {% endif %}
               </div>
             </div>
 
@@ -102,6 +112,12 @@
               <div class="input-group">
                 <span class="input-group-text"><i class="bi bi-info"></i></span>
                 <input class="form-control" type="text" id="ipv6" name="ipv6" value="{{ form.get('ipv6', '') }}">
+                {% if current.ipv6 %}
+                  <button class="btn btn-outline-secondary" type="button" title="Use your current address ({{ current.ipv6 }})"
+                          aria-label="Use your current address" data-use-address="ipv6" data-address="{{ current.ipv6 }}">
+                    <i class="bi bi-house"></i>
+                  </button>
+                {% endif %}
               </div>
             </div>
 
@@ -118,6 +134,8 @@
           </form>
         </div>
       </div>
+
+      <script src="{{ url_for('static', filename='js/addhost.js') }}" defer></script>
     {% else %}
       <div class="col-md-12">
         <p class="text-center">

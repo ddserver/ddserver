@@ -13,7 +13,7 @@ from flask import (
     url_for,
 )
 
-from ddserver import dns, hosts, zones
+from ddserver import dns, hosts, updater, zones
 from ddserver.config import DnsConfig, HostsConfig
 from ddserver.db import get_session
 from ddserver.models import Host, Zone
@@ -181,4 +181,15 @@ def _render_add_form():
         host_limit=hosts.host_limit(g.user, _config()),
         unlimited=hosts.HOST_LIMIT_UNLIMITED,
         password_min_length=PASSWORD_MIN_LENGTH,
+        current=_current_address(),
     )
+
+
+def _current_address() -> dict[str, str]:
+    """Return the address of the client by attribute of `Host`, if there is one."""
+    try:
+        attr, address = updater.parse_address(request.remote_addr or "")
+    except hosts.HostError:
+        return {}
+
+    return {attr: address} if address else {}

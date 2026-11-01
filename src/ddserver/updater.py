@@ -147,7 +147,7 @@ def _parse_addresses(myip: str) -> dict[str, str]:
     addresses = {}
 
     for entry in entries:
-        attr, value = _parse_address(entry)
+        attr, value = parse_address(entry)
 
         if attr in addresses:
             raise HostError(f"Invalid address: {myip}")
@@ -157,7 +157,8 @@ def _parse_addresses(myip: str) -> dict[str, str]:
     return addresses
 
 
-def _parse_address(address: str) -> tuple[str, str]:
+def parse_address(address: str) -> tuple[str, str]:
+    """Return the attribute of `Host` for `address`, and its canonical form."""
     if ":" not in address:
         return "ipv4", normalize_ipv4(address)
 
