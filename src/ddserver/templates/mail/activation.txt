@@ -1,0 +1,10 @@
+Hello {{ username }},
+
+an account has been created for you at ddserver.
+
+Please open this link within {{ days }} days to choose a password and activate
+your account:
+
+{{ url }}
+
+If you do not want this account, you can ignore this mail.

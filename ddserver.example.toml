@@ -2,7 +2,8 @@
 
 [web]
 
-# Secret key used to sign session cookies.
+# Secret key used to sign session cookies and the links in mails. Changing it ends
+# all sessions, and links which were already sent stop working.
 # Generate with: python3 -c 'import secrets; print(secrets.token_hex(32))'
 #
 secret_key = "change-me"

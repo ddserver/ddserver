@@ -9,6 +9,7 @@ import functools
 import re
 import secrets
 
+from itsdangerous import BadSignature, URLSafeTimedSerializer
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
@@ -25,6 +26,8 @@ from ddserver.passwords import (
 USERNAME_PATTERN = re.compile(r"[a-z0-9][a-z0-9._-]{0,31}")
 EMAIL_PATTERN = re.compile(r"[^@\s]+@[^@\s]+")
 HOST_LIMIT_PATTERN = re.compile(r"[0-9]{1,6}")
+
+ACTIVATION_DAYS = 7
 
 
 class UserError(Exception):
@@ -62,18 +65,8 @@ def create_user(
     admin: bool = False,
 ) -> User:
     """Add a new, activated user."""
-    username = normalize_username(username)
-    email = normalize_email(email)
-
-    if session.scalar(select(User).where(User.username == username)):
-        raise UserError(f"The username {username} is already taken")
-
-    if session.scalar(select(User).where(User.email == email)):
-        raise UserError(f"The email address {email} is already in use")
-
     user = User(
-        username=username,
-        email=email,
+        **_check_available(session, username, email),
         password=hash_password(password),
         admin=admin,
         status=UserStatus.ACTIVE,
@@ -81,6 +74,50 @@ def create_user(
     session.add(user)
 
     return user
+
+
+def create_invited_user(session: Session, username: str, email: str) -> User:
+    """Add a new user, who sets a password through the link in the activation mail."""
+    user = User(
+        **_check_available(session, username, email),
+        status=UserStatus.ACTIVATION,
+    )
+    session.add(user)
+
+    return user
+
+
+def activation_token(secret_key: str, user: User) -> str:
+    """Return the signed token for the activation link of `user`.
+
+    It holds the email address and not the id: SQLite may give the id of a deleted user
+    to a new user, whose account would then be open to the link of the old one.
+    """
+    return _activation_serializer(secret_key).dumps(user.email)
+
+
+def user_to_activate(session: Session, secret_key: str, token: str) -> User | None:
+    """Return the user of an activation `token`, otherwise `None`.
+
+    Nothing is stored about the token, it is the status of the user which makes the
+    link work only once.
+    """
+    try:
+        email = _activation_serializer(secret_key).loads(
+            token, max_age=ACTIVATION_DAYS * 24 * 60 * 60
+        )
+    except BadSignature:
+        return None
+
+    return session.scalar(
+        select(User).where(User.email == email, User.status == UserStatus.ACTIVATION)
+    )
+
+
+def activate(user: User, password: str) -> None:
+    """Set the first password of `user`, which makes the account active."""
+    user.password = _hash_new_password(password)
+    user.status = UserStatus.ACTIVE
 
 
 def list_users(session: Session) -> list[User]:
@@ -175,12 +212,35 @@ def change_password(user: User, current_password: str, new_password: str) -> Non
     if not verify_password(current_password, user.password):
         raise UserError("The current password is not correct")
 
-    if len(new_password) < PASSWORD_MIN_LENGTH:
+    user.password = _hash_new_password(new_password)
+
+
+def _check_available(session: Session, username: str, email: str) -> dict[str, str]:
+    """Return `username` and `email` as they get stored, if nobody else has them."""
+    username = normalize_username(username)
+    email = normalize_email(email)
+
+    if session.scalar(select(User).where(User.username == username)):
+        raise UserError(f"The username {username} is already taken")
+
+    if session.scalar(select(User).where(User.email == email)):
+        raise UserError(f"The email address {email} is already in use")
+
+    return {"username": username, "email": email}
+
+
+def _activation_serializer(secret_key: str) -> URLSafeTimedSerializer:
+    # The salt keeps tokens of different purposes apart, with the same key.
+    return URLSafeTimedSerializer(secret_key, salt="activation")
+
+
+def _hash_new_password(password: str) -> str:
+    if len(password) < PASSWORD_MIN_LENGTH:
         raise UserError(
             f"The new password must have at least {PASSWORD_MIN_LENGTH} characters"
         )
 
-    user.password = hash_password(new_password)
+    return hash_password(password)
 
 
 def _check_not_last_admin(session: Session, user: User) -> None:

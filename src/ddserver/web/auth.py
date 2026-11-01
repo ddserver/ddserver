@@ -13,9 +13,11 @@ import hashlib
 from flask import (
     Blueprint,
     abort,
+    current_app,
     flash,
     g,
     redirect,
+    render_template,
     request,
     session,
     url_for,
@@ -120,5 +122,62 @@ def login():
 def logout():
     session.clear()
     flash("You have been logged out.", "success")
+
+    return redirect(url_for("public.index"))
+
+
+@blueprint.get("/activate")
+def activate():
+    token = request.args.get("token", "")
+    user = _user_to_activate(token)
+
+    if user is None:
+        return _invalid_activation_link()
+
+    return render_template(
+        "activate.html",
+        user=user,
+        token=token,
+        password_min_length=users.PASSWORD_MIN_LENGTH,
+    )
+
+
+@blueprint.post("/activate")
+def activate_post():
+    token = request.form.get("token", "")
+    user = _user_to_activate(token)
+
+    if user is None:
+        return _invalid_activation_link()
+
+    password = request.form.get("password", "")
+
+    if password != request.form.get("password_repeat", ""):
+        flash("The passwords do not match.", "danger")
+        return redirect(url_for("auth.activate", token=token))
+
+    try:
+        users.activate(user, password)
+    except users.UserError as e:
+        flash(f"{e}.", "danger")
+        return redirect(url_for("auth.activate", token=token))
+
+    get_session().commit()
+    flash("Your account has been activated, you can log in now.", "success")
+
+    return redirect(url_for("public.index"))
+
+
+def _user_to_activate(token: str) -> User | None:
+    config = current_app.extensions["ddserver.config"]
+
+    return users.user_to_activate(get_session(), config.web.secret_key, token)
+
+
+def _invalid_activation_link():
+    flash(
+        "This activation link is not valid, has already been used or has expired. ",
+        "danger",
+    )
 
     return redirect(url_for("public.index"))

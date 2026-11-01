@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <div class="row">
+    <div class="col-md-12"><h1>Activate your account</h1></div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-8">
+      <p>
+        Choose a password to activate your account. It should consist of upper- and
+        lowercase characters, as well as numbers or special characters. The minimum
+        password length is {{ password_min_length }} characters.
+      </p>
+    </div>
+
+    <div class="col-md-4">
+      <div class="box">
+        <form action="{{ url_for('auth.activate_post') }}" method="post">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <input type="hidden" name="token" value="{{ token }}">
+          <div class="mb-3">
+            <label class="form-label" for="username">Username</label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-person"></i></span>
+              <input class="form-control" type="text" id="username" value="{{ user.username }}"
+                     autocomplete="username" readonly>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="password">Password</label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-lock"></i></span>
+              <input class="form-control" type="password" id="password" name="password"
+                     minlength="{{ password_min_length }}" autocomplete="new-password" required>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="password_repeat">Retype password</label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-lock"></i></span>
+              <input class="form-control" type="password" id="password_repeat" name="password_repeat"
+                     minlength="{{ password_min_length }}" autocomplete="new-password" required>
+            </div>
+          </div>
+          <button class="btn btn-primary" type="submit">Activate account</button>
+        </form>
+      </div>
+    </div>
+  </div>
+{% endblock %}

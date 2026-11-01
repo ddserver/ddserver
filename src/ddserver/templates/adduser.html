@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <div class="row">
+    <div class="col-md-12"><h1>Add a new user</h1></div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-8">
+      <p>
+        Enter the username and the email address of the new user. They will get an
+        activation mail, with a link to choose a password.
+      </p>
+    </div>
+
+    <div class="col-md-4">
+      <div class="box">
+        <form action="{{ url_for('admin.add_user_post') }}" method="post">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <div class="mb-3">
+            <label class="form-label" for="username">Username</label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-person"></i></span>
+              <input class="form-control" type="text" id="username" name="username"
+                     value="{{ username }}" required>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="email">E-Mail Address</label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+              <input class="form-control" type="email" id="email" name="email"
+                     value="{{ email }}" required>
+            </div>
+          </div>
+          <a class="btn btn-secondary" href="{{ url_for('admin.users') }}">Cancel</a>
+          <button class="btn btn-primary" type="submit">Add user</button>
+        </form>
+      </div>
+    </div>
+  </div>
+{% endblock %}

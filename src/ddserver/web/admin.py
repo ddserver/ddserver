@@ -13,7 +13,7 @@ from flask import (
     url_for,
 )
 
-from ddserver import dns, hosts
+from ddserver import dns, hosts, mail
 from ddserver import users as user_management
 from ddserver import zones as zone_management
 from ddserver.config import DnsConfig
@@ -33,6 +33,39 @@ def users():
         format_host_limit=user_management.format_host_limit,
         default_limit=current_app.extensions["ddserver.config"].hosts.default_limit,
     )
+
+
+@blueprint.get("/users/add")
+@admin_required
+def add_user():
+    return render_template("adduser.html")
+
+
+@blueprint.post("/users/add")
+@admin_required
+def add_user_post():
+    db_session = get_session()
+    username = request.form.get("username", "")
+    email = request.form.get("email", "")
+
+    try:
+        user = user_management.create_invited_user(db_session, username, email)
+    except user_management.UserError as e:
+        flash(f"{e}.", "danger")
+        return render_template("adduser.html", username=username, email=email)
+
+    db_session.commit()
+
+    if _send_activation_mail(user):
+        flash(f"User {user.username} has been added.", "success")
+    else:
+        flash(
+            f"User {user.username} has been added, "
+            "but the activation mail could not be sent.",
+            "warning",
+        )
+
+    return redirect(url_for("admin.users"))
 
 
 @blueprint.get("/users/<int:user_id>")
@@ -179,6 +212,21 @@ def delete_host(host_id: int):
     flash(f"Hostname {deleted} has been deleted.", "success")
 
     return redirect(back)
+
+
+def _send_activation_mail(user: User) -> bool:
+    config = current_app.extensions["ddserver.config"]
+    token = user_management.activation_token(config.web.secret_key, user)
+
+    return mail.send(
+        config.mail,
+        user.email,
+        "Activate your ddserver account",
+        "activation.txt",
+        username=user.username,
+        url=url_for("auth.activate", token=token, _external=True),
+        days=str(user_management.ACTIVATION_DAYS),
+    )
 
 
 def _dns_config() -> DnsConfig:
