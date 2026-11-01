@@ -29,7 +29,7 @@ def update():
         return response
 
     try:
-        result = updater.update(
+        results = updater.update_many(
             get_session(),
             auth.username or "",
             auth.password or "",
@@ -38,15 +38,17 @@ def update():
         )
         get_session().commit()
 
-        if result.changed:
-            config = current_app.extensions["ddserver.config"]
-            dns.publish_host(config.dns, result.changed)
+        config = current_app.extensions["ddserver.config"]
+
+        for result in results:
+            if result.changed:
+                dns.publish_host(config.dns, result.changed)
 
     except Exception:
         log.exception("update failed")
         return _text(updater.ResponseCode.SERVER_ERROR)
 
-    return _text(str(result))
+    return _text("\n".join(str(result) for result in results))
 
 
 def _text(text: str, status: int = 200) -> Response:

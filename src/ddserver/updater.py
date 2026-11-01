@@ -21,11 +21,15 @@ from ddserver.passwords import hash_password, needs_rehash, verify_password
 
 log = logging.getLogger(__name__)
 
+# Limit of the original Dyn service
+MAX_HOSTNAMES = 20
+
 
 class ResponseCode(enum.StrEnum):
     GOOD = "good"
     NOCHG = "nochg"
     NOHOST = "nohost"
+    NUMHOST = "numhost"
     BADAUTH = "badauth"
     BADAGENT = "badagent"
     SERVER_ERROR = "911"
@@ -44,13 +48,29 @@ class Response:
         return f"{self.code} {self.address}" if self.address else str(self.code)
 
 
+def update_many(
+    session: Session, username: str, password: str, hostnames: str, myip: str
+) -> list[Response]:
+    """Update each host in the comma-separated `hostnames`.
+
+    Returns one response per host, in the same order. Each host is handled on its
+    own, so with different passwords only some of them are updated.
+    """
+    names = hostnames.split(",")
+
+    if len(names) > MAX_HOSTNAMES:
+        return [Response(ResponseCode.NUMHOST)]
+
+    return [update(session, username, password, name, myip) for name in names]
+
+
 def update(
     session: Session, username: str, password: str, hostname: str, myip: str
 ) -> Response:
     """Set the addresses in `myip` for `hostname`, if `password` is its password.
 
     `myip` is an IPv4 or an IPv6 address, or one of each separated by a comma. An
-    address of the other protocol which is not mentioned stays as it is.
+    update for only one of the addresses does not change the other (if set).
     """
     if not username or not password:
         return Response(ResponseCode.BADAUTH)
@@ -92,7 +112,7 @@ def _find_host(session: Session, username: str, hostname: str) -> Host | None:
 
 
 def _set_addresses(host: Host, myip: str) -> Response:
-    """Store the addresses in `myip`. Nothing is stored if one of them is invalid."""
+    """Store the addresses in `myip`. Nothing is stored if any address is invalid."""
     try:
         addresses = _parse_addresses(myip)
     except HostError:
