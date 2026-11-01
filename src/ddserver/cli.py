@@ -5,7 +5,7 @@ from pathlib import Path
 import click
 from sqlalchemy.orm import Session
 
-from ddserver import db, hosts, users, zones
+from ddserver import db, dns, hosts, users, zones
 from ddserver.app import create_app
 from ddserver.config import DEFAULT_PATH, ConfigError, load_config
 
@@ -139,12 +139,14 @@ def user_delete(config, username: str, yes: bool):
                     abort=True,
                 )
 
-            users.delete_user(session, existing_user)
+            username = existing_user.username
+            deleted = users.delete_user(session, existing_user)
         except users.UserError as e:
             raise click.ClickException(str(e)) from e
 
         session.commit()
-        click.echo(f"User {existing_user.username} deleted.")
+        dns.delete_records(session, config.dns, deleted)
+        click.echo(f"User {username} deleted.")
 
 
 @user.command(name="grant-admin")
@@ -246,9 +248,41 @@ def zone_delete(config, name: str, yes: bool):
                 abort=True,
             )
 
-        zones.delete_zone(session, existing_zone)
+        zone_name = existing_zone.name
+        deleted = zones.delete_zone(session, existing_zone)
         session.commit()
-        click.echo(f"Zone {existing_zone.name} deleted.")
+        dns.delete_records(session, config.dns, deleted)
+        click.echo(f"Zone {zone_name} deleted.")
+
+
+@main.group(name="dns")
+def dns_group():
+    """Publish to the DNS server."""
+
+
+@dns_group.command()
+@click.option("--all", "all_hosts", is_flag=True, help="Publish every host.")
+@click.pass_obj
+def sync(config, all_hosts: bool):
+    """Publish what has not reached the DNS server yet."""
+    if not config.dns.server:
+        raise click.ClickException("dns.server: no DNS server configured")
+
+    with _session(config) as session:
+        selected = (
+            hosts.all_hosts(session) if all_hosts else hosts.unpublished_hosts(session)
+        )
+        results = [dns.publish_host(session, config.dns, host) for host in selected]
+
+        deletions = hosts.pending_deletions(session)
+        dns.delete_records(session, config.dns, deletions)
+        remaining = len(hosts.pending_deletions(session))
+
+    click.echo(f"{sum(results)} of {len(results)} hosts published.")
+    click.echo(f"{len(deletions) - remaining} of {len(deletions)} deletions done.")
+
+    if not all(results) or remaining:
+        raise click.ClickException("some changes did not reach DNS, see the log")
 
 
 def _session(config) -> Session:

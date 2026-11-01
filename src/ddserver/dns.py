@@ -3,8 +3,10 @@
 Publishing to the DNS server: RFC 2136 updates, signed with TSIG.
 
 The database is the source of truth, so this happens after the commit. A failure
-never reaches the client (decision 0003): it is logged, and repaired with
-`ddserver dns sync --all`.
+never reaches the client, but gets logged and stored. The ddserver db and dns can
+be synced later, using the cli - this is not exactly what the dyndns2 protocol
+says, but it prevents clients from sending updates again and again, while the dns
+server is not available.
 """
 
 import logging
@@ -14,9 +16,11 @@ import dns.query
 import dns.rcode
 import dns.tsig
 import dns.update
+from sqlalchemy import delete
+from sqlalchemy.orm import Session
 
 from ddserver.config import DnsConfig
-from ddserver.models import Host
+from ddserver.models import DnsDeletion, Host
 
 log = logging.getLogger(__name__)
 
@@ -65,33 +69,70 @@ def build_delete(config: DnsConfig, host: HostName) -> dns.update.UpdateMessage:
     return update
 
 
-def publish_host(config: DnsConfig, host: Host) -> bool:
-    """Send the records of `host`. Returns `False` if this failed."""
-    return _try_send(
-        config, str(HostName(host.name, host.zone.name)), build_update, host
-    )
+def publish_host(session: Session, config: DnsConfig, host: Host) -> bool:
+    """Send the records of `host` and store the outcome. Returns `False` if this failed.
 
-
-def delete_records(config: DnsConfig, hosts: list[HostName]) -> bool:
-    """Remove the records of deleted `hosts`. Returns `False` if any of this failed."""
-    results = [_try_send(config, str(h), build_delete, h) for h in hosts]
-
-    return all(results)
-
-
-def _try_send(config: DnsConfig, name: str, build, host: Host | HostName) -> bool:
+    Unlike other functions this commits, as it runs after the commit of the change.
+    """
     if not config.server:
         return True
 
+    revision = host.revision
+    name = str(HostName(host.name, host.zone.name))
+    error = _try_send(config, name, build_update, host)
+
+    host.dns_error = error
+
+    if error is None:
+        host.published_revision = revision
+
+    _store_outcome(session, name)
+
+    return error is None
+
+
+def delete_records(session: Session, config: DnsConfig, hosts: list[HostName]) -> bool:
+    """Remove the records of deleted `hosts`. Return `False` if any record failed.
+
+    What failed stays in `DnsDeletion` for the next sync. Commits like `publish_host`.
+    """
+    if not config.server:
+        return True
+
+    deleted = True
+
+    for host in hosts:
+        name = str(host)
+
+        if _try_send(config, name, build_delete, host) is None:
+            session.execute(delete(DnsDeletion).where(DnsDeletion.fqdn == name))
+            _store_outcome(session, name)
+        else:
+            deleted = False
+
+    return deleted
+
+
+def _store_outcome(session: Session, name: str) -> None:
+    # Without the outcome, the sync only does the same work again.
+    try:
+        session.commit()
+    except Exception:
+        log.exception("storing the DNS status of %s failed", name)
+        session.rollback()
+
+
+def _try_send(config: DnsConfig, name: str, build, host: Host | HostName) -> str | None:
+    """Send an update, and return the error if it failed."""
     # Anything may go wrong here, also with the configured key. It must not turn a
     # stored change into an error for the client.
     try:
         _send(config, build(config, host))
-    except Exception:
+    except Exception as e:
         log.exception("DNS update of %s failed", name)
-        return False
+        return str(e) or type(e).__name__
 
-    return True
+    return None
 
 
 def _new_update(config: DnsConfig, zone: str) -> dns.update.UpdateMessage:

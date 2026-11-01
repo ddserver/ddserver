@@ -14,8 +14,12 @@ from dataclasses import dataclass, field
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from ddserver.db import utcnow
-from ddserver.hosts import HostError, normalize_ipv4, normalize_ipv6
+from ddserver.hosts import (
+    HostError,
+    normalize_ipv4,
+    normalize_ipv6,
+    record_address_change,
+)
 from ddserver.models import Host, User, UserStatus, Zone
 from ddserver.passwords import hash_password, needs_rehash, verify_password
 
@@ -126,7 +130,7 @@ def _set_addresses(host: Host, myip: str) -> Response:
     for attr, value in addresses.items():
         setattr(host, attr, value)
 
-    host.updated = utcnow()
+    record_address_change(host)
 
     return Response(ResponseCode.GOOD, text, host)
 

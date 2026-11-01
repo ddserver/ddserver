@@ -66,7 +66,8 @@ def delete():
         return redirect(url_for("account.index"))
 
     db_session.commit()
-    dns.delete_records(current_app.extensions["ddserver.config"].dns, deleted)
+    config = current_app.extensions["ddserver.config"]
+    dns.delete_records(db_session, config.dns, deleted)
     session.clear()
     flash("Your account has been deleted.", "success")
 

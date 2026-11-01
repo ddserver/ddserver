@@ -50,9 +50,23 @@ class Host(Base):
     description: Mapped[str | None]
     ipv4: Mapped[str | None]
     ipv6: Mapped[str | None]
+    # A host has to be published as long as these two differ.
+    revision: Mapped[int] = mapped_column(default=1, server_default="1")
+    published_revision: Mapped[int] = mapped_column(default=0, server_default="0")
+    dns_error: Mapped[str | None]
     updated: Mapped[datetime | None] = mapped_column(UTCDateTime)
     created: Mapped[datetime] = mapped_column(UTCDateTime, default=utcnow)
 
     # Not database columns: these load the related object on first access.
     user: Mapped[User] = relationship()
     zone: Mapped[Zone] = relationship()
+
+
+class DnsDeletion(Base):
+    """The records of a deleted host, as long as they may still be in DNS."""
+
+    __tablename__ = "dns_deletions"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    fqdn: Mapped[str] = mapped_column(unique=True)
+    created: Mapped[datetime] = mapped_column(UTCDateTime, default=utcnow)

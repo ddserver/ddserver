@@ -67,7 +67,7 @@ def add_post():
         return _render_add_form()
 
     db_session.commit()
-    dns.publish_host(_dns_config(), host)
+    dns.publish_host(db_session, _dns_config(), host)
     flash(f"Hostname {host.name}.{zone.name} has been added.", "success")
 
     return redirect(url_for("hosts.index"))
@@ -99,7 +99,7 @@ def update(host_id: int):
     get_session().commit()
 
     if addresses_changed:
-        dns.publish_host(_dns_config(), host)
+        dns.publish_host(get_session(), _dns_config(), host)
 
     flash("The hostname has been updated.", "success")
 
@@ -135,7 +135,7 @@ def delete(host_id: int):
     host = _get_own_host(host_id)
     deleted = hosts.delete_host(db_session, host)
     db_session.commit()
-    dns.delete_records(_dns_config(), [deleted])
+    dns.delete_records(db_session, _dns_config(), [deleted])
     flash(f"Hostname {deleted} has been deleted.", "success")
 
     return redirect(url_for("hosts.index"))

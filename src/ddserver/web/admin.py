@@ -58,7 +58,7 @@ def delete_user(user_id: int):
 
     deleted = user_management.delete_user(db_session, user)
     db_session.commit()
-    dns.delete_records(_dns_config(), deleted)
+    dns.delete_records(db_session, _dns_config(), deleted)
     flash(f"User {username} has been deleted.", "success")
 
     return redirect(url_for("admin.users"))
@@ -155,7 +155,7 @@ def delete_zone(zone_id: int):
 
     deleted = zone_management.delete_zone(db_session, zone)
     db_session.commit()
-    dns.delete_records(_dns_config(), deleted)
+    dns.delete_records(db_session, _dns_config(), deleted)
     flash(f"Zone {name} has been deleted.", "success")
 
     return redirect(url_for("admin.zones"))
@@ -175,7 +175,7 @@ def delete_host(host_id: int):
 
     deleted = hosts.delete_host(db_session, host)
     db_session.commit()
-    dns.delete_records(_dns_config(), [deleted])
+    dns.delete_records(db_session, _dns_config(), [deleted])
     flash(f"Hostname {deleted} has been deleted.", "success")
 
     return redirect(back)

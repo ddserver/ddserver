@@ -8,13 +8,13 @@ Add, change, delete or list hosts. Commit to DB is done by the caller.
 import ipaddress
 import re
 
-from sqlalchemy import func, select
+from sqlalchemy import delete, func, select
 from sqlalchemy.orm import Session
 
 from ddserver.config import HostsConfig
 from ddserver.db import utcnow
 from ddserver.dns import HostName
-from ddserver.models import Host, User, Zone
+from ddserver.models import DnsDeletion, Host, User, Zone
 from ddserver.passwords import PASSWORD_MIN_LENGTH, hash_password
 
 HOSTNAME_PATTERN = re.compile(r"[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?")
@@ -134,6 +134,11 @@ def create_host(
     )
     session.add(host)
 
+    # Publishing the new host replaces the records anyway.
+    session.execute(
+        delete(DnsDeletion).where(DnsDeletion.fqdn == f"{name}.{zone.name}")
+    )
+
     return host
 
 
@@ -148,9 +153,15 @@ def update_host(host: Host, ipv4: str, ipv6: str, description: str) -> bool:
 
     host.ipv4 = ipv4
     host.ipv6 = ipv6
-    host.updated = utcnow()
+    record_address_change(host)
 
     return True
+
+
+def record_address_change(host: Host) -> None:
+    """Note that the addresses of `host` have changed, and have to be published."""
+    host.updated = utcnow()
+    host.revision += 1
 
 
 def set_host_password(host: Host, password: str) -> None:
@@ -202,13 +213,29 @@ def all_hosts(session: Session) -> list[Host]:
     return list(session.scalars(select(Host)))
 
 
+def unpublished_hosts(session: Session) -> list[Host]:
+    """Return the hosts whose latest change has not reached DNS."""
+    return list(
+        session.scalars(select(Host).where(Host.revision != Host.published_revision))
+    )
+
+
+def pending_deletions(session: Session) -> list[HostName]:
+    """Return the deleted hosts whose records may still be in DNS."""
+    fqdns = session.scalars(select(DnsDeletion.fqdn))
+
+    return [HostName(*fqdn.split(".", 1)) for fqdn in fqdns]
+
+
 def delete_host(session: Session, host: Host) -> HostName:
     """Delete `host`. All deletions of hosts go through this function.
 
-    Returns its name, for removing the records after the commit.
+    Returns its name, for removing the records after the commit. Until this has
+    worked, the deletion stays in `DnsDeletion`.
     """
     name = HostName(host.name, host.zone.name)
     session.delete(host)
+    session.add(DnsDeletion(fqdn=str(name)))
 
     return name
 

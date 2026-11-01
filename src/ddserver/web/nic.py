@@ -42,7 +42,7 @@ def update():
 
         for result in results:
             if result.changed:
-                dns.publish_host(config.dns, result.changed)
+                dns.publish_host(get_session(), config.dns, result.changed)
 
     except Exception:
         log.exception("update failed")
