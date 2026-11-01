@@ -13,9 +13,10 @@ from flask import (
     url_for,
 )
 
-from ddserver import hosts
+from ddserver import dns, hosts
 from ddserver import users as user_management
 from ddserver import zones as zone_management
+from ddserver.config import DnsConfig
 from ddserver.db import get_session
 from ddserver.models import Base, Host, User, Zone
 from ddserver.web.auth import admin_required
@@ -55,8 +56,9 @@ def delete_user(user_id: int):
     user = _get_other_user(user_id)
     username = user.username
 
-    user_management.delete_user(db_session, user)
+    deleted = user_management.delete_user(db_session, user)
     db_session.commit()
+    dns.delete_records(_dns_config(), deleted)
     flash(f"User {username} has been deleted.", "success")
 
     return redirect(url_for("admin.users"))
@@ -151,8 +153,9 @@ def delete_zone(zone_id: int):
     zone = _get_or_404(Zone, zone_id)
     name = zone.name
 
-    zone_management.delete_zone(db_session, zone)
+    deleted = zone_management.delete_zone(db_session, zone)
     db_session.commit()
+    dns.delete_records(_dns_config(), deleted)
     flash(f"Zone {name} has been deleted.", "success")
 
     return redirect(url_for("admin.zones"))
@@ -163,7 +166,6 @@ def delete_zone(zone_id: int):
 def delete_host(host_id: int):
     db_session = get_session()
     host = _get_or_404(Host, host_id)
-    fqdn = f"{host.name}.{host.zone.name}"
 
     # `back` only selects one of our own pages, it is never used as a URL.
     if request.args.get("back") == "user":
@@ -171,11 +173,16 @@ def delete_host(host_id: int):
     else:
         back = url_for("admin.zone_hosts", zone_id=host.zone_id)
 
-    hosts.delete_host(db_session, host)
+    deleted = hosts.delete_host(db_session, host)
     db_session.commit()
-    flash(f"Hostname {fqdn} has been deleted.", "success")
+    dns.delete_records(_dns_config(), [deleted])
+    flash(f"Hostname {deleted} has been deleted.", "success")
 
     return redirect(back)
+
+
+def _dns_config() -> DnsConfig:
+    return current_app.extensions["ddserver.config"].dns
 
 
 def _get_or_404[T: Base](model: type[T], object_id: int) -> T:

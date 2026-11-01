@@ -13,6 +13,7 @@ from sqlalchemy.orm import Session
 
 from ddserver.config import HostsConfig
 from ddserver.db import utcnow
+from ddserver.dns import HostName
 from ddserver.models import Host, User, Zone
 from ddserver.passwords import PASSWORD_MIN_LENGTH, hash_password
 
@@ -136,16 +137,20 @@ def create_host(
     return host
 
 
-def update_host(host: Host, ipv4: str, ipv6: str, description: str) -> None:
-    """Change the addresses and the description of `host`."""
+def update_host(host: Host, ipv4: str, ipv6: str, description: str) -> bool:
+    """Change `host`. Returns whether its addresses have changed."""
     ipv4 = normalize_ipv4(ipv4)
     ipv6 = normalize_ipv6(ipv6)
     host.description = normalize_description(description)
 
-    if (ipv4, ipv6) != (host.ipv4, host.ipv6):
-        host.ipv4 = ipv4
-        host.ipv6 = ipv6
-        host.updated = utcnow()
+    if (ipv4, ipv6) == (host.ipv4, host.ipv6):
+        return False
+
+    host.ipv4 = ipv4
+    host.ipv6 = ipv6
+    host.updated = utcnow()
+
+    return True
 
 
 def set_host_password(host: Host, password: str) -> None:
@@ -192,21 +197,34 @@ def count_hosts_by_zone(session: Session) -> dict[int, int]:
     return {zone_id: count for zone_id, count in rows}
 
 
-def delete_host(session: Session, host: Host) -> None:
-    """Delete `host`. All deletions of hosts go through this function."""
+def all_hosts(session: Session) -> list[Host]:
+    """Return all hosts."""
+    return list(session.scalars(select(Host)))
+
+
+def delete_host(session: Session, host: Host) -> HostName:
+    """Delete `host`. All deletions of hosts go through this function.
+
+    Returns its name, for removing the records after the commit.
+    """
+    name = HostName(host.name, host.zone.name)
     session.delete(host)
 
-
-def delete_hosts_of_user(session: Session, user: User) -> None:
-    """Delete all hosts of `user`."""
-    for host in session.scalars(select(Host).where(Host.user_id == user.id)):
-        delete_host(session, host)
+    return name
 
 
-def delete_hosts_of_zone(session: Session, zone: Zone) -> None:
-    """Delete all hosts in `zone`."""
-    for host in session.scalars(select(Host).where(Host.zone_id == zone.id)):
-        delete_host(session, host)
+def delete_hosts_of_user(session: Session, user: User) -> list[HostName]:
+    """Delete all hosts of `user`, and return their names."""
+    hosts = session.scalars(select(Host).where(Host.user_id == user.id)).all()
+
+    return [delete_host(session, host) for host in hosts]
+
+
+def delete_hosts_of_zone(session: Session, zone: Zone) -> list[HostName]:
+    """Delete all hosts in `zone`, and return their names."""
+    hosts = session.scalars(select(Host).where(Host.zone_id == zone.id)).all()
+
+    return [delete_host(session, host) for host in hosts]
 
 
 def _check_password(password: str) -> None:

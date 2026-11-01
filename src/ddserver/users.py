@@ -13,6 +13,7 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from ddserver import hosts
+from ddserver.dns import HostName
 from ddserver.models import User, UserStatus
 from ddserver.passwords import (
     PASSWORD_MIN_LENGTH,
@@ -130,11 +131,13 @@ def get_user(session: Session, username: str) -> User:
     return user
 
 
-def delete_user(session: Session, user: User) -> None:
-    """Delete a user, unless it is the last admin."""
+def delete_user(session: Session, user: User) -> list[HostName]:
+    """Delete a user, unless it is the last admin. Returns the names of the deleted hosts."""
     _check_not_last_admin(session, user)
-    hosts.delete_hosts_of_user(session, user)
+    deleted = hosts.delete_hosts_of_user(session, user)
     session.delete(user)
+
+    return deleted
 
 
 def set_admin(session: Session, user: User, admin: bool) -> None:

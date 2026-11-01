@@ -3,9 +3,9 @@
 
 import logging
 
-from flask import Blueprint, Response, request
+from flask import Blueprint, Response, current_app, request
 
-from ddserver import updater
+from ddserver import dns, updater
 from ddserver.db import get_session
 
 log = logging.getLogger(__name__)
@@ -31,6 +31,10 @@ def update():
             request.args.get("myip") or request.remote_addr,
         )
         get_session().commit()
+
+        if result.changed:
+            config = current_app.extensions["ddserver.config"]
+            dns.publish_host(config.dns, result.changed)
 
     except Exception:
         log.exception("update failed")

@@ -40,10 +40,22 @@ class HostsConfig:
 
 
 @dataclass(frozen=True)
+class DnsConfig:
+    # Address of the primary DNS server. Without one, nothing is published.
+    server: str = ""
+    port: int = 53
+    key_name: str = ""
+    key_secret: str = ""
+    key_algorithm: str = "hmac-sha256"
+    ttl: int = 60
+
+
+@dataclass(frozen=True)
 class Config:
     web: WebConfig
     database: DatabaseConfig
     hosts: HostsConfig
+    dns: DnsConfig
 
 
 def load_config(path: Path) -> Config:

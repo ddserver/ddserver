@@ -2,13 +2,13 @@
 """
 The update protocol (dyndns2).
 
-Clients authenticate with their username and the password of the host, 
+Clients authenticate with their username and the password of the host,
 as there is one password per host. Commit to DB is done by the caller.
 """
 
 import enum
 import logging
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -36,6 +36,8 @@ class Response:
 
     code: ResponseCode
     address: str | None = None
+    # The host with the new address, for publishing it after the commit.
+    changed: Host | None = field(default=None, compare=False)
 
     def __str__(self) -> str:
         return f"{self.code} {self.address}" if self.address else str(self.code)
@@ -106,4 +108,4 @@ def _set_address(host: Host, address: str) -> Response:
     setattr(host, field, address)
     host.updated = utcnow()
 
-    return Response(ResponseCode.GOOD, address)
+    return Response(ResponseCode.GOOD, address, host)

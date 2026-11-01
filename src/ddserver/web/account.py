@@ -3,6 +3,7 @@
 
 from flask import (
     Blueprint,
+    current_app,
     flash,
     g,
     redirect,
@@ -12,7 +13,7 @@ from flask import (
     url_for,
 )
 
-from ddserver import users
+from ddserver import dns, users
 from ddserver.db import get_session
 from ddserver.web.auth import log_in, login_required
 
@@ -59,12 +60,13 @@ def delete():
     db_session = get_session()
 
     try:
-        users.delete_user(db_session, g.user)
+        deleted = users.delete_user(db_session, g.user)
     except users.UserError as e:
         flash(f"{e}.", "danger")
         return redirect(url_for("account.index"))
 
     db_session.commit()
+    dns.delete_records(current_app.extensions["ddserver.config"].dns, deleted)
     session.clear()
     flash("Your account has been deleted.", "success")
 

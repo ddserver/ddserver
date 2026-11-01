@@ -13,8 +13,8 @@ from flask import (
     url_for,
 )
 
-from ddserver import hosts, zones
-from ddserver.config import HostsConfig
+from ddserver import dns, hosts, zones
+from ddserver.config import DnsConfig, HostsConfig
 from ddserver.db import get_session
 from ddserver.models import Host, Zone
 from ddserver.passwords import PASSWORD_MIN_LENGTH
@@ -67,6 +67,7 @@ def add_post():
         return _render_add_form()
 
     db_session.commit()
+    dns.publish_host(_dns_config(), host)
     flash(f"Hostname {host.name}.{zone.name} has been added.", "success")
 
     return redirect(url_for("hosts.index"))
@@ -85,7 +86,7 @@ def update(host_id: int):
     form = request.form
 
     try:
-        hosts.update_host(
+        addresses_changed = hosts.update_host(
             host,
             form.get("ipv4", ""),
             form.get("ipv6", ""),
@@ -96,6 +97,10 @@ def update(host_id: int):
         return _render_details(host)
 
     get_session().commit()
+
+    if addresses_changed:
+        dns.publish_host(_dns_config(), host)
+
     flash("The hostname has been updated.", "success")
 
     return redirect(url_for("hosts.details", host_id=host.id))
@@ -128,17 +133,20 @@ def change_password(host_id: int):
 def delete(host_id: int):
     db_session = get_session()
     host = _get_own_host(host_id)
-    fqdn = f"{host.name}.{host.zone.name}"
-
-    hosts.delete_host(db_session, host)
+    deleted = hosts.delete_host(db_session, host)
     db_session.commit()
-    flash(f"Hostname {fqdn} has been deleted.", "success")
+    dns.delete_records(_dns_config(), [deleted])
+    flash(f"Hostname {deleted} has been deleted.", "success")
 
     return redirect(url_for("hosts.index"))
 
 
 def _config() -> HostsConfig:
     return current_app.extensions["ddserver.config"].hosts
+
+
+def _dns_config() -> DnsConfig:
+    return current_app.extensions["ddserver.config"].dns
 
 
 def _get_own_host(host_id: int) -> Host:

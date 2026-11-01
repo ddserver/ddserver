@@ -25,3 +25,22 @@ secret_key = "change-me"
 # This can be changed on a per user basis in the webui.
 #
 # default_limit = 5
+
+
+[dns]
+
+# IP address of the primary DNS server, which has to accept dynamic updates
+# (RFC 2136) signed with the key below. Without a server, nothing is published.
+#
+# server = "192.0.2.53"
+# port = 53
+
+# TSIG key. The secret is base64 encoded.
+#
+# key_name = "ddserver"
+# key_secret = ""
+# key_algorithm = "hmac-sha256"
+
+# TTL of the published records, in seconds.
+#
+# ttl = 60
