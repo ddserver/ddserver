@@ -136,14 +136,20 @@ def _parse_addresses(myip: str) -> dict[str, str]:
 
     Raise `HostError` for an invalid address or two of the same protocol.
     """
+    # Routers fill in both placeholders, and leave one empty without that protocol.
+    entries = [entry for entry in myip.split(",") if entry.strip()]
+
+    # Without any address, there is nothing to set. The address cannot be guessed,
+    # this is up to the caller, who knows the address of the client.
+    if not entries:
+        raise HostError(f"Invalid address: {myip}")
+
     addresses = {}
 
-    for address in myip.split(","):
-        attr, value = _parse_address(address)
+    for entry in entries:
+        attr, value = _parse_address(entry)
 
-        # An empty address has nothing to set. The address cannot be guessed,
-        # this is up to the caller, who knows the address of the client.
-        if value is None or attr in addresses:
+        if attr in addresses:
             raise HostError(f"Invalid address: {myip}")
 
         addresses[attr] = value
@@ -151,7 +157,7 @@ def _parse_addresses(myip: str) -> dict[str, str]:
     return addresses
 
 
-def _parse_address(address: str) -> tuple[str, str | None]:
+def _parse_address(address: str) -> tuple[str, str]:
     if ":" not in address:
         return "ipv4", normalize_ipv4(address)
 
