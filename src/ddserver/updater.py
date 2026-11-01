@@ -7,6 +7,7 @@ as there is one password per host. Commit to DB is done by the caller.
 """
 
 import enum
+import ipaddress
 import logging
 from dataclasses import dataclass, field
 
@@ -44,9 +45,13 @@ class Response:
 
 
 def update(
-    session: Session, username: str, password: str, hostname: str, address: str
+    session: Session, username: str, password: str, hostname: str, myip: str
 ) -> Response:
-    """Set `address` for `hostname`, if `password` is the password of this host."""
+    """Set the addresses in `myip` for `hostname`, if `password` is its password.
+
+    `myip` is an IPv4 or an IPv6 address, or one of each separated by a comma. An
+    address of the other protocol which is not mentioned stays as it is.
+    """
     if not username or not password:
         return Response(ResponseCode.BADAUTH)
 
@@ -67,7 +72,7 @@ def update(
     if needs_rehash(host.password):
         host.password = hash_password(password)
 
-    return _set_address(host, address)
+    return _set_addresses(host, myip)
 
 
 def _find_host(session: Session, username: str, hostname: str) -> Host | None:
@@ -86,26 +91,52 @@ def _find_host(session: Session, username: str, hostname: str) -> Host | None:
     )
 
 
-def _set_address(host: Host, address: str) -> Response:
-    """Store `address` as the IPv4 or IPv6 address of `host`."""
-    field = "ipv6" if ":" in address else "ipv4"
-
+def _set_addresses(host: Host, myip: str) -> Response:
+    """Store the addresses in `myip`. Nothing is stored if one of them is invalid."""
     try:
-        address = (
-            normalize_ipv6(address) if field == "ipv6" else normalize_ipv4(address)
-        )
+        addresses = _parse_addresses(myip)
     except HostError:
         return Response(ResponseCode.BADAGENT)
 
-    # An empty address has nothing to set. The address cannot be guessed,
-    # this is up to the caller, who knows the address of the client.
-    if address is None:
-        return Response(ResponseCode.BADAGENT)
+    text = ",".join(addresses.values())
 
-    if getattr(host, field) == address:
-        return Response(ResponseCode.NOCHG, address)
+    if all(getattr(host, attr) == value for attr, value in addresses.items()):
+        return Response(ResponseCode.NOCHG, text)
 
-    setattr(host, field, address)
+    for attr, value in addresses.items():
+        setattr(host, attr, value)
+
     host.updated = utcnow()
 
-    return Response(ResponseCode.GOOD, address, host)
+    return Response(ResponseCode.GOOD, text, host)
+
+
+def _parse_addresses(myip: str) -> dict[str, str]:
+    """Return the addresses in `myip` by attribute of `Host`.
+
+    Raise `HostError` for an invalid address or two of the same protocol.
+    """
+    addresses = {}
+
+    for address in myip.split(","):
+        attr, value = _parse_address(address)
+
+        # An empty address has nothing to set. The address cannot be guessed,
+        # this is up to the caller, who knows the address of the client.
+        if value is None or attr in addresses:
+            raise HostError(f"Invalid address: {myip}")
+
+        addresses[attr] = value
+
+    return addresses
+
+
+def _parse_address(address: str) -> tuple[str, str | None]:
+    if ":" not in address:
+        return "ipv4", normalize_ipv4(address)
+
+    ipv6 = normalize_ipv6(address)
+    mapped = ipaddress.IPv6Address(ipv6).ipv4_mapped
+
+    # Servers listening on both protocols see IPv4 clients in this form.
+    return ("ipv4", str(mapped)) if mapped else ("ipv6", ipv6)
