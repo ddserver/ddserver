@@ -42,8 +42,8 @@
       </p>
     </div>
 
-    {% if not g.user %}
-      <div class="col-md-4">
+    <div class="col-md-4">
+      {% if not g.user %}
         <div class="box">
           <h3>Login</h3>
           <form action="{{ url_for('auth.login') }}" method="post">
@@ -62,7 +62,39 @@
             <a class="ms-2" href="{{ url_for('auth.lostpass') }}">Lost your password?</a>
           </form>
         </div>
-      </div>
-    {% endif %}
+      {% else %}
+        {% if current_ip %}
+          <div class="box">
+            <p>Your current IP address:</p>
+            <p class="current-ip">{{ current_ip }}</p>
+          </div>
+        {% endif %}
+
+        <div class="box">
+          <table class="table mb-0">
+            <tr>
+              <th>Your hostnames</th>
+              <td>{{ own_hosts }} of {{ 'unlimited' if host_limit >= unlimited else host_limit }}</td>
+            </tr>
+            <tr>
+              <th>Your share of all hostnames</th>
+              <td>{{ own_share }}%</td>
+            </tr>
+            <tr>
+              <th>Available zones</th>
+              <td>{{ zone_count }}</td>
+            </tr>
+            <tr>
+              <th>Overall users</th>
+              <td>{{ user_count }}</td>
+            </tr>
+            <tr>
+              <th>Overall hostnames</th>
+              <td>{{ host_count }}</td>
+            </tr>
+          </table>
+        </div>
+      {% endif %}
+    </div>
   </div>
 {% endblock %}

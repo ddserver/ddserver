@@ -5,6 +5,25 @@
  */
 
 /*
+ * bring back the look of Bootstrap 3
+ */
+html {
+  font-size: 15px;
+}
+
+:root {
+  --bs-body-font-family: Arial, sans-serif;
+  --bs-body-line-height: 1.4;
+  --bs-body-color: #333;
+  --bs-body-color-rgb: 51, 51, 51;
+  --bs-link-color: #337ab7;
+  --bs-link-color-rgb: 51, 122, 183;
+  --bs-link-hover-color: #0069ba;
+  --bs-link-hover-color-rgb: 0, 105, 186;
+  --bs-border-radius: 4px;
+}
+
+/*
  * main content
  */
 .main {
@@ -34,14 +53,44 @@ h4 {
 }
 
 /*
+ * A page title with a button next to it:
+ * Ensure that the line below is below both of them.
+ */
+.page-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 10px;
+  margin-bottom: 15px;
+}
+
+.page-heading h1 {
+  border-bottom: 0;
+  padding-bottom: 0;
+  margin-bottom: 0;
+}
+
+/*
  * links
  */
 a {
+  text-decoration: none;
+}
+
+/*
+ * Link transitions
+ */
+a:hover:not(.btn, .nav-link, .navbar-brand) {
+  text-decoration: underline;
   transition: color 0.5s ease;
 }
 
-a:hover {
-  color: #0069ba;
+.nav-link,
+a.btn {
+  transition: none;
 }
 
 /*
@@ -55,12 +104,168 @@ a:hover {
   margin-bottom: 20px;
 }
 
+/* A long IPv6 address has to wrap, to stay within its box. */
+.current-ip {
+  font-size: 2em;
+  font-weight: 700;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+/*
+ * tables
+ */
+.table {
+  --bs-table-border-color: #ddd;
+  --bs-table-striped-bg: #f9f9f9;
+  --bs-table-hover-bg: #f5f5f5;
+}
+
+.table tbody td {
+  vertical-align: baseline;
+  padding: 0.7em;
+}
+
+/* Bootstrap gives tables a white background, here the one of the box shows through. */
+.box .table {
+  --bs-table-bg: transparent;
+}
+
+.box .table tr:last-child > * {
+  border-bottom: 0;
+}
+
+/*
+ * forms
+ */
+.form-label {
+  font-weight: 700;
+  margin-bottom: 5px;
+}
+
+.form-control,
+.form-select {
+  border-color: #ccc;
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+}
+
+.input-group-text {
+  color: #555;
+  background-color: #eee;
+  border-color: #ccc;
+}
+
+/*
+ * buttons
+ */
+.btn-primary,
+.btn-secondary,
+.btn-outline-secondary,
+.btn-danger {
+  background-repeat: repeat-x;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 1px 1px rgba(0, 0, 0, 0.075);
+}
+
+.btn:hover {
+  background-position: 0 -15px;
+}
+
+.btn:active {
+  background-image: none;
+  box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
+}
+
+.btn:disabled {
+  background-image: none;
+  box-shadow: none;
+}
+
+.btn-primary {
+  --bs-btn-bg: #265a88;
+  --bs-btn-border-color: #245580;
+  --bs-btn-hover-bg: #265a88;
+  --bs-btn-hover-border-color: #245580;
+  --bs-btn-active-bg: #265a88;
+  --bs-btn-active-border-color: #245580;
+  --bs-btn-disabled-bg: #265a88;
+  --bs-btn-disabled-border-color: #245580;
+  --bs-btn-focus-shadow-rgb: 51, 122, 183;
+  background-image: linear-gradient(to bottom, #337ab7 0, #265a88 100%);
+  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.2);
+}
+
+.btn-danger {
+  --bs-btn-bg: #c12e2a;
+  --bs-btn-border-color: #b92c28;
+  --bs-btn-hover-bg: #c12e2a;
+  --bs-btn-hover-border-color: #b92c28;
+  --bs-btn-active-bg: #c12e2a;
+  --bs-btn-active-border-color: #b92c28;
+  --bs-btn-disabled-bg: #c12e2a;
+  --bs-btn-disabled-border-color: #b92c28;
+  --bs-btn-focus-shadow-rgb: 217, 83, 79;
+  background-image: linear-gradient(to bottom, #d9534f 0, #c12e2a 100%);
+  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.2);
+}
+
+.btn-secondary,
+.btn-outline-secondary {
+  --bs-btn-color: #333;
+  --bs-btn-bg: #e0e0e0;
+  --bs-btn-border-color: #ccc;
+  --bs-btn-hover-color: #333;
+  --bs-btn-hover-bg: #e0e0e0;
+  --bs-btn-hover-border-color: #adadad;
+  --bs-btn-active-color: #333;
+  --bs-btn-active-bg: #e0e0e0;
+  --bs-btn-active-border-color: #adadad;
+  --bs-btn-disabled-color: #333;
+  --bs-btn-disabled-bg: #e0e0e0;
+  --bs-btn-disabled-border-color: #ccc;
+  --bs-btn-focus-shadow-rgb: 204, 204, 204;
+  background-image: linear-gradient(to bottom, #fff 0, #e0e0e0 100%);
+  text-shadow: 0 1px 0 #fff;
+}
+
+/*
+ * messages
+ */
+.alert {
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.2);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25), 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.alert-success {
+  --bs-alert-color: #3c763d;
+  --bs-alert-border-color: #b2dba1;
+  background-image: linear-gradient(to bottom, #dff0d8 0, #c8e5bc 100%);
+}
+
+.alert-info {
+  --bs-alert-color: #31708f;
+  --bs-alert-border-color: #9acfea;
+  background-image: linear-gradient(to bottom, #d9edf7 0, #b9def0 100%);
+}
+
+.alert-warning {
+  --bs-alert-color: #8a6d3b;
+  --bs-alert-border-color: #f5e79e;
+  background-image: linear-gradient(to bottom, #fcf8e3 0, #f8efc0 100%);
+}
+
+.alert-danger {
+  --bs-alert-color: #a94442;
+  --bs-alert-border-color: #dca7a7;
+  background-image: linear-gradient(to bottom, #f2dede 0, #e7c3c3 100%);
+}
+
 /*
  * navigation bar
  */
 .navbar {
   padding-top: 4px;
   padding-bottom: 4px;
+  background-image: linear-gradient(to bottom, #3c3c3c 0, #222 100%);
   box-shadow: 0 3px 4px rgba(0, 0, 0, 0.4);
 }
 
