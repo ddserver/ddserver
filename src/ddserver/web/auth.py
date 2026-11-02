@@ -8,7 +8,6 @@ that user. The logged-in user of the current request is available as `g.user`.
 """
 
 import functools
-import hashlib
 
 from flask import (
     Blueprint,
@@ -24,7 +23,7 @@ from flask import (
 )
 from flask_wtf.csrf import CSRFError
 
-from ddserver import users
+from ddserver import mail, users
 from ddserver.db import get_session
 from ddserver.models import User, UserStatus
 
@@ -35,11 +34,18 @@ def log_in(user: User) -> None:
     """Start a new session for `user`, replacing everything in the current one."""
     session.clear()
     session["user_id"] = user.id
-    session["fingerprint"] = _fingerprint(user)
+    session["fingerprint"] = users.password_fingerprint(user)
 
 
-def _fingerprint(user: User) -> str:
-    return hashlib.sha256((user.password or "").encode()).hexdigest()
+def mail_url(endpoint: str, **values: str) -> str:
+    """Return the full URL for a link in a mail.
+
+    It comes from `web.base_url`, not from the request: whoever asks for a reset mail
+    chooses the `Host` header, which would let them put their own site into the link.
+    """
+    base_url = current_app.extensions["ddserver.config"].web.base_url
+
+    return base_url.rstrip("/") + url_for(endpoint, **values)
 
 
 def login_required(view):
@@ -84,7 +90,7 @@ def load_user():
     if (
         user is None
         or user.status != UserStatus.ACTIVE
-        or session.get("fingerprint") != _fingerprint(user)
+        or session.get("fingerprint") != users.password_fingerprint(user)
     ):
         session.clear()
         return
@@ -150,22 +156,95 @@ def activate_post():
     if user is None:
         return _invalid_activation_link()
 
+    if not _store_new_password(users.activate, user):
+        return redirect(url_for("auth.activate", token=token))
+
+    flash("Your account has been activated, you can log in now.", "success")
+
+    return redirect(url_for("public.index"))
+
+
+@blueprint.get("/lostpass")
+def lostpass():
+    return render_template("lostpass.html")
+
+
+@blueprint.post("/lostpass")
+def lostpass_post():
+    config = current_app.extensions["ddserver.config"]
+    user = users.find_user(get_session(), request.form.get("login", ""))
+
+    if user is not None and user.status == UserStatus.ACTIVE:
+        token = users.reset_token(config.web.secret_key, user)
+        mail.send(
+            config.mail,
+            user.email,
+            "Reset your ddserver password",
+            "reset.txt",
+            username=user.username,
+            url=mail_url("auth.reset", token=token),
+            minutes=str(users.RESET_MINUTES),
+        )
+
+    # The same answer in any case, as this must not reveal who has an account.
+    flash(
+        "If this account exists, we have sent a link to reset the password to its "
+        "email address.",
+        "success",
+    )
+
+    return redirect(url_for("public.index"))
+
+
+@blueprint.get("/lostpass/reset")
+def reset():
+    token = request.args.get("token", "")
+    user = _user_to_reset(token)
+
+    if user is None:
+        return _invalid_reset_link()
+
+    return render_template(
+        "resetpass.html",
+        user=user,
+        token=token,
+        password_min_length=users.PASSWORD_MIN_LENGTH,
+    )
+
+
+@blueprint.post("/lostpass/reset")
+def reset_post():
+    token = request.form.get("token", "")
+    user = _user_to_reset(token)
+
+    if user is None:
+        return _invalid_reset_link()
+
+    if not _store_new_password(users.reset_password, user):
+        return redirect(url_for("auth.reset", token=token))
+
+    flash("Your password has been changed, you can log in now.", "success")
+
+    return redirect(url_for("public.index"))
+
+
+def _store_new_password(set_password, user: User) -> bool:
+    """Apply the password of the form, or show what is wrong with it."""
     password = request.form.get("password", "")
 
     if password != request.form.get("password_repeat", ""):
         flash("The passwords do not match.", "danger")
-        return redirect(url_for("auth.activate", token=token))
+        return False
 
     try:
-        users.activate(user, password)
+        set_password(user, password)
     except users.UserError as e:
         flash(f"{e}.", "danger")
-        return redirect(url_for("auth.activate", token=token))
+        return False
 
     get_session().commit()
-    flash("Your account has been activated, you can log in now.", "success")
 
-    return redirect(url_for("public.index"))
+    return True
 
 
 def _user_to_activate(token: str) -> User | None:
@@ -174,10 +253,27 @@ def _user_to_activate(token: str) -> User | None:
     return users.user_to_activate(get_session(), config.web.secret_key, token)
 
 
+def _user_to_reset(token: str) -> User | None:
+    config = current_app.extensions["ddserver.config"]
+
+    return users.user_to_reset(get_session(), config.web.secret_key, token)
+
+
 def _invalid_activation_link():
     flash(
-        "This activation link is not valid, has already been used or has expired. ",
+        "This activation link is not valid, has already been used or has expired. "
+        "Please contact an administrator.",
         "danger",
     )
 
     return redirect(url_for("public.index"))
+
+
+def _invalid_reset_link():
+    flash(
+        "This link is not valid, has already been used or has expired. "
+        "You can request a new one.",
+        "danger",
+    )
+
+    return redirect(url_for("auth.lostpass"))

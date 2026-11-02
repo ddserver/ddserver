@@ -1,0 +1,9 @@
+Hello {{ username }},
+
+someone has asked to reset the password of your ddserver account.
+
+Please open this link within {{ minutes }} minutes to choose a new password:
+
+{{ url }}
+
+If this was not you, you can ignore this mail. Your password stays the same.

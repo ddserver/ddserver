@@ -6,6 +6,7 @@ Add, update, delete, list or authenticate users. Commit to DB is done by the cal
 """
 
 import functools
+import hashlib
 import re
 import secrets
 
@@ -28,6 +29,7 @@ EMAIL_PATTERN = re.compile(r"[^@\s]+@[^@\s]+")
 HOST_LIMIT_PATTERN = re.compile(r"[0-9]{1,6}")
 
 ACTIVATION_DAYS = 7
+RESET_MINUTES = 60
 
 
 class UserError(Exception):
@@ -93,7 +95,7 @@ def activation_token(secret_key: str, user: User) -> str:
     It holds the email address and not the id: SQLite may give the id of a deleted user
     to a new user, whose account would then be open to the link of the old one.
     """
-    return _activation_serializer(secret_key).dumps(user.email)
+    return _serializer(secret_key, "activation").dumps(user.email)
 
 
 def user_to_activate(session: Session, secret_key: str, token: str) -> User | None:
@@ -103,7 +105,7 @@ def user_to_activate(session: Session, secret_key: str, token: str) -> User | No
     link work only once.
     """
     try:
-        email = _activation_serializer(secret_key).loads(
+        email = _serializer(secret_key, "activation").loads(
             token, max_age=ACTIVATION_DAYS * 24 * 60 * 60
         )
     except BadSignature:
@@ -118,6 +120,55 @@ def activate(user: User, password: str) -> None:
     """Set the first password of `user`, which makes the account active."""
     user.password = _hash_new_password(password)
     user.status = UserStatus.ACTIVE
+
+
+def find_user(session: Session, login: str) -> User | None:
+    """Return the user with this username or email address, if there is one."""
+    login = login.strip().lower()
+
+    return session.scalar(
+        select(User).where((User.username == login) | (User.email == login))
+    )
+
+
+def reset_token(secret_key: str, user: User) -> str:
+    """Return the signed token for the password reset link of `user`."""
+    return _serializer(secret_key, "reset").dumps(
+        [user.email, password_fingerprint(user)]
+    )
+
+
+def user_to_reset(session: Session, secret_key: str, token: str) -> User | None:
+    """Return the user of a password reset `token`, otherwise `None`.
+
+    The token holds a fingerprint of the password, so it stops working as soon as the
+    password changes. This makes the link work only once.
+    """
+    try:
+        email, fingerprint = _serializer(secret_key, "reset").loads(
+            token, max_age=RESET_MINUTES * 60
+        )
+    except BadSignature:
+        return None
+
+    user = session.scalar(
+        select(User).where(User.email == email, User.status == UserStatus.ACTIVE)
+    )
+
+    if user is None or password_fingerprint(user) != fingerprint:
+        return None
+
+    return user
+
+
+def reset_password(user: User, password: str) -> None:
+    """Replace the password of a user, who proved their identity by a reset link."""
+    user.password = _hash_new_password(password)
+
+
+def password_fingerprint(user: User) -> str:
+    """Return a value which changes with the password, and does not reveal its hash."""
+    return hashlib.sha256((user.password or "").encode()).hexdigest()
 
 
 def list_users(session: Session) -> list[User]:
@@ -229,9 +280,9 @@ def _check_available(session: Session, username: str, email: str) -> dict[str, s
     return {"username": username, "email": email}
 
 
-def _activation_serializer(secret_key: str) -> URLSafeTimedSerializer:
+def _serializer(secret_key: str, purpose: str) -> URLSafeTimedSerializer:
     # The salt keeps tokens of different purposes apart, with the same key.
-    return URLSafeTimedSerializer(secret_key, salt="activation")
+    return URLSafeTimedSerializer(secret_key, salt=purpose)
 
 
 def _hash_new_password(password: str) -> str:

@@ -19,7 +19,7 @@ from ddserver import zones as zone_management
 from ddserver.config import DnsConfig
 from ddserver.db import get_session
 from ddserver.models import Base, Host, User, Zone
-from ddserver.web.auth import admin_required
+from ddserver.web.auth import admin_required, mail_url
 
 blueprint = Blueprint("admin", __name__, url_prefix="/admin")
 
@@ -224,7 +224,7 @@ def _send_activation_mail(user: User) -> bool:
         "Activate your ddserver account",
         "activation.txt",
         username=user.username,
-        url=url_for("auth.activate", token=token, _external=True),
+        url=mail_url("auth.activate", token=token),
         days=str(user_management.ACTIVATION_DAYS),
     )
 

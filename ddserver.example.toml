@@ -8,6 +8,10 @@
 #
 secret_key = "change-me"
 
+# Public address of ddserver, used for the links in mails.
+#
+base_url = "https://ddserver.example.org"
+
 
 [database]
 

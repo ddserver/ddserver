@@ -23,6 +23,12 @@ class ConfigError(Exception):
 @dataclass(frozen=True)
 class WebConfig:
     secret_key: str
+    # Public address of ddserver, for links in mails.
+    base_url: str
+
+    def __post_init__(self):
+        if not self.base_url.startswith(("http://", "https://")):
+            raise ConfigError("web.base_url: expected http:// or https://")
 
 
 @dataclass(frozen=True)

@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% from "macros.html" import new_password_form %}
+
+{% block content %}
+  <div class="row">
+    <div class="col-md-12"><h1>Choose a new password</h1></div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-8">
+      <p>
+        Your password should consist of upper- and lowercase characters, as well as
+        numbers or special characters. The minimum password length is
+        {{ password_min_length }} characters.
+      </p>
+    </div>
+
+    <div class="col-md-4">
+      {{ new_password_form(url_for('auth.reset_post'), token, user.username, password_min_length, 'Set password') }}
+    </div>
+  </div>
+{% endblock %}
