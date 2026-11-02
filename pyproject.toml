@@ -28,8 +28,14 @@ ddserver = "ddserver.cli:main"
 Homepage = "https://ddserver.org"
 Repository = "https://github.com/ddserver/ddserver"
 
+[project.optional-dependencies]
+legacy = [
+    "libpass>=1.9.4",
+]
+
 [dependency-groups]
 dev = [
+    "libpass>=1.9.4",
     "pytest",
     "ruff",
 ]

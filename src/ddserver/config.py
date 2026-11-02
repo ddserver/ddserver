@@ -38,6 +38,16 @@ class DatabaseConfig:
 
 
 @dataclass(frozen=True)
+class PasswordConfig:
+    # Minimum length of new passwords for users and hosts.
+    min_length: int = 10
+
+    def __post_init__(self):
+        if self.min_length < 1:
+            raise ConfigError("passwords.min_length: expected at least 1")
+
+
+@dataclass(frozen=True)
 class HostsConfig:
     # Names which users cannot register.
     reserved: tuple[str, ...] = ()
@@ -78,6 +88,7 @@ class MailConfig:
 class Config:
     web: WebConfig
     database: DatabaseConfig
+    passwords: PasswordConfig
     hosts: HostsConfig
     dns: DnsConfig
     mail: MailConfig

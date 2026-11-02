@@ -16,6 +16,12 @@ def create_app(config: Config) -> Flask:
     app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
     app.extensions["ddserver.config"] = config
 
+    # allow templates to access password_min_length
+    @app.context_processor
+    def password_min_length() -> dict[str, int]:
+        config = app.extensions["ddserver.config"]
+        return {"password_min_length": config.passwords.min_length}
+
     CSRFProtect(app)
 
     engine = db.make_engine(config.database.url)

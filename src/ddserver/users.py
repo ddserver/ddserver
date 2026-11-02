@@ -18,7 +18,6 @@ from ddserver import hosts
 from ddserver.dns import HostName
 from ddserver.models import User, UserStatus
 from ddserver.passwords import (
-    PASSWORD_MIN_LENGTH,
     hash_password,
     needs_rehash,
     verify_password,
@@ -116,9 +115,9 @@ def user_to_activate(session: Session, secret_key: str, token: str) -> User | No
     )
 
 
-def activate(user: User, password: str) -> None:
+def activate(user: User, password: str, min_length: int) -> None:
     """Set the first password of `user`, which makes the account active."""
-    user.password = _hash_new_password(password)
+    user.password = _hash_new_password(password, min_length)
     user.status = UserStatus.ACTIVE
 
 
@@ -161,9 +160,9 @@ def user_to_reset(session: Session, secret_key: str, token: str) -> User | None:
     return user
 
 
-def reset_password(user: User, password: str) -> None:
+def reset_password(user: User, password: str, min_length: int) -> None:
     """Replace the password of a user, who proved their identity by a reset link."""
-    user.password = _hash_new_password(password)
+    user.password = _hash_new_password(password, min_length)
 
 
 def password_fingerprint(user: User) -> str:
@@ -258,12 +257,14 @@ def authenticate(session: Session, username: str, password: str) -> User | None:
     return user
 
 
-def change_password(user: User, current_password: str, new_password: str) -> None:
+def change_password(
+    user: User, current_password: str, new_password: str, min_length: int
+) -> None:
     """Replace the password of a user, who has to know the current one."""
     if not verify_password(current_password, user.password):
         raise UserError("The current password is not correct")
 
-    user.password = _hash_new_password(new_password)
+    user.password = _hash_new_password(new_password, min_length)
 
 
 def _check_available(session: Session, username: str, email: str) -> dict[str, str]:
@@ -285,11 +286,9 @@ def _serializer(secret_key: str, purpose: str) -> URLSafeTimedSerializer:
     return URLSafeTimedSerializer(secret_key, salt=purpose)
 
 
-def _hash_new_password(password: str) -> str:
-    if len(password) < PASSWORD_MIN_LENGTH:
-        raise UserError(
-            f"The new password must have at least {PASSWORD_MIN_LENGTH} characters"
-        )
+def _hash_new_password(password: str, min_length: int) -> str:
+    if len(password) < min_length:
+        raise UserError(f"The new password must have at least {min_length} characters")
 
     return hash_password(password)
 

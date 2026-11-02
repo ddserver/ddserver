@@ -20,6 +20,13 @@ base_url = "https://ddserver.example.org"
 # url = "sqlite:///ddserver.db"
 
 
+[passwords]
+
+# Minimum length of new passwords for users and hosts.
+#
+# min_length = 10
+
+
 [hosts]
 
 # Names which users cannot register, in any zone.

@@ -144,7 +144,6 @@ def activate():
         "activate.html",
         user=user,
         token=token,
-        password_min_length=users.PASSWORD_MIN_LENGTH,
     )
 
 
@@ -208,7 +207,6 @@ def reset():
         "resetpass.html",
         user=user,
         token=token,
-        password_min_length=users.PASSWORD_MIN_LENGTH,
     )
 
 
@@ -231,13 +229,14 @@ def reset_post():
 def _store_new_password(set_password, user: User) -> bool:
     """Apply the password of the form, or show what is wrong with it."""
     password = request.form.get("password", "")
+    min_length = current_app.extensions["ddserver.config"].passwords.min_length
 
     if password != request.form.get("password_repeat", ""):
         flash("The passwords do not match.", "danger")
         return False
 
     try:
-        set_password(user, password)
+        set_password(user, password, min_length)
     except users.UserError as e:
         flash(f"{e}.", "danger")
         return False

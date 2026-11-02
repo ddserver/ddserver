@@ -17,7 +17,6 @@ from ddserver import dns, hosts, updater, zones
 from ddserver.config import DnsConfig, HostsConfig
 from ddserver.db import get_session
 from ddserver.models import Host, Zone
-from ddserver.passwords import PASSWORD_MIN_LENGTH
 from ddserver.web.auth import login_required
 
 blueprint = Blueprint("hosts", __name__, url_prefix="/hosts")
@@ -61,6 +60,7 @@ def add_post():
             ipv6=form.get("ipv6", ""),
             description=form.get("description", ""),
             config=_config(),
+            password_min_length=_password_min_length(),
         )
     except hosts.HostError as e:
         flash(f"{e}.", "danger")
@@ -117,7 +117,7 @@ def change_password(host_id: int):
         return _render_details(host)
 
     try:
-        hosts.set_host_password(host, password)
+        hosts.set_host_password(host, password, _password_min_length())
     except hosts.HostError as e:
         flash(f"{e}.", "danger")
         return _render_details(host)
@@ -145,6 +145,10 @@ def _config() -> HostsConfig:
     return current_app.extensions["ddserver.config"].hosts
 
 
+def _password_min_length() -> int:
+    return current_app.extensions["ddserver.config"].passwords.min_length
+
+
 def _dns_config() -> DnsConfig:
     return current_app.extensions["ddserver.config"].dns
 
@@ -168,7 +172,6 @@ def _render_details(host: Host):
         "host.html",
         host=host,
         form=request.form,
-        password_min_length=PASSWORD_MIN_LENGTH,
     )
 
 
@@ -180,7 +183,6 @@ def _render_add_form():
         form=request.form,
         host_limit=hosts.host_limit(g.user, _config()),
         unlimited=hosts.HOST_LIMIT_UNLIMITED,
-        password_min_length=PASSWORD_MIN_LENGTH,
         current=_current_address(),
     )
 

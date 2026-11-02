@@ -23,9 +23,7 @@ blueprint = Blueprint("account", __name__, url_prefix="/account")
 @blueprint.get("")
 @login_required
 def index():
-    return render_template(
-        "account.html", password_min_length=users.PASSWORD_MIN_LENGTH
-    )
+    return render_template("account.html")
 
 
 @blueprint.post("/password")
@@ -39,7 +37,10 @@ def change_password():
 
     try:
         users.change_password(
-            g.user, request.form.get("current_password", ""), new_password
+            g.user,
+            request.form.get("current_password", ""),
+            new_password,
+            current_app.extensions["ddserver.config"].passwords.min_length,
         )
     except users.UserError as e:
         flash(f"{e}.", "danger")
