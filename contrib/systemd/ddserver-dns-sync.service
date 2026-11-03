@@ -1,0 +1,27 @@
+[Unit]
+Description=Publish pending ddserver changes to the DNS server
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+User=ddserver
+Group=ddserver
+StateDirectory=ddserver
+StateDirectoryMode=0750
+WorkingDirectory=/var/lib/ddserver
+ExecStart=/opt/ddserver/bin/ddserver dns sync
+
+# Hardening
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+RestrictNamespaces=yes
+LockPersonality=yes
+SystemCallArchitectures=native

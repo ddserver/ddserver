@@ -39,8 +39,9 @@ class WebConfig:
 
 @dataclass(frozen=True)
 class DatabaseConfig:
-    # A relative SQLite path is relative to the current working directory.
-    url: str = "sqlite:///ddserver.db"
+    # Four slashes: an absolute path. With three, it is relative to the current
+    # working directory (e.g. `sqlite:///ddserver.db` for development).
+    url: str = "sqlite:////var/lib/ddserver/ddserver.db"
 
 
 @dataclass(frozen=True)

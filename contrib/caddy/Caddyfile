@@ -1,0 +1,12 @@
+# Caddy gets a certificate for the domain name automatically, redirects HTTP
+# to HTTPS and sets the X-Forwarded-* headers.
+#
+# In ddserver.toml, set:
+#
+#   [web]
+#   base_url = "https://ddserver.example.org"
+#   proxies = 1
+
+ddserver.example.org {
+	reverse_proxy 127.0.0.1:8080
+}

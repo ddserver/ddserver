@@ -1,0 +1,30 @@
+[Unit]
+Description=ddserver web interface and dynamic DNS updates
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+User=ddserver
+Group=ddserver
+StateDirectory=ddserver
+StateDirectoryMode=0750
+WorkingDirectory=/var/lib/ddserver
+ExecStart=/opt/ddserver/bin/gunicorn --bind 127.0.0.1:8080 --workers 2 --no-control-socket ddserver.wsgi:app
+Restart=on-failure
+
+# Hardening
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+RestrictNamespaces=yes
+LockPersonality=yes
+SystemCallArchitectures=native
+
+[Install]
+WantedBy=multi-user.target

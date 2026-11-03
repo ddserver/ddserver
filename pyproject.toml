@@ -6,7 +6,6 @@ readme = "README.md"
 license = "AGPL-3.0-or-later"
 authors = [
     { name = "Sven Reissmann", email = "sven@0x80.io" },
-    { name = "Dustin Frisch", email = "fooker@lab.sh" },
 ]
 requires-python = ">=3.12"
 dependencies = [

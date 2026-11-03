@@ -21,9 +21,10 @@ base_url = "https://ddserver.example.org"
 
 [database]
 
-# Database URL in SQLAlchemy format.
+# Database URL in SQLAlchemy format. For SQLite, four slashes give an absolute
+# path, three a path relative to the working directory (e.g. for development).
 #
-# url = "sqlite:///ddserver.db"
+# url = "sqlite:////var/lib/ddserver/ddserver.db"
 
 
 [passwords]
@@ -40,7 +41,7 @@ base_url = "https://ddserver.example.org"
 # reserved = ["www", "mail"]
 
 # Number of hostnames a user can have.
-# This can be changed on a per user basis in the webui.
+# This can be changed on a per-user basis in the webui.
 #
 # default_limit = 5
 
