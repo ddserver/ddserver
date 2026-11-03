@@ -155,6 +155,10 @@ a.btn {
   border-color: #ccc;
 }
 
+.password-meter {
+  margin-top: 5px;
+}
+
 /*
  * buttons
  */

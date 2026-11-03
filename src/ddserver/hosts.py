@@ -15,7 +15,7 @@ from ddserver.config import HostsConfig, PasswordConfig
 from ddserver.db import utcnow
 from ddserver.dns import HostName
 from ddserver.models import DnsDeletion, Host, User, Zone
-from ddserver.passwords import hash_password
+from ddserver.passwords import PasswordError, check_password, hash_password
 
 HOSTNAME_PATTERN = re.compile(r"[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?")
 FQDN_MAX_LENGTH = 253
@@ -117,7 +117,7 @@ def create_host(
     if len(f"{name}.{zone.name}") > FQDN_MAX_LENGTH:
         raise HostError(f"The hostname {name} is too long for this zone")
 
-    _check_password(password, password_min_length)
+    _check_password(user, password, password_min_length)
 
     existing = select(Host).where(Host.zone_id == zone.id, Host.name == name)
     if session.scalar(existing):
@@ -167,7 +167,7 @@ def record_address_change(host: Host) -> None:
 
 def set_host_password(host: Host, password: str, min_length: int) -> None:
     """Replace the password of `host`."""
-    _check_password(password, min_length)
+    _check_password(host.user, password, min_length)
     host.password = hash_password(password)
 
 
@@ -255,6 +255,8 @@ def delete_hosts_of_zone(session: Session, zone: Zone) -> list[HostName]:
     return [delete_host(session, host) for host in hosts]
 
 
-def _check_password(password: str, min_length: int) -> None:
-    if len(password) < min_length:
-        raise HostError(f"The password must have at least {min_length} characters")
+def _check_password(user: User, password: str, min_length: int) -> None:
+    try:
+        check_password(password, min_length, user.username, user.email)
+    except PasswordError as e:
+        raise HostError(str(e)) from e

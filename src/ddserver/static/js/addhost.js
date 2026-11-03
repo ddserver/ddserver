@@ -33,6 +33,7 @@ document.getElementById("generate-password").addEventListener("click", () => {
     const field = document.getElementById(id);
     field.type = "text";
     field.value = password;
+    field.dispatchEvent(new Event("input"));
   }
 });
 
