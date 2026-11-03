@@ -271,6 +271,7 @@ a.btn {
   padding-bottom: 4px;
   background-image: linear-gradient(to bottom, #3c3c3c 0, #222 100%);
   box-shadow: 0 3px 4px rgba(0, 0, 0, 0.4);
+  --bs-navbar-nav-link-padding-x: 0.75rem;
 }
 
 .navbar-brand img {
