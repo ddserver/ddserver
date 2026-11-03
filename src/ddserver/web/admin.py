@@ -18,7 +18,7 @@ from ddserver import users as user_management
 from ddserver import zones as zone_management
 from ddserver.config import DnsConfig
 from ddserver.db import get_session
-from ddserver.models import Base, Host, User, Zone
+from ddserver.models import Base, Host, User, UserStatus, Zone
 from ddserver.web.auth import admin_required, mail_url
 
 blueprint = Blueprint("admin", __name__, url_prefix="/admin")
@@ -64,6 +64,23 @@ def add_user_post():
             "but the activation mail could not be sent.",
             "warning",
         )
+
+    return redirect(url_for("admin.users"))
+
+
+@blueprint.post("/users/<int:user_id>/activation")
+@admin_required
+def resend_activation(user_id: int):
+    user = _get_or_404(User, user_id)
+
+    if user.status != UserStatus.ACTIVATION:
+        flash(f"User {user.username} is already activated.", "danger")
+        return redirect(url_for("admin.users"))
+
+    if _send_activation_mail(user):
+        flash(f"The activation mail has been sent to {user.username}.", "success")
+    else:
+        flash("The activation mail could not be sent.", "danger")
 
     return redirect(url_for("admin.users"))
 

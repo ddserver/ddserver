@@ -31,7 +31,7 @@
               <td><a href="{{ url_for('admin.user_hosts', user_id=user.id) }}">{{ user.username }}</a></td>
               <td>{{ user.email }}</td>
               <td>{{ user.created.strftime('%Y-%m-%d') }}</td>
-              <td>{{ 'Admin' if user.admin else 'User' }}</td>
+              <td>{% if user.admin %}<b>Admin</b>{% else %}User{% endif %}</td>
               <td>{{ user.status.value }}</td>
               <td>
                 <form action="{{ url_for('admin.set_host_limit', user_id=user.id) }}" method="post">
@@ -49,6 +49,13 @@
                 {% if user.id == g.user.id %}
                   <span class="text-secondary">This is you</span>
                 {% else %}
+                  {% if user.status == 'activation' %}
+                    <form class="d-inline" action="{{ url_for('admin.resend_activation', user_id=user.id) }}" method="post">
+                      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                      <button class="btn btn-sm btn-outline-secondary" type="submit">Resend activation</button>
+                    </form>
+                  {% endif %}
+
                   <form class="d-inline" action="{{ url_for('admin.set_admin', user_id=user.id) }}" method="post">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <input type="hidden" name="admin" value="{{ '0' if user.admin else '1' }}">
