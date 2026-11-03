@@ -3,6 +3,7 @@
 
 from flask import Flask
 from flask_wtf.csrf import CSRFProtect
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 from ddserver import db
 from ddserver.config import Config
@@ -14,7 +15,15 @@ def create_app(config: Config) -> Flask:
     app = Flask(__name__)
     app.config["SECRET_KEY"] = config.web.secret_key
     app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
+    # Only send the session cookie over HTTPS, if ddserver is reached that way.
+    app.config["SESSION_COOKIE_SECURE"] = config.web.base_url.startswith("https://")
     app.extensions["ddserver.config"] = config
+
+    # Behind a reverse proxy, take the client address, scheme and host name from the
+    # `X-Forwarded-*` headers of the proxy. Without a proxy, anyone could send them.
+    if config.web.proxies:
+        n = config.web.proxies
+        app.wsgi_app = ProxyFix(app.wsgi_app, x_for=n, x_proto=n, x_host=n)
 
     # allow templates to access password_min_length
     @app.context_processor

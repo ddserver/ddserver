@@ -12,6 +12,12 @@ secret_key = "change-me"
 #
 base_url = "https://ddserver.example.org"
 
+# Number of reverse proxies in front of ddserver (usually 0 or 1). ddserver
+# takes the client address and the scheme from their X-Forwarded-* headers.
+# Set this only behind a proxy: otherwise clients could fake their address.
+#
+# proxies = 0
+
 
 [database]
 

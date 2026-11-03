@@ -25,10 +25,16 @@ class WebConfig:
     secret_key: str
     # Public address of ddserver, for links in mails.
     base_url: str
+    # Number of reverse proxies in front of ddserver,
+    # whose `X-Forwarded-*` headers are trusted.
+    proxies: int = 0
 
     def __post_init__(self):
         if not self.base_url.startswith(("http://", "https://")):
             raise ConfigError("web.base_url: expected http:// or https://")
+
+        if self.proxies < 0:
+            raise ConfigError("web.proxies: expected 0 or more")
 
 
 @dataclass(frozen=True)
