@@ -62,7 +62,13 @@
                 <td><span class="badge text-bg-danger">Delete</span></td>
                 <td></td>
                 <td>{{ deletion.created.strftime('%Y-%m-%d %H:%M') }}</td>
-                <td></td>
+                <td>
+                  {% if deletion.error %}
+                    {{ deletion.error }}
+                  {% else %}
+                    <span class="text-secondary">Not tried yet</span>
+                  {% endif %}
+                </td>
               </tr>
             {% endfor %}
           </tbody>

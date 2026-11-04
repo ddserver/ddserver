@@ -71,4 +71,6 @@ class DnsDeletion(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     fqdn: Mapped[str] = mapped_column(unique=True)
+    # The error of the last attempt to delete the records.
+    error: Mapped[str | None]
     created: Mapped[datetime] = mapped_column(UTCDateTime, default=utcnow)

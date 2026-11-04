@@ -16,7 +16,7 @@ import dns.query
 import dns.rcode
 import dns.tsig
 import dns.update
-from sqlalchemy import delete
+from sqlalchemy import delete, select
 from sqlalchemy.orm import Session
 
 from ddserver.config import DnsConfig
@@ -105,7 +105,7 @@ def publish_host(session: Session, config: DnsConfig, host: Host) -> bool:
 def delete_records(session: Session, config: DnsConfig, hosts: list[HostName]) -> bool:
     """Remove the records of deleted `hosts`. Return `False` if any record failed.
 
-    What failed stays in `DnsDeletion` for the next sync. Commits like `publish_host`.
+    What failed stays in `DnsDeletion`, with the error, for the next sync. Commits like `publish_host`.
     """
     if not config.server:
         return True
@@ -114,12 +114,19 @@ def delete_records(session: Session, config: DnsConfig, hosts: list[HostName]) -
 
     for host in hosts:
         name = str(host)
+        error = _try_send(config, name, build_delete, host)
 
-        if _try_send(config, name, build_delete, host) is None:
+        if error is None:
             session.execute(delete(DnsDeletion).where(DnsDeletion.fqdn == name))
-            _store_outcome(session, name)
         else:
+            entry = session.scalar(select(DnsDeletion).where(DnsDeletion.fqdn == name))
+
+            if entry is not None:
+                entry.error = error
+
             deleted = False
+
+        _store_outcome(session, name)
 
     return deleted
 
