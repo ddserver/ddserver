@@ -174,9 +174,15 @@ a.btn {
   background-position: 0 -15px;
 }
 
-.btn:active {
+/* switched on toggle button (`.btn-check`)  */
+.btn:active,
+.btn-check:checked + .btn {
   background-image: none;
   box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
+}
+
+.btn-check:checked + .btn > .bi {
+  color: var(--bs-link-color);
 }
 
 .btn:disabled {

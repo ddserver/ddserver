@@ -27,6 +27,9 @@
               <tr>
                 <td>
                   {{ host.name }}<a class="text-secondary" href="{{ url_for('admin.zone_hosts', zone_id=host.zone_id) }}">.{{ host.zone.name }}</a>
+                  {% if host.wildcard %}
+                    <i class="bi bi-asterisk small text-primary" title="Wildcard: all names below this hostname resolve too"></i>
+                  {% endif %}
                   {% if host.description %}
                     <i class="bi bi-info-circle small" title="{{ host.description }}"></i>
                   {% endif %}

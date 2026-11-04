@@ -44,9 +44,12 @@ class HostName(NamedTuple):
 def build_update(config: DnsConfig, host: Host) -> dns.update.UpdateMessage:
     """Return the update which makes DNS match `host`.
 
-    Replacing RRsets gives the same result however often it is sent.
+    Replacing RRsets gives the same result however often it is sent. Without the
+    wildcard option, the wildcard records are deleted: they may be left from the time
+    it was on.
     """
     update = _new_update(config, host.zone.name)
+    wildcard = f"*.{host.name}"
 
     for rdtype, address in (("A", host.ipv4), ("AAAA", host.ipv6)):
         if address:
@@ -54,17 +57,25 @@ def build_update(config: DnsConfig, host: Host) -> dns.update.UpdateMessage:
         else:
             update.delete(host.name, rdtype)
 
+        if address and host.wildcard:
+            update.replace(wildcard, config.ttl, rdtype, address)
+        else:
+            update.delete(wildcard, rdtype)
+
     return update
 
 
 def build_delete(config: DnsConfig, host: HostName) -> dns.update.UpdateMessage:
     """Return the update which removes the records of `host`.
 
-    Only `A` and `AAAA`, as ddserver does not touch anything else.
+    Only `A` and `AAAA`, as ddserver does not touch anything else. Also those of the
+    wildcard, which is not known any more after the host has been deleted.
     """
     update = _new_update(config, host.zone)
-    update.delete(host.name, "A")
-    update.delete(host.name, "AAAA")
+
+    for name in (host.name, f"*.{host.name}"):
+        update.delete(name, "A")
+        update.delete(name, "AAAA")
 
     return update
 

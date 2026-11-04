@@ -43,6 +43,14 @@
           A description can be set to add personal notes. The description is only visible
           in the ddserver web interface.
         </p>
+
+        <h3>(Optional) Wildcard</h3>
+        <p>
+          With the wildcard option (<i class="bi bi-asterisk"></i> next to the hostname), all
+          names below your hostname resolve to the same addresses, e.g.
+          <code>www.myhost.example.org</code> for <code>myhost.example.org</code>. Useful if
+          you run several services behind one address.
+        </p>
       </div>
 
       <div class="col-md-4">
@@ -56,6 +64,10 @@
                 <span class="input-group-text"><i class="bi bi-display"></i></span>
                 <input class="form-control" type="text" id="name" name="name"
                        value="{{ form.get('name', '') }}" maxlength="63" required>
+                <input class="btn-check" type="checkbox" id="wildcard" name="wildcard" autocomplete="off"{% if 'wildcard' in form %} checked{% endif %}>
+                <label class="btn btn-outline-secondary" for="wildcard" title="Wildcard: resolve all names below this hostname too">
+                  <i class="bi bi-asterisk"></i><span class="visually-hidden">Wildcard</span>
+                </label>
               </div>
             </div>
 
@@ -128,6 +140,7 @@
                 <textarea class="form-control" id="description" name="description" rows="2" maxlength="255">{{ form.get('description', '') }}</textarea>
               </div>
             </div>
+
 
             <button class="btn btn-primary" type="submit">Add hostname</button>
             <a class="btn btn-secondary" href="{{ url_for('hosts.index') }}">Cancel</a>

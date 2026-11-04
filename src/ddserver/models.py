@@ -4,7 +4,7 @@
 import enum
 from datetime import datetime
 
-from sqlalchemy import Enum, ForeignKey, UniqueConstraint
+from sqlalchemy import Enum, ForeignKey, UniqueConstraint, false
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from ddserver.db import Base, UTCDateTime, utcnow
@@ -50,6 +50,8 @@ class Host(Base):
     description: Mapped[str | None]
     ipv4: Mapped[str | None]
     ipv6: Mapped[str | None]
+    # Also publish the addresses for `*.<name>.<zone>`.
+    wildcard: Mapped[bool] = mapped_column(default=False, server_default=false())
     # A host has to be published as long as these two differ.
     revision: Mapped[int] = mapped_column(default=1, server_default="1")
     published_revision: Mapped[int] = mapped_column(default=0, server_default="0")

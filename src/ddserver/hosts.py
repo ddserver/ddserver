@@ -94,6 +94,7 @@ def create_host(
     ipv4: str = "",
     ipv6: str = "",
     description: str = "",
+    wildcard: bool = False,
     config: HostsConfig = _DEFAULT_CONFIG,
     password_min_length: int = PasswordConfig.min_length,
 ) -> Host:
@@ -131,6 +132,7 @@ def create_host(
         ipv4=ipv4,
         ipv6=ipv6,
         description=description,
+        wildcard=wildcard,
         updated=utcnow() if ipv4 or ipv6 else None,
     )
     session.add(host)
@@ -143,20 +145,28 @@ def create_host(
     return host
 
 
-def update_host(host: Host, ipv4: str, ipv6: str, description: str) -> bool:
-    """Change `host`. Returns whether its addresses have changed."""
+def update_host(
+    host: Host, ipv4: str, ipv6: str, description: str, wildcard: bool
+) -> bool:
+    """Change `host`. Returns whether it has to be published."""
     ipv4 = normalize_ipv4(ipv4)
     ipv6 = normalize_ipv6(ipv6)
     host.description = normalize_description(description)
 
-    if (ipv4, ipv6) == (host.ipv4, host.ipv6):
-        return False
+    if (ipv4, ipv6) != (host.ipv4, host.ipv6):
+        host.ipv4 = ipv4
+        host.ipv6 = ipv6
+        host.wildcard = wildcard
+        record_address_change(host)
+        return True
 
-    host.ipv4 = ipv4
-    host.ipv6 = ipv6
-    record_address_change(host)
+    if wildcard != host.wildcard:
+        # Not an address change, so `updated` stays.
+        host.wildcard = wildcard
+        host.revision += 1
+        return True
 
-    return True
+    return False
 
 
 def record_address_change(host: Host) -> None:

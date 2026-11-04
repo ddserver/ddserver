@@ -59,6 +59,7 @@ def add_post():
             ipv4=form.get("ipv4", ""),
             ipv6=form.get("ipv6", ""),
             description=form.get("description", ""),
+            wildcard="wildcard" in form,
             config=_config(),
             password_min_length=_password_min_length(),
         )
@@ -86,11 +87,12 @@ def update(host_id: int):
     form = request.form
 
     try:
-        addresses_changed = hosts.update_host(
+        changed = hosts.update_host(
             host,
             form.get("ipv4", ""),
             form.get("ipv6", ""),
             form.get("description", ""),
+            "wildcard" in form,
         )
     except hosts.HostError as e:
         flash(f"{e}.", "danger")
@@ -98,7 +100,7 @@ def update(host_id: int):
 
     get_session().commit()
 
-    if addresses_changed:
+    if changed:
         dns.publish_host(get_session(), _dns_config(), host)
 
     flash("The hostname has been updated.", "success")

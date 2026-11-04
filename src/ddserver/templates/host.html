@@ -18,6 +18,10 @@
             <div class="input-group">
               <span class="input-group-text"><i class="bi bi-display"></i></span>
               <input class="form-control" type="text" id="hostname" value="{{ host.name }}.{{ host.zone.name }}" readonly>
+              <input class="btn-check" type="checkbox" id="wildcard" name="wildcard" autocomplete="off"{% if ('wildcard' in form if form else host.wildcard) %} checked{% endif %}>
+              <label class="btn btn-outline-secondary" for="wildcard" title="Wildcard: resolve all names below this hostname too">
+                <i class="bi bi-asterisk"></i><span class="visually-hidden">Wildcard</span>
+              </label>
             </div>
           </div>
 
@@ -44,6 +48,7 @@
               <textarea class="form-control" id="description" name="description" rows="2" maxlength="255">{{ form.get('description', host.description or '') }}</textarea>
             </div>
           </div>
+
 
           <button class="btn btn-primary" type="submit">Update</button>
           <a class="btn btn-secondary" href="{{ url_for('hosts.index') }}">Back</a>
