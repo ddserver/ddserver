@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <div class="row">
+    <div class="col-md-12"><h1>DNS status</h1></div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-12">
+      {% if not server %}
+        <div class="alert alert-info">
+          No DNS server is configured (<code>[dns] server</code>), so nothing is published.
+          Changes are kept, and published by the first sync once a server is configured.
+        </div>
+      {% elif not hosts and not deletions %}
+        <div class="alert alert-success">All changes have reached the DNS server.</div>
+      {% else %}
+        <p>
+          These changes have not reached the DNS server yet. They are retried by
+          <code>ddserver dns sync</code> (every 5 minutes with the systemd timer).
+          Details are in the log.
+        </p>
+      {% endif %}
+
+      {% if hosts or deletions %}
+        <table class="table table-striped table-hover">
+          <thead>
+            <tr>
+              <th>Hostname</th>
+              <th>Change</th>
+              <th>User</th>
+              <th>Since</th>
+              <th>Error</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for host in hosts %}
+              <tr>
+                <td>{{ host.name }}.{{ host.zone.name }}</td>
+                <td>
+                  {# never published: new, or imported from an older version #}
+                  {% if host.published_revision == 0 %}
+                    <span class="badge text-bg-success">Add</span>
+                  {% else %}
+                    <span class="badge text-bg-info">Update</span>
+                  {% endif %}
+                </td>
+                <td><a href="{{ url_for('admin.user_hosts', user_id=host.user_id) }}">{{ host.user.username }}</a></td>
+                <td>{{ (host.updated or host.created).strftime('%Y-%m-%d %H:%M') }}</td>
+                <td>
+                  {% if host.dns_error %}
+                    {{ host.dns_error }}
+                  {% else %}
+                    <span class="text-secondary">Not tried yet</span>
+                  {% endif %}
+                </td>
+              </tr>
+            {% endfor %}
+            {% for deletion in deletions %}
+              <tr>
+                <td>{{ deletion.fqdn }}</td>
+                <td><span class="badge text-bg-danger">Delete</span></td>
+                <td></td>
+                <td>{{ deletion.created.strftime('%Y-%m-%d %H:%M') }}</td>
+                <td></td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% endif %}
+    </div>
+  </div>
+{% endblock %}

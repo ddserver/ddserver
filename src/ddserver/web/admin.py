@@ -153,6 +153,31 @@ def set_host_limit(user_id: int):
     return redirect(url_for("admin.users"))
 
 
+@blueprint.get("/dns")
+@admin_required
+def dns_status():
+    db_session = get_session()
+
+    return render_template(
+        "dns.html",
+        server=_dns_config().server,
+        hosts=hosts.unpublished_hosts(db_session),
+        deletions=hosts.list_deletions(db_session),
+    )
+
+
+@blueprint.app_context_processor
+def dns_problems() -> dict[str, int]:
+    """Number of changes which have not reached DNS, for the menu of admins.
+
+    Without a DNS server, nothing is published, which is no problem then.
+    """
+    if not (g.get("user") and g.user.admin and _dns_config().server):
+        return {"dns_problems": 0}
+
+    return {"dns_problems": hosts.count_out_of_sync(get_session())}
+
+
 @blueprint.get("/zones")
 @admin_required
 def zones():

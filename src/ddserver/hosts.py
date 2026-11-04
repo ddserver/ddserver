@@ -231,6 +231,19 @@ def unpublished_hosts(session: Session) -> list[Host]:
     )
 
 
+def count_out_of_sync(session: Session) -> int:
+    """Return the number of hosts and deletions which have not reached DNS."""
+    hosts = select(func.count()).where(Host.revision != Host.published_revision)
+    deletions = select(func.count()).select_from(DnsDeletion)
+
+    return session.scalar(hosts) + session.scalar(deletions)
+
+
+def list_deletions(session: Session) -> list[DnsDeletion]:
+    """Return the pending deletions, oldest first (for display)."""
+    return list(session.scalars(select(DnsDeletion).order_by(DnsDeletion.created)))
+
+
 def pending_deletions(session: Session) -> list[HostName]:
     """Return the deleted hosts whose records may still be in DNS."""
     fqdns = session.scalars(select(DnsDeletion.fqdn))
