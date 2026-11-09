@@ -61,6 +61,9 @@
             <button class="btn btn-primary" type="submit">Login</button>
             <a class="ms-2" href="{{ url_for('auth.lostpass') }}">Lost your password?</a>
           </form>
+          {% if signup_open %}
+            <p class="mt-3 mb-0">No account yet? <a href="{{ url_for('signup.signup') }}">Sign up</a></p>
+          {% endif %}
         </div>
       {% else %}
         {% if current_ip %}

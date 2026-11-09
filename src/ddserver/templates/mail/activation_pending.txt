@@ -1,0 +1,12 @@
+Hello {{ username }},
+
+someone has tried to sign up at ddserver with this email address. There already
+is an account for this address, which has not been activated yet. Its username
+is {{ username }}.
+
+Please open this link within {{ days }} days to choose a password and activate
+this account:
+
+{{ url }}
+
+If this was not you, you can ignore this mail.

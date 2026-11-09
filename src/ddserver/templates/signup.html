@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <div class="row">
+    <div class="col-md-12"><h1>Sign up</h1></div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-8">
+      <p>
+        Choose a username and enter your email address. We will send you a mail with a
+        link to choose your password and activate your account.
+      </p>
+      {% if signup_domains %}
+        <p>
+          Sign-up is only possible with an email address from
+          {% for domain in signup_domains %}<strong>{{ domain }}</strong>{{ ", " if not loop.last }}{% endfor %}.
+        </p>
+      {% endif %}
+      <p>
+        The username is used to log in, and by your routers to update your hostnames.
+      </p>
+    </div>
+
+    <div class="col-md-4">
+      <div class="box">
+        <form action="{{ url_for('signup.signup_post') }}" method="post">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <div class="mb-3">
+            <label class="form-label" for="username">Username</label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-person"></i></span>
+              <input class="form-control" type="text" id="username" name="username"
+                     value="{{ username }}" maxlength="32" autocomplete="username" required>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="email">Email address</label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+              <input class="form-control" type="email" id="email" name="email"
+                     value="{{ email }}" autocomplete="email" required>
+            </div>
+          </div>
+          <a class="btn btn-secondary" href="{{ url_for('public.index') }}">Cancel</a>
+          <button class="btn btn-primary" type="submit">Sign up</button>
+        </form>
+      </div>
+    </div>
+  </div>
+{% endblock %}

@@ -7,7 +7,7 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 
 from ddserver import db
 from ddserver.config import Config
-from ddserver.web import account, admin, auth, hosts, nic, public
+from ddserver.web import account, admin, auth, hosts, nic, public, signup
 
 
 def create_app(config: Config) -> Flask:
@@ -25,11 +25,14 @@ def create_app(config: Config) -> Flask:
         n = config.web.proxies
         app.wsgi_app = ProxyFix(app.wsgi_app, x_for=n, x_proto=n, x_host=n)
 
-    # allow templates to access password_min_length
+    # config variables to be accessed in templates
     @app.context_processor
-    def password_min_length() -> dict[str, int]:
+    def template_settings() -> dict[str, int | bool]:
         config = app.extensions["ddserver.config"]
-        return {"password_min_length": config.passwords.min_length}
+        return {
+            "password_min_length": config.passwords.min_length,
+            "signup_open": config.signup.mode != "closed",
+        }
 
     CSRFProtect(app)
 
@@ -39,6 +42,7 @@ def create_app(config: Config) -> Flask:
 
     app.register_blueprint(public.blueprint)
     app.register_blueprint(auth.blueprint)
+    app.register_blueprint(signup.blueprint)
     app.register_blueprint(hosts.blueprint)
     app.register_blueprint(account.blueprint)
     app.register_blueprint(admin.blueprint)

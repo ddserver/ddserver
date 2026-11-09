@@ -1,0 +1,10 @@
+Hello {{ username }},
+
+someone has tried to sign up at ddserver with this email address.
+You already have an account, with the username {{ username }}.
+
+If you have forgotten your password, you can choose a new one here:
+
+{{ url }}
+
+If this was not you, you can ignore this mail.

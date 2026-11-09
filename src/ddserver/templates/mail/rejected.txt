@@ -1,0 +1,4 @@
+Hello {{ username }},
+
+your sign-up at ddserver has not been approved, and your request has been
+deleted.

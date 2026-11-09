@@ -19,7 +19,7 @@ from ddserver import zones as zone_management
 from ddserver.config import DnsConfig
 from ddserver.db import get_session
 from ddserver.models import Base, Host, User, UserStatus, Zone
-from ddserver.web.auth import admin_required, mail_url
+from ddserver.web.auth import admin_required, send_activation_mail
 
 blueprint = Blueprint("admin", __name__, url_prefix="/admin")
 
@@ -56,7 +56,7 @@ def add_user_post():
 
     db_session.commit()
 
-    if _send_activation_mail(user):
+    if send_activation_mail(user):
         flash(f"User {user.username} has been added.", "success")
     else:
         flash(
@@ -77,10 +77,63 @@ def resend_activation(user_id: int):
         flash(f"User {user.username} is already activated.", "danger")
         return redirect(url_for("admin.users"))
 
-    if _send_activation_mail(user):
+    if send_activation_mail(user):
         flash(f"The activation mail has been sent to {user.username}.", "success")
     else:
         flash("The activation mail could not be sent.", "danger")
+
+    return redirect(url_for("admin.users"))
+
+
+@blueprint.post("/users/<int:user_id>/approve")
+@admin_required
+def approve_user(user_id: int):
+    user = _get_or_404(User, user_id)
+
+    try:
+        user_management.approve(user)
+    except user_management.UserError as e:
+        flash(f"{e}.", "danger")
+        return redirect(url_for("admin.users"))
+
+    get_session().commit()
+
+    if send_activation_mail(user):
+        flash(f"User {user.username} has been approved.", "success")
+    else:
+        flash(
+            f"User {user.username} has been approved, "
+            "but the activation mail could not be sent.",
+            "warning",
+        )
+
+    return redirect(url_for("admin.users"))
+
+
+@blueprint.post("/users/<int:user_id>/reject")
+@admin_required
+def reject_user(user_id: int):
+    db_session = get_session()
+    user = _get_or_404(User, user_id)
+
+    # Only requests: an account which is in use is deleted, not rejected.
+    if user.status != UserStatus.APPROVAL:
+        flash(f"User {user.username} does not need an approval.", "danger")
+        return redirect(url_for("admin.users"))
+
+    username, email = user.username, user.email
+    user_management.delete_user(db_session, user)
+    db_session.commit()
+
+    config = current_app.extensions["ddserver.config"]
+    mail.send(
+        config.mail,
+        email,
+        "Your ddserver sign-up",
+        "rejected.txt",
+        username=username,
+    )
+    flash(f"The sign-up of {username} has been rejected.", "success")
 
     return redirect(url_for("admin.users"))
 
@@ -167,15 +220,26 @@ def dns_status():
 
 
 @blueprint.app_context_processor
-def dns_problems() -> dict[str, int]:
-    """Number of changes which have not reached DNS, for the menu of admins.
+def admin_badges() -> dict[str, int]:
+    """Numbers for the menu of admins: what needs their attention.
 
-    Without a DNS server, nothing is published, which is no problem then.
+    `dns_problems`: changes which have not reached DNS. Without a DNS server, nothing
+    is published, which is no problem then.
+    `awaiting_approval`: sign-ups which wait for an admin.
     """
-    if not (g.get("user") and g.user.admin and _dns_config().server):
-        return {"dns_problems": 0}
+    if not (g.get("user") and g.user.admin):
+        return {"dns_problems": 0, "awaiting_approval": 0}
 
-    return {"dns_problems": hosts.count_out_of_sync(get_session())}
+    db_session = get_session()
+    dns_problems = 0
+
+    if _dns_config().server:
+        dns_problems = hosts.count_out_of_sync(db_session)
+
+    return {
+        "dns_problems": dns_problems,
+        "awaiting_approval": user_management.count_awaiting_approval(db_session),
+    }
 
 
 @blueprint.get("/zones")
@@ -254,21 +318,6 @@ def delete_host(host_id: int):
     flash(f"Hostname {deleted} has been deleted.", "success")
 
     return redirect(back)
-
-
-def _send_activation_mail(user: User) -> bool:
-    config = current_app.extensions["ddserver.config"]
-    token = user_management.activation_token(config.web.secret_key, user)
-
-    return mail.send(
-        config.mail,
-        user.email,
-        "Activate your ddserver account",
-        "activation.txt",
-        username=user.username,
-        url=mail_url("auth.activate", token=token),
-        days=str(user_management.ACTIVATION_DAYS),
-    )
 
 
 def _dns_config() -> DnsConfig:

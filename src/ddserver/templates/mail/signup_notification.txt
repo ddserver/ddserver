@@ -1,0 +1,10 @@
+Hello,
+
+a new user has signed up at ddserver:
+
+Username: {{ username }}
+Email:    {{ email }}
+
+The user has been sent the activation mail. All users are listed here:
+
+{{ url }}

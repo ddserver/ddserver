@@ -68,8 +68,10 @@ def create_user(
     admin: bool = False,
 ) -> User:
     """Add a new, activated user."""
+    username, email = _check_available(session, username, email)
     user = User(
-        **_check_available(session, username, email),
+        username=username,
+        email=email,
         password=hash_password(password),
         admin=admin,
         status=UserStatus.ACTIVE,
@@ -79,15 +81,49 @@ def create_user(
     return user
 
 
-def create_invited_user(session: Session, username: str, email: str) -> User:
-    """Add a new user, who sets a password through the link in the activation mail."""
+def create_invited_user(
+    session: Session, username: str, email: str, approval: bool = False
+) -> User:
+    """Add a new user, who sets a password through the link in the activation mail.
+
+    With `approval`, an admin has to approve the user before that mail is sent.
+    """
+    username, email = _check_available(session, username, email)
     user = User(
-        **_check_available(session, username, email),
-        status=UserStatus.ACTIVATION,
+        username=username,
+        email=email,
+        status=UserStatus.APPROVAL if approval else UserStatus.ACTIVATION,
     )
     session.add(user)
 
     return user
+
+
+def approve(user: User) -> None:
+    """Approve a sign-up: the user can now be sent the activation mail."""
+    if user.status != UserStatus.APPROVAL:
+        raise UserError(f"User {user.username} does not need an approval")
+
+    user.status = UserStatus.ACTIVATION
+
+
+def list_admins(session: Session) -> list[User]:
+    """Return the active admins, e.g. to notify them."""
+    admins = select(User).where(User.admin, User.status == UserStatus.ACTIVE)
+
+    return list(session.scalars(admins))
+
+
+def count_awaiting_approval(session: Session) -> int:
+    """Return the number of sign-ups which wait for an admin."""
+    waiting = select(func.count()).where(User.status == UserStatus.APPROVAL)
+
+    return session.scalar(waiting)
+
+
+def get_user_by_email(session: Session, email: str) -> User | None:
+    """Return the user with the email address `email`, if there is one."""
+    return session.scalar(select(User).where(User.email == normalize_email(email)))
 
 
 def activation_token(secret_key: str, user: User) -> str:
@@ -269,18 +305,25 @@ def change_password(
     user.password = _hash_new_password(user, new_password, min_length)
 
 
-def _check_available(session: Session, username: str, email: str) -> dict[str, str]:
-    """Return `username` and `email` as they get stored, if nobody else has them."""
+def check_username_available(session: Session, username: str) -> str:
+    """Return `username` as it gets stored, raise `UserError` if it is taken."""
     username = normalize_username(username)
-    email = normalize_email(email)
 
     if session.scalar(select(User).where(User.username == username)):
         raise UserError(f"The username {username} is already taken")
 
+    return username
+
+
+def _check_available(session: Session, username: str, email: str) -> tuple[str, str]:
+    """Return `username` and `email` as they get stored, if nobody else has them."""
+    username = check_username_available(session, username)
+    email = normalize_email(email)
+
     if session.scalar(select(User).where(User.email == email)):
         raise UserError(f"The email address {email} is already in use")
 
-    return {"username": username, "email": email}
+    return username, email
 
 
 def _serializer(secret_key: str, purpose: str) -> URLSafeTimedSerializer:

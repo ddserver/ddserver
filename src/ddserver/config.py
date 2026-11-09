@@ -55,6 +55,26 @@ class PasswordConfig:
 
 
 @dataclass(frozen=True)
+class SignupConfig:
+    # Who can sign up: `open` (anyone), `restricted` (addresses from `domains`) or
+    # `closed` (admins add users).
+    mode: str = "closed"
+    # Mail domains for `restricted`, compared exactly (no subdomains).
+    domains: tuple[str, ...] = ()
+    # New accounts need the approval of an admin before the activation mail is sent.
+    approval: bool = False
+    # Mail all admins about each new sign-up.
+    notify_admins: bool = True
+
+    def __post_init__(self):
+        if self.mode not in ("open", "restricted", "closed"):
+            raise ConfigError("signup.mode: expected open, restricted or closed")
+
+        if self.mode == "restricted" and not self.domains:
+            raise ConfigError("signup.domains: required for mode restricted")
+
+
+@dataclass(frozen=True)
 class HostsConfig:
     # Names which users cannot register.
     reserved: tuple[str, ...] = ()
@@ -96,6 +116,7 @@ class Config:
     web: WebConfig
     database: DatabaseConfig
     passwords: PasswordConfig
+    signup: SignupConfig
     hosts: HostsConfig
     dns: DnsConfig
     mail: MailConfig

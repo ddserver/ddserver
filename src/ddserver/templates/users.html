@@ -48,6 +48,24 @@
               <td class="text-end">
                 {% if user.id == g.user.id %}
                   <span class="text-secondary">This is you</span>
+                {% elif user.status == 'approval' %}
+                  <form class="d-inline" action="{{ url_for('admin.approve_user', user_id=user.id) }}" method="post">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button class="btn btn-sm btn-primary" type="submit">Approve</button>
+                  </form>
+
+                  {% call confirm_button(
+                    id='reject-user-%d' % user.id,
+                    title='Reject this sign-up',
+                    action=url_for('admin.reject_user', user_id=user.id),
+                    button='Reject',
+                    small=true
+                  ) %}
+                    <p>Do you really want to reject this sign-up? The request is deleted, and
+                    the user gets a mail.</p>
+                    <p>Username: <strong>{{ user.username }}</strong><br>
+                    Email: <strong>{{ user.email }}</strong></p>
+                  {% endcall %}
                 {% else %}
                   {% if user.status == 'activation' %}
                     <form class="d-inline" action="{{ url_for('admin.resend_activation', user_id=user.id) }}" method="post">

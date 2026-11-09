@@ -1,0 +1,11 @@
+Hello,
+
+a new user has signed up at ddserver and waits for approval:
+
+Username: {{ username }}
+Email:    {{ email }}
+
+The user gets the activation mail once an admin has approved the account. Please
+approve or reject it here:
+
+{{ url }}

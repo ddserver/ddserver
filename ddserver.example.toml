@@ -34,6 +34,29 @@ base_url = "https://ddserver.example.org"
 # min_length = 10
 
 
+[signup]
+
+# Who can create an account: "open" (anyone, confirmed by an activation mail),
+# "restricted" (only addresses from the domains below) or "closed" (only admins
+# add users).
+#
+# mode = "closed"
+
+# Mail domains for mode "restricted". Only exact matches: "example.org" does not
+# allow addresses from "mail.example.org".
+#
+# domains = ["example.org"]
+
+# New accounts have to be approved by an admin, before they get the activation
+# mail. Rejected requests are deleted.
+#
+# approval = false
+
+# Mail all admins about each new sign-up.
+#
+# notify_admins = true
+
+
 [hosts]
 
 # Names which users cannot register, in any zone.

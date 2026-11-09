@@ -41,7 +41,11 @@
             </li>
             {% if g.user.admin %}
               <li class="nav-item">
-                <a class="nav-link" href="{{ url_for('admin.users') }}"><i class="bi bi-people"></i> Users</a>
+                <a class="nav-link" href="{{ url_for('admin.users') }}"><i class="bi bi-people"></i> Users
+                  {% if awaiting_approval %}
+                    <span class="badge rounded-pill text-bg-danger" title="Sign-ups waiting for approval">{{ awaiting_approval }}</span>
+                  {% endif %}
+                </a>
               </li>
               <li class="nav-item">
                 <a class="nav-link" href="{{ url_for('admin.zones') }}"><i class="bi bi-diagram-3"></i> Zones</a>

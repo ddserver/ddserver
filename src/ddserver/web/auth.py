@@ -48,6 +48,22 @@ def mail_url(endpoint: str, **values: str) -> str:
     return base_url.rstrip("/") + url_for(endpoint, **values)
 
 
+def send_activation_mail(user: User, template: str = "activation.txt") -> bool:
+    """Send the link to choose a password to a user who is not activated yet."""
+    config = current_app.extensions["ddserver.config"]
+    token = users.activation_token(config.web.secret_key, user)
+
+    return mail.send(
+        config.mail,
+        user.email,
+        "Activate your ddserver account",
+        template,
+        username=user.username,
+        url=mail_url("auth.activate", token=token),
+        days=str(users.ACTIVATION_DAYS),
+    )
+
+
 def login_required(view):
     """Send visitors who are not logged in to the start page."""
 
