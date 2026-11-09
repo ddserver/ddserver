@@ -75,6 +75,15 @@ class SignupConfig:
 
 
 @dataclass(frozen=True)
+class MotdConfig:
+    # HTML file shown on the start page, read on every request. Without one, or if
+    # the file is missing or empty, nothing is shown.
+    file: str = ""
+    # Show it to every visitor, not only to logged-in users.
+    public: bool = False
+
+
+@dataclass(frozen=True)
 class HostsConfig:
     # Names which users cannot register.
     reserved: tuple[str, ...] = ()
@@ -117,6 +126,7 @@ class Config:
     database: DatabaseConfig
     passwords: PasswordConfig
     signup: SignupConfig
+    motd: MotdConfig
     hosts: HostsConfig
     dns: DnsConfig
     mail: MailConfig

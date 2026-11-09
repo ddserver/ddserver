@@ -57,6 +57,18 @@ base_url = "https://ddserver.example.org"
 # notify_admins = true
 
 
+[motd]
+
+# Extra notification (motd) shown on the start page.
+# HTML is allowed in the file. To remove the text, delete the file.
+#
+# file = "/etc/ddserver/motd"
+
+# Show the text to every visitor, or only logged-in users.
+#
+# public = false
+
+
 [hosts]
 
 # Names which users cannot register, in any zone.
