@@ -1,0 +1,9 @@
+Hello {{ username }},
+
+you have asked to use this email address for your ddserver account.
+
+Please open this link within {{ hours }} hours to confirm it:
+
+{{ url }}
+
+If this was not you, you can ignore this mail. Nothing changes then.

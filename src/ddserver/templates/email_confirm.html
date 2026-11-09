@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <div class="row">
+    <div class="col-md-12"><h1>Confirm your new email address</h1></div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-8">
+      <p>Please confirm, to use this email address for your ddserver account from now on.</p>
+      <form action="{{ url_for('account.confirm_email_post') }}" method="post">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="hidden" name="token" value="{{ token }}">
+        <a class="btn btn-secondary" href="{{ url_for('public.index') }}">Cancel</a>
+        <button class="btn btn-primary" type="submit">Confirm</button>
+      </form>
+    </div>
+  </div>
+{% endblock %}

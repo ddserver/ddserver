@@ -1,0 +1,6 @@
+Hello {{ username }},
+
+the email address of your ddserver account has been changed to {{ email }}.
+Mails, also for a lost password, go to the new address from now on.
+
+If this was not you, please contact an administrator.

@@ -10,7 +10,6 @@
     <div class="col-md-4">
       <h3>Account information</h3>
       <p>
-        This is your username, email address and account creation date.<br>
         If you do not want to use your account anymore, click the "Delete account"
         button. This will immediately remove all your hostnames and user information
         from our system and can not be undone.
@@ -23,6 +22,17 @@
         Your login password should consist of upper- and lowercase characters, as
         well as numbers or special characters. The minimum password length is
         {{ password_min_length }} characters.
+      </p>
+    </div>
+
+    <div class="col-md-4">
+      <h3>Change your email address</h3>
+      <p>
+        We send a link to the new address. Your address changes once you follow it.
+        {% if signup_domains %}
+          The new address has to be from one of the following domains:
+          {% for domain in signup_domains %}<strong>{{ domain }}</strong>{{ ", " if not loop.last }}{% endfor %}.
+        {% endif %}
       </p>
     </div>
   </div>
@@ -100,6 +110,31 @@
             </div>
           </div>
           <button class="btn btn-primary" type="submit">Update password</button>
+        </form>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="box">
+        <form action="{{ url_for('account.change_email') }}" method="post">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <div class="mb-3">
+            <label class="form-label" for="new_email">New email address</label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+              <input class="form-control" type="email" id="new_email" name="email"
+                     autocomplete="email" required>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="email_password">Current password</label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-lock"></i></span>
+              <input class="form-control" type="password" id="email_password" name="current_password"
+                     autocomplete="current-password" required>
+            </div>
+          </div>
+          <button class="btn btn-primary" type="submit">Change email address</button>
         </form>
       </div>
     </div>

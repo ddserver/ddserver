@@ -15,6 +15,7 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from ddserver import hosts
+from ddserver.config import SignupConfig
 from ddserver.dns import HostName
 from ddserver.models import User, UserStatus
 from ddserver.passwords import (
@@ -31,6 +32,7 @@ HOST_LIMIT_PATTERN = re.compile(r"[0-9]{1,6}")
 
 ACTIVATION_DAYS = 7
 RESET_MINUTES = 60
+EMAIL_CHANGE_HOURS = 24
 
 
 class UserError(Exception):
@@ -303,6 +305,80 @@ def change_password(
         raise UserError("The current password is not correct")
 
     user.password = _hash_new_password(user, new_password, min_length)
+
+
+def email_domain_allowed(email: str, signup: SignupConfig) -> bool:
+    """Return whether `email` may be used by users (sign-up, change).
+
+    In `restricted` mode, the address must be from one of the domains listed
+    in the allow list.
+    """
+    if signup.mode != "restricted":
+        return True
+
+    domain = email.strip().rpartition("@")[2].lower()
+
+    return domain in {allowed.lower() for allowed in signup.domains}
+
+
+def request_email_change(
+    user: User, current_password: str, new_email: str, signup: SignupConfig
+) -> str:
+    """Check a new email address for `user`, and return it as it gets stored.
+
+    It is only stored once confirmed, see `email_change_token`. Whether another user
+    has the address is checked then, so that this does not tell.
+    """
+    if not verify_password(current_password, user.password):
+        raise UserError("The current password is not correct")
+
+    new_email = normalize_email(new_email)
+
+    if new_email == user.email:
+        raise UserError("This is your current email address")
+
+    if not email_domain_allowed(new_email, signup):
+        raise UserError("Please use an email address from one of the listed domains")
+
+    return new_email
+
+
+def email_change_token(secret_key: str, user: User, new_email: str) -> str:
+    """Return the signed token for the link which confirms `new_email`.
+
+    It holds the current address, so it stops working once the address has changed.
+    """
+    return _serializer(secret_key, "email-change").dumps([user.email, new_email])
+
+
+def change_email(session: Session, secret_key: str, token: str) -> tuple[User, str]:
+    """Store the new email address of a confirmation `token`.
+
+    Returns the user and the old address. Raises `UserError` if the token is not
+    valid, or the new address is taken by now.
+    """
+    try:
+        old_email, new_email = _serializer(secret_key, "email-change").loads(
+            token, max_age=EMAIL_CHANGE_HOURS * 60 * 60
+        )
+    except BadSignature:
+        raise UserError(
+            "This link is not valid, has already been used or has expired"
+        ) from None
+
+    user = session.scalar(
+        select(User).where(User.email == old_email, User.status == UserStatus.ACTIVE)
+    )
+
+    if user is None:
+        raise UserError("This link is not valid, has already been used or has expired")
+
+    if session.scalar(select(User).where(User.email == new_email)):
+        raise UserError(f"The email address {new_email} is already in use")
+
+    user.email = new_email
+
+    return user, old_email
 
 
 def check_username_available(session: Session, username: str) -> str:

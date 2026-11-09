@@ -42,7 +42,7 @@ def signup_post():
     username = request.form.get("username", "")
     email = request.form.get("email", "")
 
-    if not _domain_allowed(email):
+    if not users.email_domain_allowed(email, _config()):
         flash("Please use an email address from one of the listed domains.", "danger")
         return _render_form(username, email)
 
@@ -123,17 +123,6 @@ def _render_form(username: str = "", email: str = ""):
     return render_template(
         "signup.html", username=username, email=email, signup_domains=domains
     )
-
-
-def _domain_allowed(email: str) -> bool:
-    config = _config()
-
-    if config.mode != "restricted":
-        return True
-
-    domain = email.strip().rpartition("@")[2].lower()
-
-    return domain in {allowed.lower() for allowed in config.domains}
 
 
 def _send_to_existing_user(user: User) -> None:
