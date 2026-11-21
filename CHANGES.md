@@ -1,3 +1,37 @@
+1.0.0
+================
+
+Complete rewrite. 
+
+New features:
+
+* Publish to any DNS server by dynamic updates (RFC 2136) with TSIG; failed
+  updates are retried, admins see them on the DNS page
+* IPv6 addresses can be updated with the dyndns2 protocol, also together with IPv4
+* Optional wildcard per hostname
+* Sign-up modes: open, restricted to mail domains, closed; optional admin approval
+* Change of the email address, resend of activation mails
+* Start page text (motd) for everyone or for logged-in users only
+* Command line for users, zones, DNS and mail
+* SQLite by default, schema migrations with Alembic
+* Configuration in TOML
+* Example setup with gunicorn, Caddy and systemd
+
+Changes:
+
+* Python 3.12 or newer, Flask instead of Bottle, Bootstrap 5
+* Passwords hashed with Argon2; 0.3 hashes keep working and are rehashed on use
+* Update credentials only via HTTP Basic auth, no longer as URL parameters
+* `nohost` instead of `badauth` for unknown users, `badagent` for invalid
+  addresses
+* No more MySQL and PowerDNS remote backend
+
+Removed:
+
+* Yubikey OTP authentication
+* reCAPTCHA
+* Blocking of hostnames by admins (abuse)
+
 0.3
 ===
 
