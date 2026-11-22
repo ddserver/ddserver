@@ -65,15 +65,15 @@
       <p>
         To be able to resolve hostnames in the new zone, your DNS server must be
         authoritative for the zone you add here and accept dynamic updates from ddserver.
-        Please refer to the <a target="_blank" href="https://docs.ddserver.org">ddserver documentation</a>
+        Please refer to the <a target="_blank" href="https://github.com/ddserver/ddserver/blob/main/docs/dns.md">DNS server setup</a>
         for more information.
       </p>
 
       <h3>Important notes</h3>
       <p>
         Be aware that users are allowed to add any subdomain (i.e. <i>mail</i>) to the zone.
-        Please refer to the <a target="_blank" href="https://docs.ddserver.org">ddserver documentation</a>
-        to get information on how to restrict specific hostnames from being registered.
+        To keep specific hostnames from being registered, list them in
+        <code>[hosts] reserved</code> in the configuration file.
       </p>
       <p>
         Further, be aware that ddserver overwrites the DNS records of the hostnames

@@ -16,7 +16,6 @@ Features
 * Sign-up: open, restricted to mail domains, or closed; optional admin approval
 * Any DNS server with TSIG-signed dynamic updates; failed updates are retried
 * Command line for administration
-* Import from ddserver 0.3
 
 
 Documentation
