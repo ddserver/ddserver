@@ -17,7 +17,7 @@ from ddserver import mail, users
 from ddserver.config import SignupConfig
 from ddserver.db import get_session
 from ddserver.models import User, UserStatus
-from ddserver.web.auth import mail_url, send_activation_mail
+from ddserver.web.auth import honeypot_filled, mail_url, send_activation_mail
 
 blueprint = Blueprint("signup", __name__)
 
@@ -42,6 +42,12 @@ def signup_post():
     username = request.form.get("username", "")
     email = request.form.get("email", "")
 
+    # Spam protection.
+    # A bot gets the answer for a successful sign-up, but nothing is stored or sent.
+    if honeypot_filled():
+        _flash_signed_up()
+        return redirect(url_for("public.index"))
+
     if not users.email_domain_allowed(email, _config()):
         flash("Please use an email address from one of the listed domains.", "danger")
         return _render_form(username, email)
@@ -63,6 +69,12 @@ def signup_post():
 
     # The same answer for a known email address, as this must not reveal who has an
     # account. The mail tells the owner of the address what to do.
+    _flash_signed_up()
+
+    return redirect(url_for("public.index"))
+
+
+def _flash_signed_up() -> None:
     if _config().approval:
         flash(
             "Thank you for signing up. An admin will review your request, then you "
@@ -75,8 +87,6 @@ def signup_post():
             "to activate your account.",
             "success",
         )
-
-    return redirect(url_for("public.index"))
 
 
 def _sign_up(username: str, email: str) -> None:

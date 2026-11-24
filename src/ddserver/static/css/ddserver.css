@@ -104,6 +104,15 @@ a.btn {
   margin-bottom: 20px;
 }
 
+/* The honeypot field: out of sight, but not `display: none`. */
+.honeypot {
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
 /* A long IPv6 address has to wrap, to stay within its box. */
 .current-ip {
   font-size: 2em;

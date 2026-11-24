@@ -8,6 +8,7 @@ that user. The logged-in user of the current request is available as `g.user`.
 """
 
 import functools
+import logging
 
 from flask import (
     Blueprint,
@@ -27,7 +28,12 @@ from ddserver import mail, users
 from ddserver.db import get_session
 from ddserver.models import User, UserStatus
 
+log = logging.getLogger(__name__)
+
 blueprint = Blueprint("auth", __name__)
+
+# The name of the honeypot field in the forms which work without login.
+HONEYPOT_FIELD = "website"
 
 
 def log_in(user: User) -> None:
@@ -35,6 +41,19 @@ def log_in(user: User) -> None:
     session.clear()
     session["user_id"] = user.id
     session["fingerprint"] = users.password_fingerprint(user)
+
+
+def honeypot_filled() -> bool:
+    """Return whether the hidden honeypot field of the form was filled in.
+
+    Humans do not see the field, simple form bots fill in every field.
+    The caller answers as for a normal failure, so the bot learns nothing.
+    """
+    if not request.form.get(HONEYPOT_FIELD, ""):
+        return False
+
+    log.warning("honeypot filled in: %s from %s", request.path, request.remote_addr)
+    return True
 
 
 def mail_url(endpoint: str, **values: str) -> str:
@@ -124,11 +143,16 @@ def csrf_error(error: CSRFError):
 @blueprint.post("/login")
 def login():
     db_session = get_session()
-    user = users.authenticate(
-        db_session,
-        request.form.get("username", ""),
-        request.form.get("password", ""),
-    )
+    user = None
+
+    # Spam protection
+    # A bot gets the answer for a wrong password, without the cost of checking it.
+    if not honeypot_filled():
+        user = users.authenticate(
+            db_session,
+            request.form.get("username", ""),
+            request.form.get("password", ""),
+        )
 
     if user is None:
         flash("Wrong username or password.", "danger")
@@ -187,7 +211,11 @@ def lostpass():
 @blueprint.post("/lostpass")
 def lostpass_post():
     config = current_app.extensions["ddserver.config"]
-    user = users.find_user(get_session(), request.form.get("login", ""))
+    user = None
+
+    # Spam protection
+    if not honeypot_filled():
+        user = users.find_user(get_session(), request.form.get("login", ""))
 
     if user is not None and user.status == UserStatus.ACTIVE:
         token = users.reset_token(config.web.secret_key, user)

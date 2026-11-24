@@ -65,3 +65,15 @@
     </form>
   </div>
 {% endmacro %}
+
+{#
+  A field which humans do not see, to protect against simple form bots: they fill
+  in every field, and a filled-in field makes the request fail. Hidden by CSS, as
+  bots may skip fields with `type="hidden"` or `display: none`.
+#}
+{% macro honeypot() %}
+  <div class="honeypot" aria-hidden="true">
+    <label for="website">Website</label>
+    <input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
+  </div>
+{% endmacro %}
